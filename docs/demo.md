@@ -9,6 +9,32 @@ npm run dev:dashboard
 
 Ouvrir **http://127.0.0.1:3002**. Le dashboard est en HTML/CSS/JavaScript natif.
 
+## Démo de deux minutes
+
+Préparer les essais **avant** la présentation pour ne pas dépendre des délais Testnet : CSV / « Comparer deux façons de reprendre », puis Reçus / « L’application s’arrête ». Garder le runner ouvert : son historique local n’est pas rechargé après redémarrage. Vérifier que les rapports sont bien TESTNET et les exports disponibles. Ne jamais présenter une simulation comme une preuve réseau.
+
+| Temps | À montrer | À dire |
+| --- | --- | --- |
+| 0:00–0:20 | Les quatre étapes : application → panne → exécution → bilan | « Le client paie. L’application tombe en panne. Va-t-il recevoir son résultat, ou payer encore ? » |
+| 0:20–0:45 | Essai CSV comparatif, carte « Recommencer en payant » | « Ici, notre exemple naïf crée volontairement un second paiement. Le client reçoit son résultat, mais paie deux fois. Ce n’est pas une faille de Stellar. » |
+| 0:45–1:10 | Carte « Retrouver le même achat » | « Avec la reprise, l’achat existant est retrouvé : un seul règlement et le résultat confirmé. Voici le montant observé et le temps de reprise mesuré. » |
+| 1:10–1:35 | Essai Reçus après crash : paiement, résultat, délai | « Cette autre application utilise le même kit. Après redémarrage, elle retrouve également l’achat. Les deux applications sont aujourd’hui nos exemples ; l’adoption par une équipe externe reste à prouver. » |
+| 1:35–1:55 | Ouvrir « Vérifier les preuves Stellar et les mesures », un lien de transaction et l’export JSON | « Le bilan repose sur des transferts observés et un accusé du client logiciel. Les preuves sont consultables et exportables. » |
+| 1:55–2:00 | Revenir au bilan | « Notre prochaine validation : un développeur extérieur intègre le kit avec notre documentation. » |
+
+En cas de réseau indisponible, utiliser une campagne ARCHIVE en annonçant sa date et son caractère historique. Les campagnes regroupent plusieurs achats : ne pas comparer arbitrairement deux cartes comme si elles provenaient du même scénario. En dernier recours, utiliser la simulation en disant explicitement « ceci illustre le comportement, ce n’est pas une nouvelle exécution réelle ».
+
+## Parcours sans explication technique
+
+1. **Application** : choisir ce que le client achète. Le reçu JSON rémunère une génération, pas une facture.
+2. **Panne** : choisir une situation décrite en langage courant. La comparaison est proposée en premier.
+3. **Exécution** : simulation par défaut, ou Testnet explicitement choisi. Les contrôles sont bloqués pendant l’essai pour éviter les doubles lancements.
+4. **Bilan** : lire le paiement observé, la réception confirmée et le délai. Les preuves Stellar et la timeline sont dépliables, sans masquer les marqueurs de simulation ou d’archive.
+
+Un montant nul avec des preuves incomplètes est affiché « Non établi », jamais « le client n’a pas payé ». Sans accusé, afficher « Pas confirmé ». Une exécution terminée n’est pas nécessairement un achat réussi : le bilan traduit séparément PASS, FAIL, UNKNOWN et UNSUPPORTED. Le délai utilise la mesure client lorsqu’elle existe, sinon celle du serveur, avec son origine explicitement indiquée ; aucune durée fictive n’est inventée pour la simulation.
+
+Pour évaluer la compréhension, montrer un bilan à quelqu’un sans commentaire et lui demander : « Le client a-t-il payé ? A-t-il reçu son résultat ? Qu’a changé la reprise ? » Ce test utilisateur reste à organiser ; les vérifications techniques ne le remplacent pas.
+
 ## Parcours conseillé
 
 1. Choisir **CSV**, **TESTNET**, puis **Naïf vs durable**. Montrer les deux rapports : un paiement en mode durable, deux dans la fixture naïve.
@@ -48,6 +74,14 @@ Pour une reprise manuelle, redémarrer le facilitator et l'application concerné
 Les rapports locaux restent dans .local/runner/. Ils ne sont pas rechargés automatiquement dans l'historique au démarrage. Aucun renouvellement automatique d'autorisation après un état incertain.
 
 ## Vérifier
+
+Les vérifications de présentation (UNKNOWN, comparaison, simulation, archives, lancement et connexion indisponible) sont isolées dans le périmètre dashboard :
+
+```sh
+node --test apps/dashboard/presentation.test.mjs
+```
+
+Elles exécutent la logique avec un DOM minimal ; elles ne valident pas le rendu CSS dans un navigateur. Vérifier manuellement le parcours sur écran large et mobile, l’accès au clavier, le téléchargement et l’ouverture des détails avant la présentation.
 
 ```sh
 npm run typecheck

@@ -1,20 +1,22 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChaosPay — laboratoire de reprise</title><link rel="stylesheet" href="/style.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChaosPay — retrouver un achat après une panne</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-  <header><a class="brand" href="/">◈ ChaosPay <span>LAB</span></a><span class="network">● Stellar Testnet · local</span></header>
-  <main>
-    <section class="intro"><p class="eyebrow">PAYMENT RESILIENCE LAB</p><h1>Le paiement passe.<br><em>La réponse disparaît.</em></h1><p>Injectez une panne. Reprenez le même achat. Comparez les transferts réellement observés.</p></section>
-    <section class="panel controls" aria-label="Configurer une expérience">
-      <label>Scénario<select id="scenario"></select></label>
-      <label>Application<select id="application"><option value="csv">Conversion CSV</option><option value="receipt">API de reçus JSON</option></select></label>
-      <label>Source<select id="source"><option value="SIMULATED">SIMULATED · sans paiement</option><option value="TESTNET">TESTNET · exécution réelle</option></select></label>
-      <button id="launch">Lancer l’expérience →</button>
-      <p id="description"></p><p id="notice">Simulation : les transferts et verdicts sont fictifs.</p>
-      <p id="error" role="alert"></p>
-    </section>
-    <div class="workspace"><aside class="panel"><h2>Expériences</h2><div id="history"></div></aside>
-    <section id="detail" aria-live="polite"><div class="panel empty">Lancez une simulation ou sélectionnez une campagne historique.</div></section></div>
-    <footer>Un PASS exige un transfert attendu et un accusé applicatif. Une interruption reste inconnue sans preuve. La fixture naïve crée volontairement une nouvelle autorisation ; elle ne démontre pas une faille Stellar.</footer>
-  </main><script type="module" src="/app.js"></script>
+<header><a class="brand" href="/">◈ ChaosPay <span>LAB</span></a><span class="network">Stellar Testnet · argent de test</span></header>
+<main>
+  <section class="intro"><p class="eyebrow">UN ACHAT. UNE PANNE. ET APRÈS ?</p><h1>Payé ne veut pas dire <em>reçu.</em></h1><p>Découvrez ce qui arrive au client quand une application tombe en panne après son paiement.</p></section>
+  <section class="panel" aria-label="Préparer une expérience">
+    <div class="steps">
+      <label><span class="step">1 · APPLICATION</span><span>Quel service utilise le client ?</span><select id="application"><option value="csv">Convertir des données en fichier CSV</option><option value="receipt">Générer un reçu JSON</option></select><small id="application-description"></small></label>
+      <label><span class="step">2 · PANNE</span><span>Que se passe-t-il ?</span><select id="scenario"></select><small id="description"></small></label>
+      <div class="execution"><label><span class="step">3 · EXÉCUTION</span><span>Comment essayer ?</span><select id="source"><option value="SIMULATED">Simulation · aucun paiement</option><option value="TESTNET">Testnet · paiement de test réel</option></select></label><button id="launch" disabled>Voir ce qui arrive au client →</button></div>
+    </div>
+    <p id="notice" class="notice"></p><p id="error" role="alert"></p><p id="connection" role="status" class="muted"></p>
+  </section>
+  <div class="workspace">
+    <aside class="panel"><h2>Vos expériences</h2><p class="muted">Choisissez un essai ou une campagne enregistrée.</p><div id="history"></div></aside>
+    <section aria-labelledby="balance-title"><p class="step" id="balance-title">4 · BILAN POUR LE CLIENT</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="panel empty">Choisissez une application et une panne, puis lancez l’expérience. Aucun paiement réseau n’est effectué en simulation.</div></div></section>
+  </div>
+  <footer>Deux applications de démonstration utilisent le même kit. L’intégration par une équipe externe reste à valider. Un accusé confirme la réception par le client logiciel, pas la lecture par une personne.</footer>
+</main><script type="module" src="/app.js"></script>
 </body></html>
