@@ -128,5 +128,21 @@ app.use("/paid", paid.router);</code></pre>
 const V={home:document.getElementById("home"),demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};
 const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
+for(const code of document.querySelectorAll("#install pre > code")){
+  const button=document.createElement("button");
+  button.type="button";button.className="copy-code";button.setAttribute("aria-label","Copy code");button.title="Copy code";
+  button.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="11" height="11" rx="1.5"/><path d="M13 4V3.5A1.5 1.5 0 0 0 11.5 2h-8A1.5 1.5 0 0 0 2 3.5v8A1.5 1.5 0 0 0 3.5 13H4"/></svg><span class="sr-only">Copy code</span>';
+  button.addEventListener("click",async()=>{
+    try{
+      await navigator.clipboard.writeText(code.textContent);
+      button.classList.add("copied");button.setAttribute("aria-label","Copied");button.title="Copied";
+      setTimeout(()=>{button.classList.remove("copied");button.setAttribute("aria-label","Copy code");button.title="Copy code"},1400);
+    }catch{
+      button.classList.add("copy-failed");button.setAttribute("aria-label","Clipboard unavailable");button.title="Clipboard unavailable";
+      setTimeout(()=>{button.classList.remove("copy-failed");button.setAttribute("aria-label","Copy code");button.title="Copy code"},1800);
+    }
+  });
+  code.parentElement.append(button);
+}
 </script>
 </body></html>
