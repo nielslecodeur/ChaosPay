@@ -2,6 +2,8 @@ const $ = id => document.getElementById(id);
 let state = { scenarios: [], runs: [], busy: false }, selected, previous = '';
 const el = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
 const badge = text => el('span', text, `badge ${text}`);
+// Native XLM only in the MVP; preserve all seven decimal places without floating point conversion.
+const xlm = atomic => { const n = BigInt(atomic); return `${n / 10000000n},${(n % 10000000n).toString().padStart(7, '0')} XLM`; };
 function describe() {
   $('description').textContent = state.scenarios.find(s => s.id === $('scenario').value)?.description ?? '';
   $('notice').textContent = $('source').value === 'SIMULATED' ? 'Simulation : les transferts et verdicts sont fictifs.' : 'Exécution Testnet : configurez .env et arrêtez les serveurs manuels. Le runner démarre et arrête ses propres processus. La comparaison peut régler trois paiements de test.';
@@ -30,10 +32,14 @@ function render() {
     const card = el('article', undefined, 'panel report');
     card.append(badge(report.verdict), el('h3', report.mode === 'durable' ? 'Reprise durable' : 'Fixture naïve'), el('p', report.purchaseId));
     const metrics = el('div', undefined, 'metrics');
-    for (const [value, label] of [[report.transfers.length, 'Transferts'], [report.settledAmountAtomic, 'Montant atomique'], [report.expectedAmountAtomic, 'Prix atomique'], [report.responseRecovered ? 'Oui' : 'Non', 'Résultat accusé']]) {
+    const settlements = new Set(report.transfers.map(t => t.txHash).filter(Boolean)).size;
+    const duration = run.source === 'SIMULATED' ? 'Non mesuré' : Number.isFinite(report.recoveryDurationMs) ? `${(report.recoveryDurationMs / 1000).toFixed(3)} s` : 'Non mesuré';
+    for (const [value, label] of [[settlements, 'Règlements observés (transactions uniques)'], [xlm(report.settledAmountAtomic), 'Montant payé observé · hors frais'], [xlm(report.expectedAmountAtomic), 'Prix de l’achat'], [report.responseRecovered ? 'Oui' : 'Non', 'Résultat récupéré et accusé'], [duration, 'Délai de reprise']]) {
       const metric = el('div', undefined, 'metric'); metric.append(el('strong', String(value)), el('span', label)); metrics.append(metric);
     }
     card.append(metrics, el('p', report.reason));
+    card.append(el('p', `Unités atomiques : ${report.settledAmountAtomic} payées / ${report.expectedAmountAtomic} attendues. Le délai couvre la détection de l’interruption jusqu’à l’accusé du résultat, redémarrage inclus.`));
+    if (report.verdict === 'UNKNOWN') card.append(el('p', 'Observation incomplète : le montant observé ne permet pas de conclure à l’absence d’un paiement.'));
     for (const t of report.transfers) {
       const transfer = el('div', undefined, 'transfer');
       transfer.append(el('div', `Ledger ${t.ledger} · ${t.amountAtomic} unités`), el('div', `Actif : ${t.tokenContract}`), el('div', `De : ${t.from}`), el('div', `Vers : ${t.to}`));

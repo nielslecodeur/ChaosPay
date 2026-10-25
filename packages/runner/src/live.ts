@@ -9,6 +9,7 @@ import { config, secret, NETWORK, RPC_URL } from '../../../apps/demo-merchant/sr
 import { digest } from '../../evidence/src/index.js';
 import { event, publicReport, type Run } from './report.js';
 import { Processes } from './processes.js';
+import { RecoveryTimer } from './recovery.js';
 
 export async function execute(run: Run, processes: Processes) {
   const c = config();
@@ -28,6 +29,7 @@ export async function execute(run: Run, processes: Processes) {
   event(run, 'process', 'Facilitator et marchand prêts (processus locaux du runner).');
   for (const mode of run.scenario === 'comparison' ? ['durable', 'naive'] as const : ['durable'] as const) {
     const id = `runner-${randomUUID()}`;
+    const recovery = new RecoveryTimer();
     const path = `/purchases/${id}?mode=${mode}`;
     const body = JSON.stringify({ rows: [{ item: 'demo', amount: 42 }, { item: 'second', amount: 10 }] });
     async function authorize() {
@@ -53,6 +55,7 @@ export async function execute(run: Run, processes: Processes) {
       if (typeof result.csv !== 'string' || digest(result.csv) !== result.csvHash) throw new Error('CSV integrity mismatch');
       const ack = await request(`/purchases/${id}/ack?mode=${mode}`, { method: 'POST', headers, body: JSON.stringify({ csvHash: result.csvHash }) });
       if (!ack.ok) throw new Error('Acknowledgment failed');
+      recovery.acknowledged();
       event(run, 'delivery', `${id} : intégrité du CSV vérifiée, accusé reçu par le marchand.`);
     }
     if (run.scenario === 'concurrent') await Promise.all([send('none'), send('none')]);
@@ -60,6 +63,7 @@ export async function execute(run: Run, processes: Processes) {
     else {
       try { await send(run.scenario === 'crash' ? 'crash' : 'drop'); } catch (error) {
         if (!(error instanceof Error) || error.message !== 'Request interrupted') throw error;
+        recovery.interrupted();
       }
       if (run.scenario === 'crash') {
         await processes.stop('merchant');
@@ -74,7 +78,8 @@ export async function execute(run: Run, processes: Processes) {
     }
     const response = await request(`/reports/${id}?mode=${mode}`);
     if (!response.ok) throw new Error('Report unavailable');
-    run.reports.push(publicReport(await response.json()));
+    const report = publicReport(await response.json());
+    run.reports.push({ ...report, recoveryDurationMs: report.responseRecovered ? recovery.durationMs : null });
     event(run, 'evidence', `${id} : rapport de l’observateur reçu.`);
   }
 }

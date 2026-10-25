@@ -1,4 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*.ts", "../../scenarios/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "../../scenarios/**/*.ts", "tests/**/*.ts", "verify-testnet.ts"]
 }
