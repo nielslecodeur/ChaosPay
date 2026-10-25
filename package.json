@@ -17,7 +17,9 @@
     "verify:engine": "tsx --env-file=.env scripts/verify-engine.ts",
     "dev:dashboard": "tsx packages/runner/src/server.ts",
     "dev:receipt": "tsx --env-file=.env apps/receipt-api/src/server.ts",
-    "verify:dashboard": "node scripts/verify-dashboard.mjs"
+    "verify:dashboard": "node scripts/verify-dashboard.mjs",
+    "build:recovery": "npm run build --prefix packages/recovery",
+    "verify:integration": "tsx --env-file=.env scripts/verify-integration.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "16.4.1",

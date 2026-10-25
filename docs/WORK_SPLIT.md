@@ -43,3 +43,11 @@ Les IA accélèrent le développement ; les tests réseau et la relecture déter
 La branche feat/recovery-kit part de feat/runner-dashboard. Elle modifie le moteur, le runner et le dashboard pour intégrer les deux API et les nouveaux rapports. Intégrer cette branche avant de reprendre le travail B.
 
 Le cœur est dans packages/recovery/ ; apps/demo-merchant/ et apps/receipt-api/ utilisent le même adaptateur. Suite proposée pour B : présentation de la démo et vidéo ; pour A : essai chez une API externe et préparation d’un package distribuable. Voir ENGINE_API.md et RECOVERY_KIT.md.
+
+## Étape suivante : intégration A et UX B
+
+Base commune : feat/recovery-kit, commit 64bd455. A travaille sur feat/integration-a : paquet installable, montage dans une API existante et validation hors dépôt. Guide : INTEGRATION_A.md ; preuves : evidence/public/integration-a.json. La troisième API est écrite par notre équipe : le pilote externe reste à organiser.
+
+B crée sa propre branche depuis la base commune et travaille sur apps/dashboard/ et docs/demo.md : parcours application → panne → exécution → bilan, paiements observés/résultat/durée en premier, détails Stellar ensuite, puis démo de deux minutes. B peut utiliser les deux API existantes ; la troisième intégration n’est pas ajoutée au dashboard dans cette étape A.
+
+A ne modifie pas les fichiers du dashboard ou du runner. Ses seuls nouveaux scripts racine sont build:recovery et verify:integration ; conserver ces entrées lors de la fusion de package.json. Les champs et routes des deux API existantes restent compatibles. Toute évolution du contrat ou du runner doit être coordonnée.

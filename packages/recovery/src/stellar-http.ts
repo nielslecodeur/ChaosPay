@@ -13,9 +13,15 @@ export interface PaidService<I,O> {
   validate: (body: unknown) => I;
   produce: (input: I, context: { purchaseId: string; txHash: string; buyer: string }) => O | Promise<O>;
   legacyCsv?: boolean;
+  basePath?: string;
+  enableFaults?: boolean;
 }
-export async function createPaidService<I,O>(service: PaidService<I,O>) {
-  const c = config(), base = "http://127.0.0.1:" + service.port;
+export async function createPaidRouter<I,O>(service: PaidService<I,O>) {
+  const mount = service.basePath ?? "";
+  if (!Number.isInteger(service.port) || service.port < 1 || service.port > 65535) throw new Error("Invalid service port.");
+  if (mount && !/^\/(?:[a-zA-Z0-9_-]+)(?:\/[a-zA-Z0-9_-]+)*$/.test(mount)) throw new Error("Invalid basePath.");
+  if (!/^[a-zA-Z0-9_-]{1,60}$/.test(service.serviceId)) throw new Error("Invalid serviceId.");
+  const c = config(), base = "http://127.0.0.1:" + service.port + mount;
   const observer = new rpc.Server(RPC_URL);
   if ((await observer.getNetwork()).passphrase !== PASSPHRASE) throw new Error("Unexpected RPC network.");
   const resource = new x402ResourceServer(new HTTPFacilitatorClient({url:c.facilitatorUrl})).register(NETWORK,new ExactStellarScheme());
@@ -73,6 +79,7 @@ export async function createPaidService<I,O>(service: PaidService<I,O>) {
       const p=payload(req.get("PAYMENT-SIGNATURE"));
       if (p.resource?.url !== url) throw new RecoveryError(409,"Authorization belongs to another service or purchase.");
       const fault=req.get("X-Chaos-Fault")??"none";
+      if (fault !== "none" && !service.enableFaults) throw new RecoveryError(403,"Fault injection is disabled for this integration.");
       if (!faults.includes(fault as Fault)) throw new RecoveryError(400,"Unsupported fault.");
       const result=await kit.execute({purchaseId:id,mode:m,payload:p,input,fault:fault as Fault});
       if (result.status!=="READY") {res.status(202).json({purchaseId:id,...result});return;}
@@ -100,7 +107,13 @@ export async function createPaidService<I,O>(service: PaidService<I,O>) {
     res.status(status).json({error:e instanceof RecoveryError?e.message:"Operation interrupted; preserve the original authorization."});
   };
   app.use(errors);
-  const server=app.listen(service.port,"127.0.0.1",()=>console.log(service.serviceId+": "+base+" (Testnet)"));
-  server.once("close",()=>store.close());
+  return {router:app,close:()=>store.close()};
+}
+
+export async function createPaidService<I,O>(service: PaidService<I,O>) {
+  if (service.basePath) throw new Error("Use createPaidRouter to mount under basePath.");
+  const paid = await createPaidRouter({...service,enableFaults:service.enableFaults ?? true});
+  const server=paid.router.listen(service.port,"127.0.0.1",()=>console.log(service.serviceId+": http://127.0.0.1:"+service.port+" (Testnet)"));
+  server.once("close",paid.close);
   return server;
 }

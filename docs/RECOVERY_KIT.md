@@ -1,6 +1,6 @@
 # Kit de reprise
 
-Le kit source TypeScript est dans `packages/recovery/src/`. Il est intégré à deux applications : conversion JSON vers CSV et génération de reçus JSON. Il n'est pas encore publié sur npm.
+Le kit source TypeScript est dans `packages/recovery/src/`. Il est intégré à deux applications : conversion JSON vers CSV et génération de reçus JSON. Il n'est pas encore publié sur npm. Une archive installable et un routeur Express intégrable sont maintenant disponibles ; voir [INTEGRATION_A.md](INTEGRATION_A.md).
 
 ## Lancer la démonstration
 
@@ -74,4 +74,4 @@ Les bases CSV existantes sont migrées à l'ouverture : clés préfixées par cs
 
 ## Limites
 
-Testnet, actif XLM natif, services locaux, journal SQLite, hooks explicites et un facilitator de démonstration. Le kit a été extrait en source ; il reste à le versionner comme bibliothèque distribuable et à l'essayer chez une équipe externe. La signature de paiement protège l'autorisation Stellar ; l'association au service et au corps est contrôlée localement par le journal, ce qui ne constitue pas une liaison cryptographique générale des données métier.
+Testnet, actif XLM natif, services locaux, journal SQLite, hooks explicites et un facilitator de démonstration. Le kit peut être installé depuis une archive npm locale et a un consommateur isolé. Il reste à choisir sa licence, préparer sa publication et l'essayer chez une équipe externe. La signature de paiement protège l'autorisation Stellar ; l'association au service et au corps est contrôlée localement par le journal, ce qui ne constitue pas une liaison cryptographique générale des données métier.
