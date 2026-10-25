@@ -23,13 +23,13 @@ export async function execute(run: Run, processes: Processes) {
       event(run, 'http', `${path} → HTTP ${r.status}`);
       return r;
     } catch {
-      event(run, 'interruption', `${path} → réponse indisponible ; paiement à réconcilier.`);
+      event(run, 'interruption', `${path} → response unavailable; payment must be reconciled.`);
       throw new Error('Request interrupted');
     }
   };
   await processes.start('facilitator', c.facilitatorUrl);
   await processes.start('merchant', merchantUrl, application);
-  event(run, 'process', 'Facilitator et marchand prêts (processus locaux du runner).');
+  event(run, 'process', 'Facilitator and merchant ready (local runner processes).');
   for (const mode of run.scenario === 'comparison' ? ['durable', 'naive'] as const : ['durable'] as const) {
     const id = `runner-${randomUUID()}`;
     const recovery = new RecoveryTimer();
@@ -47,7 +47,7 @@ export async function execute(run: Run, processes: Processes) {
       // Save the original request alongside the authorization for manual recovery.
       writeFileSync('.local/request-' + mode + '-' + id + '.json', JSON.stringify({application,merchantUrl,path,body:JSON.parse(body)}), {mode:0o600});
       writeFileSync(`.local/client-${mode}-${id}.json`, JSON.stringify(payload), { mode: 0o600 });
-      event(run, 'authorization', `${id} : autorisation sauvegardée localement avant envoi.`);
+      event(run, 'authorization', `${id}: authorization saved locally before sending.`);
       return Buffer.from(JSON.stringify(payload)).toString('base64');
     }
     let signature = await authorize();
@@ -62,7 +62,7 @@ export async function execute(run: Run, processes: Processes) {
       const ack = await request(`/purchases/${id}/ack?mode=${mode}`, { method: 'POST', headers, body: JSON.stringify({ resultHash: result.resultHash }) });
       if (!ack.ok) throw new Error('Acknowledgment failed');
       recovery.acknowledged();
-      event(run, 'delivery', `${id} : intégrité du résultat vérifiée, accusé reçu par le marchand.`);
+      event(run, 'delivery', `${id}: result integrity verified, acknowledgment received by the merchant.`);
       return true;
     }
     if (run.scenario === 'concurrent') await Promise.all([send('none'), send('none')]);
@@ -75,7 +75,7 @@ export async function execute(run: Run, processes: Processes) {
       if (run.scenario === 'crash') {
         await processes.stop('merchant');
         await processes.start('merchant', merchantUrl, application);
-        event(run, 'process', 'Marchand redémarré ; journaux conservés.');
+        event(run, 'process', 'Merchant restarted; logs preserved.');
       }
       const checkpoint = await request('/reports/' + id + '?mode=' + mode);
       if (!checkpoint.ok) throw new Error('Checkpoint unavailable');
@@ -84,7 +84,7 @@ export async function execute(run: Run, processes: Processes) {
       run.checkpoints!.push(before);
       event(run,'checkpoint', 'Before recovery: ' + before.verdict);
       if (mode === 'naive') {
-        event(run, 'authorization', 'Fixture naïve : création volontaire d’une seconde autorisation.');
+        event(run, 'authorization', 'Naive fixture: deliberately creating a second authorization.');
         signature = await authorize();
       }
       let recovered = false;
@@ -98,6 +98,6 @@ export async function execute(run: Run, processes: Processes) {
     if (!response.ok) throw new Error('Report unavailable');
     const report = publicReport(await response.json());
     run.reports.push({ ...report, recoveryDurationMs: report.responseRecovered ? recovery.durationMs : null });
-    event(run, 'evidence', `${id} : rapport de l’observateur reçu.`);
+    event(run, 'evidence', `${id}: observer report received.`);
   }
 }
