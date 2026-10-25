@@ -35,6 +35,14 @@ if (existsSync(cache) && !fresh) {
   mkdirSync(".local",{ recursive: true });
   writeFileSync(cache,JSON.stringify(payload),{ mode: 0o600 });
 }
+const requestFile=".local/request-durable-"+id+".json";
+if(mode==="durable") {
+  const request={url,body};
+  if(existsSync(requestFile)) {
+    const saved=JSON.parse(readFileSync(requestFile,"utf8"));
+    if(digest(saved.body)!==digest(body) || (saved.url ?? new URL(saved.path,saved.merchantUrl).href)!==url) throw new Error("Saved request conflicts with this purchase.");
+  } else writeFileSync(requestFile,JSON.stringify(request),{mode:0o600});
+}
 try {
   async function send() {
     const response = await fetch(url, {

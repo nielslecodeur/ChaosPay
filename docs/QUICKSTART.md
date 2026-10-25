@@ -1,161 +1,160 @@
-# Installer ChaosPay dans une API indépendante
+# Installer le kit dans une API séparée
 
-Ce guide utilise une archive locale, Node 24 et PowerShell sous Windows. Aucune publication npm ni inscription n'est nécessaire. Le résultat visé : acheter une vérification de facture, perdre la réponse, puis récupérer le résultat avec le même paiement.
+Ce guide utilise `@chaospay/recovery@0.1.0` livré sous forme d’archive locale. Le nom npm n’est pas une publication : ne pas lancer `npm install @chaospay/recovery` depuis le registre. Le package reste `private` et `UNLICENSED` ; la licence et la publication restent à décider.
 
-L'application est un exemple de notre équipe. Son installation hors du dépôt démontre l'indépendance technique du paquet, pas une adoption par un client externe.
+Objectif : installer le kit hors du dépôt, conserver les routes d’une API de vérification de factures, puis vérifier la reprise d’un achat. L’exemple est écrit par notre équipe ; une installation isolée n’est pas une adoption par une équipe extérieure.
 
-## 1. Préparer l'archive et le réseau
+## 1. Prérequis et préparation
 
-Dans le dépôt ChaosPay à jour :
+Les commandes ci-dessous sont pour **PowerShell**, avec **Node 24** et npm. Vérifier `node --version`. Réseau nécessaire : registre npm, RPC Stellar Testnet et, pour la création des comptes, Friendbot/Horizon.
+
+Dans le dépôt ChaosPay :
 
 ```powershell
 npm ci
+# Seulement si le .env n’existe pas encore :
 npm run setup:testnet
 npm run check:connections
-New-Item -ItemType Directory -Force .local/packages
-npm pack ./packages/recovery --pack-destination .local/packages
-$sourceRoot = (Get-Location).Path
 ```
 
-Si .env existe déjà et que check:connections réussit, réutiliser cette configuration au lieu de recréer les comptes. Les XLM de Testnet n'ont pas de valeur réelle.
+Si `.env` existe, conserver ce fichier et passer directement au contrôle des connexions. Il contient les clés du client payeur et du facilitator. Ne pas le transmettre avec le package. Les paiements utilisent des XLM Testnet, sans valeur réelle.
 
-Le paquet est .local/packages/chaospay-recovery-0.1.0.tgz. npm pack compile automatiquement le JavaScript et les types. Les clés restent dans .env et ne sont pas incluses.
+## 2. Construire l’archive
 
-## 2. Créer un dossier vierge et installer
-
-Dans le même terminal :
+Toujours depuis le dépôt :
 
 ```powershell
-$consumerRoot = Join-Path $env:TEMP ("chaospay-guide-" + [guid]::NewGuid().ToString("N"))
-New-Item -ItemType Directory -Path $consumerRoot
-Set-Location $consumerRoot
-New-Item -ItemType Directory vendor
-Copy-Item -LiteralPath "$sourceRoot/.local/packages/chaospay-recovery-0.1.0.tgz" -Destination vendor
-npm init -y
-npm pkg set type=module
-npm install ./vendor/chaospay-recovery-0.1.0.tgz express@5.3.0 @x402/core@2.23.0 @x402/stellar@2.23.0 @stellar/stellar-sdk@16.4.1
-Copy-Item -LiteralPath "$sourceRoot/examples/invoice-check-api/server.mjs" -Destination .
-Copy-Item -LiteralPath "$sourceRoot/examples/invoice-check-api/domain.mjs" -Destination .
-Copy-Item -LiteralPath "$sourceRoot/docs/quickstart/client.mjs" -Destination .
-@(".env*", ".local/", "node_modules/", "vendor/") | Set-Content .gitignore
+$taskRepo = (Get-Location).Path
+npm run build:recovery
+New-Item -ItemType Directory -Force .local/packages | Out-Null
+npm pack ./packages/recovery --pack-destination .local/packages --json
 ```
 
-Les deux premiers fichiers contiennent seulement l'API consommatrice et son traitement métier ; le marchand de démonstration n'est pas copié. Les imports du serveur passent par @chaospay/recovery/stellar-http. Les dépendances x402 supplémentaires servent au client de démonstration.
+Résultat attendu : `.local/packages/chaospay-recovery-0.1.0.tgz`. Examiner la liste retournée par npm : seuls `dist/`, `README.md` et `package.json` doivent être présents. Les déclarations TypeScript sont incluses ; ni `.env`, ni SQLite, ni application marchande ne doivent entrer dans l’archive.
 
-Noter les chemins $sourceRoot et $consumerRoot : les variables ne sont pas partagées entre les terminaux.
+## 3. Installer dans un dossier vierge
 
-## 3. Configurer les rôles
+Dans **le même terminal**, pour conserver `$taskRepo` :
 
-Créer deux fichiers UTF-8 dans le dossier indépendant en remplaçant les valeurs indiquées.
-
-.env.merchant :
-
-```dotenv
-MERCHANT_ADDRESS=ADRESSE_PUBLIQUE_DU_MARCHAND
-PAYMENT_AMOUNT_ATOMIC=100000
-FACILITATOR_URL=http://127.0.0.1:4022
-CHAOSPAY_ENABLE_FAULTS=1
+```powershell
+$consumerB = Join-Path ([System.IO.Path]::GetTempPath()) ('chaospay-guide-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $consumerB | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $taskRepo 'examples/invoice-check-api') -File |
+  Copy-Item -Destination $consumerB
+New-Item -ItemType Directory -Path (Join-Path $consumerB 'vendor') | Out-Null
+Copy-Item -LiteralPath (Join-Path $taskRepo '.local/packages/chaospay-recovery-0.1.0.tgz') -Destination (Join-Path $consumerB 'vendor')
+Set-Location $consumerB
+npm install --ignore-scripts --no-audit --no-fund
+npm test
+npm run typecheck
+node --input-type=module -e "console.log(import.meta.resolve('@chaospay/recovery'))"
 ```
 
-.env.client :
+Les tests métier et TypeScript doivent passer. La dernière commande doit afficher un chemin dans **le `node_modules` du nouveau dossier**, pas dans le dépôt ChaosPay. Le `package.json` de l’exemple installe l’archive depuis `vendor/`.
 
-```dotenv
-MERCHANT_ADDRESS=LA_MEME_ADRESSE_PUBLIQUE
-PAYMENT_AMOUNT_ATOMIC=100000
-BUYER_SECRET=CLE_SECRETE_DU_COMPTE_PAYEUR_TESTNET
-```
-
-Utiliser MERCHANT_ADDRESS et BUYER_SECRET générés dans le .env du dépôt. Si le prix a été personnalisé, utiliser exactement le même montant dans les deux fichiers et dans le facilitator.
-
-Ne pas copier la clé du payeur dans le fichier marchand. Le client signe ; le marchand reçoit une autorisation. Les fichiers .env et .local ne doivent pas être publiés.
-
-Le paramètre CHAOSPAY_ENABLE_FAULTS active les pannes uniquement pour cet essai local. Sans ce paramètre, une requête demandant une panne est rejetée avec HTTP 403.
+Le code métier est `domain.mjs`. L’intégration est dans `server.mjs` : import de `createPaidRouter` depuis `@chaospay/recovery/stellar-http`, montage sous `/paid`, et transmission de `validateInvoice` et `checkInvoice`. Aucun fichier du marchand CSV n’est copié.
 
 ## 4. Démarrer les services
 
-**Terminal 1, dans le dépôt ChaosPay :**
+Dans un **second terminal**, revenir au dépôt ChaosPay et lancer :
 
 ```powershell
 npm run dev:facilitator
 ```
 
-**Terminal 2, dans le dossier indépendant :**
+Le package utilise encore le facilitator de démonstration ChaosPay, avec ses reçus durables. L’application consommatrice est isolée, mais l’ensemble n’est pas autonome vis-à-vis de ce service. Aucun remplacement par un facilitator arbitraire n’est validé.
+
+Dans le premier terminal, toujours dans `$consumerB`, créer une configuration contenant uniquement les valeurs publiques :
 
 ```powershell
-node --env-file=.env.merchant server.mjs
+Get-Content -LiteralPath (Join-Path $taskRepo '.env') |
+  Where-Object { $_ -match '^(MERCHANT_ADDRESS|FACILITATOR_URL|PAYMENT_AMOUNT_ATOMIC|TOKEN_CONTRACT)=' } |
+  Set-Content -LiteralPath .env.public -Encoding ascii
+node --env-file=.env.public server.mjs
 ```
 
-L'API écoute sur http://127.0.0.1:3004. /catalog reste une route métier ordinaire ; /paid contient les routes de paiement et de reprise.
+L’API doit annoncer `http://127.0.0.1:3004`. Elle n’a pas besoin des clés privées du client ou du facilitator. Les hooks de panne restent désactivés par défaut.
 
-Le facilitator doit rester disponible. Cette version dépend de ses reçus durables ; installer le paquet ne suffit pas à remplacer ce composant.
-
-## 5. Effectuer le premier achat
-
-**Terminal 3, dans le dossier indépendant :**
+Dans un troisième terminal :
 
 ```powershell
-$purchase = "normal-" + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-node --env-file=.env.client client.mjs $purchase none
+Invoke-RestMethod http://127.0.0.1:3004/catalog
+Invoke-RestMethod http://127.0.0.1:3004/paid/health
 ```
 
-Le client demande le prix, vérifie le réseau, le bénéficiaire, l'actif et le montant, sauvegarde une autorisation, paie, vérifie le résultat et accuse sa réception.
+Attendu : le catalogue existant reste disponible et la route payante indique `serviceId: invoice-check`, réseau Testnet et prix atomique.
 
-Résultat attendu : PASS, une transaction et un total calculé de 2500 unités monétaires de facture. Ce montant de facture est distinct du prix du service, ici 100000 unités atomiques de XLM Testnet (0,01 XLM).
+## 5. Comprendre le branchement dans sa propre API
 
-La sortie affiche le résultat et le hash de transaction, jamais la clé ou l'autorisation. Le rapport est conservé dans .local/report-<identifiant>.json.
+La même intégration s’applique à un traitement existant :
 
-## 6. Perdre la réponse et reprendre le même achat
+```javascript
+import express from 'express';
+import { createPaidRouter } from '@chaospay/recovery/stellar-http';
 
-Dans le terminal 3 :
+const app = express();
+app.get('/catalog', (_, res) => res.json({ services: ['text-length'] }));
+const paid = await createPaidRouter({
+  serviceId: 'text-length',
+  port: 3004,
+  basePath: '/paid',
+  databasePath: '.local/purchases.sqlite',
+  description: 'Compter les caractères d’un texte',
+  validate: body => {
+    if (typeof body?.text !== 'string') throw new Error('Texte requis');
+    return body.text;
+  },
+  produce: text => ({ length: text.length }),
+});
+app.use('/paid', paid.router);
+const server = app.listen(3004, '127.0.0.1');
+server.once('close', paid.close);
+```
+
+Utiliser un fichier `.mjs` ou un projet ESM. Le service, le port et le préfixe doivent être stables et correspondre à l’URL réellement appelée. L’adaptateur actuel ne prend en charge que HTTP local et Stellar Testnet.
+
+`validate` rejette une entrée invalide avant paiement. `produce` calcule un résultat JSON déterministe. Cette fonction peut être rappelée après un crash : ne pas y déclencher un email, une livraison ou une autre action externe sans protection propre contre les doublons.
+
+## 6. Premier achat et reprise : responsabilité du client
+
+Un HTTP 402 est un prix proposé, **pas un paiement réussi**. Les routes de l’exemple sont :
+
+| Action | Route |
+| --- | --- |
+| Demander puis payer | `POST /paid/purchases/:id?mode=durable` |
+| Confirmer la réception | `POST /paid/purchases/:id/ack?mode=durable` |
+| Lire le bilan | `GET /paid/reports/:id?mode=durable` |
+
+Le client sauvegarde le corps, l’URL, l’identifiant et l’autorisation signée **avant** l’envoi. Après interruption ou HTTP 202, il réutilise exactement ces données, sans créer une nouvelle autorisation. Il vérifie `SHA-256(JSON.stringify(result)) === resultHash`, puis accuse réception avec `{ "resultHash": "…" }` et le `PAYMENT-SIGNATURE` original.
+
+Il n’existe pas encore de package client autonome. Pour un premier achat reproductible, utiliser la campagne ci-dessous. `smoke:payment` et les deux choix du dashboard ciblent les exemples historiques : ils ne constituent pas un client générique pour cette troisième API.
+
+## 7. Valider les paiements et les pannes
+
+Arrêter avec Ctrl+C les deux services manuels sur **3004 et 4022**, puis revenir au dépôt :
 
 ```powershell
-$purchase = "drop-" + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-node --env-file=.env.client client.mjs $purchase drop
-node --env-file=.env.client client.mjs $purchase none
+Set-Location $taskRepo
+npm run verify:integration
 ```
 
-Le premier appel se termine volontairement avec le code 2 et un message de réponse indisponible. Le second affiche « Original authorization reused », puis PASS et une seule transaction.
+Cette commande crée **un autre dossier vierge**, installe l’archive et gère ses propres serveurs. Elle effectue quatre achats Testnet : sans panne, réponse perdue, crash et confirmation inaccessible. Elle vérifie le contenu du résultat, les conflits sur entrée modifiée, l’accusé, UNKNOWN avant reprise et un seul règlement par achat.
 
-Ne pas changer $purchase entre les deux appels. Ne pas supprimer .local/client-<identifiant>.json. Un nouvel identifiant représente un nouvel achat et peut entraîner un nouveau paiement.
+Attendu : quatre lignes PASS et `evidence/public/integration-a.json`. Les autorisations privées restent dans `.local/integration-authorizations/`. Le chemin du journal consommateur est affiché à la fin : conserver ce dossier et les journaux du facilitator. Ne pas supprimer ni recréer les clés pour « réparer » une interruption.
 
-## 7. Tester les autres pannes
+Pour une panne manuelle, activer `CHAOSPAY_ENABLE_FAULTS=1` avant de lancer l’exemple. Un hook désactivé retourne 403 : c’est une protection attendue. Ne jamais exposer ce laboratoire sur Internet.
 
-**Crash :** lancer le client avec un nouvel identifiant et crash. Le terminal 2 s'arrête avec le code 86. Redémarrer exactement le même serveur, depuis le même dossier et avec le même journal, puis relancer le même identifiant avec none.
-
-**Confirmation inaccessible :** lancer avec un nouvel identifiant et confirmation-lost. Le client retourne UNKNOWN avec le code 2. Attendre quelques secondes puis reprendre le même identifiant avec none. Si HTTP 202 persiste, attendre et répéter ; ne pas recréer d'autorisation.
-
-Pour consulter l'état avant reprise :
-
-```powershell
-Invoke-RestMethod "http://127.0.0.1:3004/paid/reports/$purchase"
-```
-
-UNKNOWN indique une preuve ou un accusé manquant. Cela ne prouve pas l'absence de paiement.
-
-## 8. Brancher votre propre traitement
-
-Dans server.mjs, createPaidRouter reçoit validate et produce importés depuis domain.mjs. Remplacer ces deux fonctions par la validation et le traitement de votre service. Conserver un serviceId stable et un databasePath durable ; adapter port et basePath au montage réel.
-
-produce doit retourner une valeur JSON et pouvoir être rappelé sans dommage. Un crash avant sauvegarde peut répéter cette fonction : emails, livraisons et autres effets externes demandent leur propre idempotence.
-
-Le kit conserve le paiement et le résultat, mais ne garantit pas la résolution automatique de toute interruption. Une soumission incertaine sans reçu peut rester UNKNOWN.
-
-## Dépannage
+## En cas de blocage
 
 | Symptôme | Vérification |
 | --- | --- |
-| Module introuvable | Installer l'archive depuis le dossier indépendant ; vérifier son nom et type=module. |
-| Échec au démarrage | Node 24, paramètres publics valides et facilitator actif sur 4022. |
-| Port occupé | Arrêter les autres serveurs manuels sur 3004 ; ne pas lancer la campagne automatique en parallèle. |
-| HTTP 403 | Activer les hooks pour cet essai, puis redémarrer le serveur. |
-| HTTP 409 | Reprendre avec le même contenu, identifiant et fichier d'autorisation. |
-| Code 2 / UNKNOWN | Préserver les fichiers, attendre ou redémarrer le serveur selon la panne, puis réessayer le même achat. |
-| Solde insuffisant / réseau réinitialisé | Revoir la configuration Testnet ; ne pas effacer les preuves pour masquer l'état d'un ancien achat. |
+| Package introuvable | Installer le `.tgz` local ; compiler avant `npm pack`. |
+| Erreur de syntaxe import / SQLite indisponible | Node 24, fichier `.mjs` ou projet ESM. |
+| L’API ne démarre pas | Vérifier le facilitator, le RPC et `MERCHANT_ADDRESS`. L’initialisation les contacte. |
+| Port occupé | Arrêter les serveurs manuels avant la campagne. Ne pas tuer un processus inconnu. |
+| HTTP 402 | Étape normale du protocole ; il manque encore le paiement signé. |
+| HTTP 409 | Identifiant réutilisé avec un autre corps, une autre autorisation ou ressource. Conserver l’achat original. |
+| HTTP 202 / UNKNOWN | Attendre et réconcilier avec l’autorisation originale ; ne pas conclure « non payé ». |
+| Aucun reçu après interruption de soumission | Intervention manuelle parfois nécessaire ; aucune reprise automatique universelle promise. |
 
-## Validation et limites
-
-[Retours de répétition du guide](QUICKSTART_REVIEW.md) décrit l'essai effectué par l'agent dans un dossier vierge. Cela ne remplace pas un essai autonome par un autre développeur.
-
-Les quatre scénarios de référence A sont visibles comme archives dans le dashboard. Ils ne déclenchent pas une nouvelle exécution. La troisième API n'est pas ajoutée au sélecteur interactif.
-
-Le client fourni est un script pédagogique pour ce guide ; aucun package client pour agents n'est distribué. La publication npm, la licence et la disponibilité du nom restent des décisions ultérieures.
+Le bilan prouve des transferts observés et un accusé logiciel. Il ne prouve pas la lecture humaine, ni l’exécution unique de tout effet métier. Voir [contrat A](INTEGRATION_A.md), [kit et limites](RECOVERY_KIT.md) et [retour d’essai B](INTEGRATION_REVIEW_B.md).

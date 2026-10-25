@@ -38,26 +38,32 @@ async function mount(current, options = {}) {
 test('UNKNOWN with no transfer never claims no payment or successful receipt', async () => {
   const { nodes } = await mount(run({ reports: [report({ verdict: 'UNKNOWN', settledAmountAtomic: '0', responseRecovered: false, transfers: [], recoveryMs: null })] }));
   const text = nodes.get('detail').text;
-  assert.match(text, /Achat encore incertain/); assert.match(text, /Non établi/); assert.match(text, /Pas confirmé/); assert.match(text, /Non mesuré/);
-  assert.doesNotMatch(text, /Achat réussi/);
+  assert.match(text, /Purchase unresolved/); assert.match(text, /Not established/); assert.match(text, /Not confirmed/); assert.match(text, /Not measured/);
+  assert.doesNotMatch(text, /Purchase succeeded/);
 });
 test('comparison shows overpayment first and distinguishes receipt from success', async () => {
   const { nodes } = await mount(run({ reports: [report(), report({ mode: 'naive', verdict: 'FAIL', settledAmountAtomic: '200000', transfers: [report().transfers[0], { ...report().transfers[0], txHash: 'b'.repeat(64) }] })] }));
   const text = nodes.get('detail').text;
-  assert.ok(text.indexOf('Recommencer en payant') < text.indexOf('Retrouver le même achat'));
-  assert.match(text, /0,0200000 XLM/); assert.match(text, /Le client a payé trop/); assert.match(text, /deux achats/);
+  assert.ok(text.indexOf('Pay again on retry') < text.indexOf('Recover the same purchase'));
+  assert.match(text, /0\.0200000 XLM/); assert.match(text, /Customer overpaid/); assert.match(text, /two separate demo purchases/);
 });
 test('simulation remains fictitious and never displays a measured duration or explorer link', async () => {
   const { nodes } = await mount(run({ source: 'SIMULATED' }));
   const text = nodes.get('detail').text;
-  assert.match(text, /SIMULATION/); assert.match(text, /Paiement fictif/); assert.match(text, /Non mesuré/);
-  assert.doesNotMatch(text, /Ouvrir la transaction/);
+  assert.match(text, /SIMULATION/); assert.match(text, /Fictional payment/); assert.match(text, /Not measured/);
+  assert.doesNotMatch(text, /Open transaction/);
 });
 test('archive identifies historical provenance and uses the server duration explicitly', async () => {
   const { nodes } = await mount(run({ source: 'ARCHIVE', application: undefined, reports: [report({ serviceId: 'receipt' })] }));
-  assert.match(nodes.get('detail').text, /Génération de reçus/);
-  assert.match(nodes.get('detail').text, /sans nouvelle vérification/);
-  assert.match(nodes.get('detail').text, /enregistrée par le serveur/);
+  assert.match(nodes.get('detail').text, /Receipt generation/);
+  assert.match(nodes.get('detail').text, /no new network verification/);
+  assert.match(nodes.get('detail').text, /Since the server recorded the interruption/);
+});
+test('package integration archive identifies the third API without claiming an external pilot', async () => {
+  const { nodes } = await mount(run({ source: 'ARCHIVE', application: undefined, reports: [report({ serviceId: 'invoice-check' })] }));
+  assert.match(nodes.get('detail').text, /Independent package integration/);
+  assert.match(nodes.get('detail').text, /not been piloted by an external customer/);
+  assert.match(nodes.get('detail').text, /campaign runs separately/);
 });
 test('launch preserves the existing runner contract and selected application', async () => {
   const { nodes, calls } = await mount(run({ source: 'SIMULATED' }));
@@ -69,15 +75,23 @@ test('launch preserves the existing runner contract and selected application', a
 test('busy and disconnected states disable launching another run', async () => {
   const busy = await mount(run(), { busy: true }); assert.equal(busy.nodes.get('launch').disabled, true);
   const offline = await mount(run(), { offline: true }); assert.equal(offline.nodes.get('launch').disabled, true);
-  assert.match(offline.nodes.get('connection').text, /Connexion au laboratoire interrompue/);
+  assert.match(offline.nodes.get('connection').text, /Connection to the lab lost/);
 });
 
-test('isolated package archive shows provenance, authorization and before/after without live claims', async () => {
+test('installation page links to GitHub and both platform installers', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  assert.match(html, /https:\/\/github\.com\/nielslecodeur\/Lumaid/);
+  assert.match(html, /blob\/main\/install\.ps1/);
+  assert.match(html, /blob\/main\/install\.sh/);
+  assert.match(html, /id="inst-downloads"/);
+});
+
+test('isolated package archive shows provenance and before/after without live claims', async () => {
  const current=run({source:'ARCHIVE',scenario:'drop',application:undefined,reports:[report({serviceId:'invoice-check'})],checkpoints:[report({verdict:'UNKNOWN',responseRecovered:false})],integrationEvidence:{package:'@chaospay/recovery@0.1.0',archiveSha256:'a'.repeat(64),authorizationCount:1,originalAuthorizationReused:true}});
  const {nodes}=await mount(current);
  const text=nodes.get('detail').text;
- assert.match(text,/Vérification de facture/); assert.match(text,/1 autorisation/);
- assert.match(text,/même autorisation réutilisée : oui/); assert.match(text,/état inconnu/);
- assert.match(text,/hors du dépôt/); assert.match(text,/aucun pilote client externe/);
- assert.match(text,/sans nouvelle vérification/);
+ assert.match(text,/Invoice check · installed package/); assert.match(text,/1 observed settlement/);
+ assert.match(text,/Before recovery: unknown status/); assert.match(text,/outside the repository/);
+ assert.match(text,/has not been piloted by an external customer/);
+ assert.match(text,/no new network verification/);
 });

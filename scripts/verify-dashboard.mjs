@@ -13,7 +13,7 @@ try {
     if(await fetch(url+'/api/state').then(r=>r.ok,()=>false)) break;
     await delay(500);
   }
-  const page=await fetch(url).then(r=>r.text()); assert.ok(page.includes('ChaosPay'));
+  const page=await fetch(url).then(r=>r.text()); assert.ok(page.includes('Lumaid'));
   const state=await fetch(url+'/api/state').then(r=>r.json());
   const wanted=process.argv.slice(2);
   const ids=wanted.length?wanted:state.scenarios.map(s=>s.id);

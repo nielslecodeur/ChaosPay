@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { isScenario, scenarios } from '../../../scenarios/index.js';
 import { simulate } from './fixture.js';
-import { event, publicReport, type Run } from './report.js';
+import { event, type Run } from './report.js';
 import { archiveRuns } from './archives.js';
 import { Processes } from './processes.js';
 
@@ -32,21 +32,21 @@ function save(run: Run) {
 if (existsSync('evidence/public')) for (const name of readdirSync('evidence/public').filter(n => n.endsWith('.json'))) {
   try {
     const data = JSON.parse(readFileSync(resolve('evidence/public', name), 'utf8'));
-    for (const run of archiveRuns(data,name.replace(/\.json$/, ""))) {
-      event(run, "archive", "Preuves historiques chargées ; aucune nouvelle exécution réseau.");
-      runs.set(run.runId,run);
+    for (const run of archiveRuns(data, name.replace(/\.json$/, ''))) {
+      event(run, 'archive', 'Historical evidence loaded from the repository; no new network run was performed.');
+      runs.set(run.runId, run);
     }
   } catch { /* Ignore unsupported archives. */ }
 }
 app.get('/api/state', (_req, res) => res.json({ busy, scenarios, runs: [...runs.values()].reverse() }));
 app.post('/api/runs', (req, res) => {
   const { scenario, source, application = "csv" } = req.body ?? {};
-  if (!["csv","receipt"].includes(application) || !isScenario(scenario) || !['SIMULATED', 'TESTNET'].includes(source)) { res.status(400).json({ error: 'Scénario ou source invalide.' }); return; }
-  if (busy) { res.status(409).json({ error: 'Une exécution est déjà en cours.' }); return; }
+  if (!["csv","receipt"].includes(application) || !isScenario(scenario) || !['SIMULATED', 'TESTNET'].includes(source)) { res.status(400).json({ error: 'Invalid scenario or source.' }); return; }
+  if (busy) { res.status(409).json({ error: 'An experiment is already running.' }); return; }
   if (source === 'SIMULATED') {
     const run = simulate(scenario); run.application = application; runs.set(run.runId, run); save(run); res.status(201).json(run); return;
   }
-  if (!existsSync('.env')) { res.status(409).json({ error: 'Configurer Testnet avec npm run setup:testnet avant une exécution réelle.' }); return; }
+  if (!existsSync('.env')) { res.status(409).json({ error: 'Configure Testnet with npm run setup:testnet before a live run.' }); return; }
   const run: Run = { runId: randomUUID(), scenario, source, application, status: 'RUNNING', startedAt: new Date().toISOString(), timeline: [], reports: [] };
   busy = true; runs.set(run.runId, run);
   res.status(202).json(run);
@@ -57,9 +57,9 @@ app.post('/api/runs', (req, res) => {
       await execute(run, processes); run.status = 'COMPLETE';
     } catch {
       run.status = 'INTERRUPTED';
-      event(run, 'error', 'Exécution interrompue. Verdict inconnu sans rapport. Vérifier la configuration et les ports ; conserver les journaux et autorisations pour la reprise.');
+      event(run, 'error', 'Execution interrupted. Verdict is unknown without a report. Check configuration and ports; preserve logs and authorizations for recovery.');
     } finally {
-      try { await processes.close(); } catch { event(run, 'error', 'Un processus du runner n’a pas pu être arrêté.'); }
+      try { await processes.close(); } catch { event(run, 'error', 'A runner process could not be stopped.'); }
       busy = false; save(run);
     }
   })();

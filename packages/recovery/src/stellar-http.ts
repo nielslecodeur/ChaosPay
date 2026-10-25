@@ -46,7 +46,9 @@ export async function createPaidRouter<I,O>(service: PaidService<I,O>) {
       },
       async receipt(authDigest) {
         const r = await fetch(c.facilitatorUrl+"/receipts/"+authDigest,{signal:AbortSignal.timeout(15000)});
-        return r.ok ? await r.json() as {transaction?:string} : {};
+        if (r.status===404) return {};
+        if (!r.ok) throw new Error("Receipt temporarily unavailable.");
+        return await r.json() as {transaction?:string};
       },
       observe: (hash,expected) => observe(observer,hash,expected),
     },

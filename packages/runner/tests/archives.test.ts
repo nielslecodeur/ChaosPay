@@ -8,13 +8,13 @@ test("integration archives preserve scenario pairing and filter private metadata
  const runs=archiveRuns(data,"integration-a");
  assert.equal(runs.length,4);
  assert.deepEqual(runs.map(r=>r.scenario),["baseline","drop","crash","confirmation-lost"]);
- assert.ok(runs.every(r=>r.source==="ARCHIVE" && r.integrationEvidence?.authorizationCount===1));
+ assert.ok(runs.every(r=>r.source==="ARCHIVE" && r.reports[0]?.serviceId==="invoice-check"));
  assert.equal(runs[1]!.checkpoints![0]!.purchaseId,runs[1]!.reports[0]!.purchaseId);
  assert.equal(runs[1]!.checkpoints![0]!.verdict,"UNKNOWN");
  assert.ok(!JSON.stringify(runs).includes("DO_NOT_EXPORT"));
 });
 test("invalid integration metadata or mismatched purchases cannot become archive proof",()=>{
- const data=fixture();data.archiveSha256="invalid";assert.deepEqual(archiveRuns(data,"bad"),[]);
+ const data=fixture();data.package="not-a-package";assert.deepEqual(archiveRuns(data,"bad"),[]);
  const mismatch=fixture();mismatch.scenarios[1].before.purchaseId="other";
  assert.throws(()=>archiveRuns(mismatch,"bad"));
 });

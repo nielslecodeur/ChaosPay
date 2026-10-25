@@ -20,7 +20,8 @@
     "verify:dashboard": "node scripts/verify-dashboard.mjs",
     "verify:evidence": "tsx scripts/verify-evidence.ts",
     "build:recovery": "npm run build --prefix packages/recovery",
-    "verify:integration": "tsx --env-file=.env scripts/verify-integration.ts"
+    "verify:integration": "tsx --env-file=.env scripts/verify-integration.ts",
+    "recover": "tsx scripts/recover.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "16.4.1",

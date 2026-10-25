@@ -1,5 +1,7 @@
 import { digest, verdict, type Observation, type PaymentExpectation, type PurchaseReport } from "../../evidence/src/index.js";
 import { Store, Queue, type Purchase } from "./store.js";
+import { diagnose, type RecoveryDiagnostic } from "./diagnostics.js";
+export { diagnose, type RecoveryDiagnostic, type RecoveryCode } from "./diagnostics.js";
 export { Store } from "./store.js";
 
 export interface PaymentGateway<P> {
@@ -68,15 +70,16 @@ export class RecoveryKit<P,I,O> {
         }
       }
       p = store.get(key)!;
+      let receiptUnavailable=false;
       if (!p.txHash) {
-        const receipt = await gateway.receipt(authDigest).catch(() => ({} as { transaction?: string }));
+        const receipt = await gateway.receipt(authDigest).catch(() => {receiptUnavailable=true;return {} as {transaction?:string};});
         if (receipt.transaction) { store.update(key,"UNKNOWN",receipt.transaction,p.result); p = store.get(key)!; }
       }
       const evidence = await gateway.observe(p.txHash,this.expected(p));
       if (evidence.status !== "CONFIRMED") {
         store.update(key,evidence.status,p.txHash,p.result);
         if (evidence.status === "UNKNOWN") store.unknown(key);
-        return { status: evidence.status, reason: evidence.reason, txHash: p.txHash };
+        return { status: evidence.status, reason: evidence.reason, txHash: p.txHash, diagnostic:diagnose(p,evidence,receiptUnavailable) };
       }
       store.update(key,"SETTLED",p.txHash,p.result);
       if (fresh && fault === "crash") { store.interrupted(key); throw new FaultTriggered("crash"); }
@@ -99,15 +102,19 @@ export class RecoveryKit<P,I,O> {
       throw new RecoveryError(409,"Result acknowledgment does not match this purchase.");
     this.options.store.delivered(key);
   }
-  async report(id: string, mode: "durable" | "naive"): Promise<PurchaseReport & { observations: Observation[]; attempts: { state: string; txHash: string; deliveries: number }[] }> {
+  async report(id: string, mode: "durable" | "naive"): Promise<PurchaseReport & { diagnostics: (RecoveryDiagnostic & {txHash:string})[]; observations: Observation[]; attempts: { state: string; txHash: string; deliveries: number }[] }> {
     const { store, gateway } = this.options;
     const purchases = store.list(id,mode).filter(p => p.key.startsWith(this.options.serviceId + ":"));
     if (!purchases.length) throw new RecoveryError(404,"Unknown purchase.");
     const expected = this.expected(purchases[0]!);
     const observations: Observation[] = [];
+    const diagnostics:(RecoveryDiagnostic & {txHash:string})[]=[];
     for (const p of purchases) {
-      const known = p.txHash ? { transaction: p.txHash } : await gateway.receipt(p.authDigest).catch(() => ({} as { transaction?: string }));
-      observations.push(await gateway.observe(known.transaction ?? "",expected));
+      let receiptUnavailable=false;
+      const known = p.txHash ? {transaction:p.txHash} : await gateway.receipt(p.authDigest).catch(()=>{receiptUnavailable=true;return {} as {transaction?:string};});
+      const observation=await gateway.observe(known.transaction??"",expected);
+      observations.push(observation);
+      diagnostics.push({...diagnose({...p,txHash:known.transaction??""},observation,receiptUnavailable),txHash:known.transaction??""});
     }
     const responseRecovered = purchases.some(p => p.deliveries > 0);
     const interruptions = purchases.map(p => p.interruptedAt).filter((n): n is number => n !== null);
@@ -118,7 +125,7 @@ export class RecoveryKit<P,I,O> {
       tokenContract: expected.tokenContract, expectedAmountAtomic: expected.amountAtomic,
       responseRecovered, ...verdict(observations,expected,responseRecovered),
       recoveryMs, unknownObservations: purchases.reduce((n,p) => n+p.unknownObservations,0),
-      observations, attempts: purchases.map(p => ({ state:p.state,txHash:p.txHash,deliveries:p.deliveries })),
+      diagnostics, observations, attempts: purchases.map(p => ({ state:p.state,txHash:p.txHash,deliveries:p.deliveries })),
     };
   }
 }

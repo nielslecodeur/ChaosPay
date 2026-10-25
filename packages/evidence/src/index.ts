@@ -5,7 +5,7 @@ export interface Transfer {
   amountAtomic: string; ledger: number;
 }
 export interface PaymentExpectation { tokenContract: string; from: string; to: string; amountAtomic: string; }
-export interface Observation { status: "CONFIRMED" | "FAILED" | "UNKNOWN" | "UNSUPPORTED"; txHash: string; transfers: Transfer[]; reason: string; }
+export interface Observation { reasonCode?: "HASH_MISSING" | "NOT_FOUND" | "RPC_UNAVAILABLE" | "RPC_RESPONSE_UNREADABLE"; status: "CONFIRMED" | "FAILED" | "UNKNOWN" | "UNSUPPORTED"; txHash: string; transfers: Transfer[]; reason: string; }
 export interface PurchaseReport {
   serviceId?: string; recoveryMs?: number | null; unknownObservations?: number;
   schemaVersion: 1; purchaseId: string; mode: "naive" | "durable"; network: "stellar:testnet";
