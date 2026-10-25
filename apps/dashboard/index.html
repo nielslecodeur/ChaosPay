@@ -2,16 +2,15 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-<header><a class="brand" href="#home" aria-label="Lumaid home">Lumaid</a><nav aria-label="Sections"><a href="#home" id="nav-home">Home</a><a href="#demo" id="nav-demo">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
+<header><a class="brand" href="#home" aria-label="Lumaid home">Lumaid</a><nav aria-label="Sections"><a href="#demo" id="nav-demo">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
 <main>
 <div id="home">
+  <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
   <section class="home-hero" aria-labelledby="home-title">
-    <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
     <div class="home-copy">
       <p class="home-kicker">PAYMENT RECOVERY, REIMAGINED</p>
       <h1 id="home-title">Lumaid</h1>
       <p class="home-tagline">Your payment never failed.</p>
-      <p class="home-description">Even when the response disappears, the purchase should still make it home.</p>
       <div class="home-actions"><a class="home-cta" href="#demo">Explore the demo <span aria-hidden="true">↗</span></a><a class="home-secondary" href="#docs">How it works</a></div>
     </div>
     <div class="home-route" aria-label="Payment journey: authorized, settled, result recovered, receipt acknowledged">
@@ -128,7 +127,7 @@ app.use("/paid", paid.router);</code></pre>
 </main><script type="module" src="/app.js"></script>
 <script>
 const V={home:document.getElementById("home"),demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};
-const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
+const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
 </script>
 </body></html>
