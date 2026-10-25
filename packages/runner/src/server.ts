@@ -7,6 +7,7 @@ import { isScenario, scenarios } from '../../../scenarios/index.js';
 import { simulate } from './fixture.js';
 import { event, publicReport, type Run } from './report.js';
 import { Processes } from './processes.js';
+import { isSupportedApplication } from './applications.js';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 process.chdir(root);
@@ -40,7 +41,10 @@ if (existsSync('evidence/public')) for (const name of readdirSync('evidence/publ
 app.get('/api/state', (_req, res) => res.json({ busy, scenarios, runs: [...runs.values()].reverse() }));
 app.post('/api/runs', (req, res) => {
   const { scenario, source, application = "csv" } = req.body ?? {};
-  if (!["csv","receipt"].includes(application) || !isScenario(scenario) || !['SIMULATED', 'TESTNET'].includes(source)) { res.status(400).json({ error: 'Invalid scenario or source.' }); return; }
+  const validSource = source === 'SIMULATED' || source === 'TESTNET';
+  if (!validSource || !isSupportedApplication(application, source) || !isScenario(scenario)) {
+    res.status(400).json({ error: 'Invalid scenario or application for this run mode.' }); return;
+  }
   if (busy) { res.status(409).json({ error: 'An experiment is already running.' }); return; }
   if (source === 'SIMULATED') {
     const run = simulate(scenario); run.application = application; runs.set(run.runId, run); save(run); res.status(201).json(run); return;

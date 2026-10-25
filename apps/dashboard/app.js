@@ -1,32 +1,75 @@
 const $ = id => document.getElementById(id);
 const el = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
 const badge = (text, tone = '') => el('span', text, `badge ${tone}`);
-const apps = { csv: 'CSV conversion', receipt: 'Receipt generation', 'invoice-check': 'Invoice check · installed package' };
+const apps = {
+  csv: 'CSV conversion',
+  receipt: 'Receipt generation',
+  'market-quote': 'Market quote · simulation',
+  'web-research': 'Research brief · simulation',
+  'delivery-status': 'Parcel tracking · simulation',
+  'weather-brief': 'Weather briefing · simulation',
+  'invoice-check': 'Invoice check · installed package',
+};
+const appDescriptions = {
+  csv: 'The client pays to convert a small data table into a CSV file.',
+  receipt: 'The client pays to generate a JSON receipt; this does not pay the invoice.',
+  'market-quote': 'Simulation only: an agent requests a sample price quote for an asset.',
+  'web-research': 'Simulation only: an agent buys a short brief from a fictional research service.',
+  'delivery-status': 'Simulation only: an agent checks a fictional parcel tracking service.',
+  'weather-brief': 'Simulation only: an agent requests a sample local weather briefing.',
+};
+const appActions = {
+  csv: 'convert a small data table into a CSV file',
+  receipt: 'generate a JSON receipt; the invoice itself is not paid',
+  'market-quote': 'get a sample market quote for an asset',
+  'web-research': 'buy a short research brief',
+  'delivery-status': 'check a parcel delivery update',
+  'weather-brief': 'get a local weather briefing',
+};
+const testnetApplications = new Set(['csv', 'receipt']);
 const scenarios = {
   comparison: ['Compare two recovery strategies', 'After a lost response, compare paying again with recovering the existing purchase.'],
   drop: ['The response disappears', 'Payment is confirmed, but the client never receives the response.'],
   crash: ['The app crashes', 'The app restarts after payment and must recover the purchase.'],
   'confirmation-lost': ['Confirmation is unavailable', 'Payment was submitted. Its status remains unknown until confirmation returns.'],
   'ack-lost': ['Receipt cannot be confirmed', 'The result arrives, but its acknowledgment is lost.'],
-  'before-submit': ['Failure before payment', 'The request is interrupted before payment is sent.'],
+  'before-submit': ['Bug before settlement · automatic retry', 'A failure is injected before the facilitator receives the payment. The runner retries the same authorization; no on-chain transaction is cancelled.'],
   concurrent: ['The client sends two requests', 'Two simultaneous requests refer to the same purchase.'],
   baseline: ['Everything works', 'A purchase with no failure, as a baseline.'],
 };
 const sourceText = { SIMULATED: 'SIMULATION · fictional data', TESTNET: 'TESTNET · live test', ARCHIVE: 'ARCHIVE · historical evidence' };
 const statusText = { RUNNING: 'Running', COMPLETE: 'Complete', INTERRUPTED: 'Interrupted' };
 let state = { scenarios: [], runs: [], busy: false }, selected, previous = '', pending = false, reachable = false;
+const astronautCursor = $('astronaut-cursor');
+if (astronautCursor && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || !document.body.classList.contains('home-view')) {
+      astronautCursor.classList.remove('is-visible');
+      return;
+    }
+    astronautCursor.style.transform = `translate3d(${event.clientX - 42}px, ${event.clientY - 20}px, 0)`;
+    astronautCursor.classList.add('is-visible');
+  });
+  addEventListener('hashchange', () => {
+    if (!document.body.classList.contains('home-view')) astronautCursor.classList.remove('is-visible');
+  });
+  addEventListener('pointerleave', () => astronautCursor.classList.remove('is-visible'));
+}
 const starCanvas = $('starfield');
 const starContext = starCanvas?.getContext?.('2d');
 let launchSkyJourney = () => {};
 if (starContext) {
   const starMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const home = starCanvas.closest('#home');
-  const stars = Array.from({ length: 232 }, () => ({
+  const starTints = ['255,239,225', '196,210,255', '255,194,178'];
+  const stars = Array.from({ length: 360 }, () => ({
     x: 0.01 + Math.random() * 0.98,
     y: Math.random(),
-    radius: Math.random() * 1.4 + 0.35,
+    radius: Math.random() * 1.35 + 0.35,
     phase: Math.random() * Math.PI * 2,
     pace: 0.0007 + Math.random() * 0.0014,
+    sparkle: Math.random() > 0.82,
+    tint: starTints[Math.floor(Math.random() * starTints.length)],
   }));
   const route = [[0.46, 0.76], [0.57, 0.54], [0.68, 0.67], [0.79, 0.38], [0.92, 0.48]];
   const pointer = { x: -1000, y: -1000, lastX: -1000, lastY: -1000, active: false };
@@ -39,12 +82,12 @@ if (starContext) {
     starContext.clearRect(0, 0, skyWidth, skyHeight);
 
     const routeGradient = starContext.createLinearGradient(route[0][0] * skyWidth, 0, route.at(-1)[0] * skyWidth, 0);
-    routeGradient.addColorStop(0, 'rgba(116, 255, 217, 0.18)');
-    routeGradient.addColorStop(0.55, 'rgba(116, 255, 217, 0.72)');
-    routeGradient.addColorStop(1, 'rgba(255, 196, 126, 0.62)');
+    routeGradient.addColorStop(0, 'rgba(255, 147, 124, 0.2)');
+    routeGradient.addColorStop(0.55, 'rgba(255, 177, 145, 0.76)');
+    routeGradient.addColorStop(1, 'rgba(255, 231, 204, 0.72)');
     starContext.lineWidth = 2;
     starContext.shadowBlur = 17;
-    starContext.shadowColor = 'rgba(94, 255, 211, 0.55)';
+    starContext.shadowColor = 'rgba(255, 149, 125, 0.55)';
     starContext.strokeStyle = routeGradient;
     starContext.beginPath();
     route.forEach(([x, y], index) => {
@@ -62,43 +105,50 @@ if (starContext) {
       const pull = pointer.active && distance < 210 ? Math.pow(1 - distance / 210, 2) * 34 : 0;
       const x = baseX + (distance ? dx / distance * pull : 0);
       const y = baseY + (distance ? dy / distance * pull : 0);
-      const pulse = 0.28 + (Math.sin(time * star.pace + star.phase) + 1) * 0.36;
+      const twinkle = (Math.sin(time * star.pace + star.phase) + 1) / 2;
+      const pulse = 0.2 + twinkle * 0.75;
       const lit = pointer.active && distance < 175;
-      starContext.fillStyle = lit ? `rgba(255, 213, 158, ${0.55 + pulse * 0.45})` : `rgba(226, 248, 244, ${pulse})`;
-      if (lit) {
-        starContext.shadowBlur = 12;
-        starContext.shadowColor = 'rgba(255, 191, 126, 0.8)';
+      starContext.fillStyle = lit ? `rgba(255, 197, 169, ${0.55 + pulse * 0.45})` : `rgba(${star.tint}, ${pulse})`;
+      const glint = star.sparkle && twinkle > 0.82;
+      if (lit || glint) {
+        starContext.shadowBlur = glint ? 5 + twinkle * 7 : 12;
+        starContext.shadowColor = lit ? 'rgba(255, 137, 119, 0.8)' : 'rgba(255, 231, 204, 0.9)';
         nearby.push({ x, y, distance });
       }
       starContext.beginPath();
-      starContext.arc(x, y, star.radius + (lit ? 0.5 : 0), 0, Math.PI * 2);
+      starContext.arc(x, y, star.radius * (glint ? 1.35 : 1) + (lit ? 0.5 : 0), 0, Math.PI * 2);
       starContext.fill();
       starContext.shadowBlur = 0;
+      if (glint) {
+        const flare = star.radius * (1.5 + twinkle);
+        starContext.strokeStyle = `rgba(255, 244, 231, ${(twinkle - 0.65) * 0.75})`;
+        starContext.lineWidth = 0.7;
+        starContext.beginPath();
+        starContext.moveTo(x - flare, y);
+        starContext.lineTo(x + flare, y);
+        starContext.moveTo(x, y - flare);
+        starContext.lineTo(x, y + flare);
+        starContext.stroke();
+      }
     }
 
     if (pointer.active) {
       starContext.lineWidth = 0.7;
       for (const star of nearby) {
         if (star.distance > 150) continue;
-        starContext.strokeStyle = `rgba(255, 209, 151, ${(1 - star.distance / 165) * 0.42})`;
+        starContext.strokeStyle = `rgba(255, 184, 159, ${(1 - star.distance / 165) * 0.42})`;
         starContext.beginPath();
         starContext.moveTo(pointer.x, pointer.y);
         starContext.lineTo(star.x, star.y);
         starContext.stroke();
       }
-      const cursorPulse = 0.5 + Math.sin(time * 0.006) * 0.5;
-      starContext.strokeStyle = `rgba(255, 219, 173, ${0.35 + cursorPulse * 0.35})`;
-      starContext.lineWidth = 1;
-      starContext.beginPath();
-      starContext.arc(pointer.x, pointer.y, 9 + cursorPulse * 5, 0, Math.PI * 2);
-      starContext.stroke();
     }
 
     route.forEach(([x, y], index) => {
       const pulse = 0.52 + Math.sin(time * 0.0015 + index) * 0.2;
-      starContext.fillStyle = index === route.length - 1 ? `rgba(255, 207, 151, ${pulse})` : `rgba(177, 255, 230, ${pulse})`;
+      starContext.fillStyle = index === route.length - 1 ? `rgba(255, 208, 176, ${pulse})` : `rgba(255, 165, 139, ${pulse})`;
       starContext.shadowBlur = 12;
-      starContext.shadowColor = index === route.length - 1 ? 'rgba(255, 185, 117, 0.9)' : 'rgba(100, 255, 206, 0.8)';
+      starContext.shadowColor = index === route.length - 1 ? 'rgba(255, 188, 152, 0.9)' : 'rgba(255, 132, 113, 0.8)';
       starContext.beginPath();
       starContext.arc(x * skyWidth, y * skyHeight, index === route.length - 1 ? 2.4 : 1.8, 0, Math.PI * 2);
       starContext.fill();
@@ -144,9 +194,9 @@ if (starContext) {
       starContext.lineCap = 'round';
       starContext.lineJoin = 'round';
       starContext.lineWidth = 3;
-      starContext.strokeStyle = 'rgba(211, 255, 238, 0.9)';
+      starContext.strokeStyle = 'rgba(255, 220, 202, 0.9)';
       starContext.shadowBlur = 30;
-      starContext.shadowColor = '#73ffd2';
+      starContext.shadowColor = '#ff9a82';
       starContext.stroke();
       starContext.fillStyle = '#ffffff';
       starContext.beginPath();
@@ -158,7 +208,7 @@ if (starContext) {
     const routeDuration = 4200;
     for (let packet = 0; packet < 3; packet++) {
       const routeProgress = ((time / routeDuration * (route.length - 1) + packet * 1.38) % (route.length - 1));
-      const packetColor = packet === 2 ? '#ffd09a' : packet === 1 ? '#9deaff' : '#effff8';
+      const packetColor = packet === 2 ? '#ffe0bd' : packet === 1 ? '#ff9c86' : '#fff1e6';
       for (let tail = 8; tail >= 0; tail--) {
         const progress = routeProgress - tail * 0.035;
         if (progress < 0) continue;
@@ -181,10 +231,10 @@ if (starContext) {
       const progress = (time - pulse.started) / 1500 - pulse.delay;
       if (progress < 0) continue;
       if (progress >= 1) { pulses.splice(index, 1); continue; }
-      starContext.strokeStyle = `rgba(152, 255, 220, ${(1 - progress) * 0.95})`;
+      starContext.strokeStyle = `rgba(255, 180, 151, ${(1 - progress) * 0.95})`;
       starContext.lineWidth = 3.5 * (1 - progress) + 0.5;
       starContext.shadowBlur = 26 * (1 - progress);
-      starContext.shadowColor = '#70ffd4';
+      starContext.shadowColor = '#ff9279';
       starContext.beginPath();
       starContext.arc(pulse.x, pulse.y, 12 + progress * 290, 0, Math.PI * 2);
       starContext.stroke();
@@ -220,8 +270,8 @@ if (starContext) {
       else {
         const x = meteor.x - progress * 0.32, y = meteor.y + progress * 0.4;
         const trail = starContext.createLinearGradient(x * skyWidth, y * skyHeight, (x + 0.14) * skyWidth, (y - 0.18) * skyHeight);
-        trail.addColorStop(0, 'rgba(184, 255, 230, 0)');
-        trail.addColorStop(1, 'rgba(219, 255, 247, 0.88)');
+        trail.addColorStop(0, 'rgba(255, 182, 154, 0)');
+        trail.addColorStop(1, 'rgba(255, 236, 218, 0.88)');
         starContext.strokeStyle = trail;
         starContext.lineWidth = 1.5;
         starContext.beginPath();
@@ -236,7 +286,7 @@ if (starContext) {
     for (let index = 0; index < count; index++) {
       const angle = Math.random() * Math.PI * 2;
       const velocity = 0.6 + Math.random() * speed;
-      const colors = ['#a1ffe2', '#fff0c4', '#ffffff', '#ffca91'];
+      const colors = ['#ff9c86', '#fff0d8', '#ffffff', '#ffc5a1'];
       sparks.push({ x, y, vx: Math.cos(angle) * velocity, vy: Math.sin(angle) * velocity, life: 0.65 + Math.random() * 0.4, size: 0.7 + Math.random() * 1.8, color: colors[index % colors.length] });
     }
   }
@@ -311,7 +361,7 @@ if (starContext) {
   home.addEventListener('pointerdown', event => { if (event.isPrimary) burst(event); });
   document.querySelector('.home-cta')?.addEventListener('click', event => {
     event.preventDefault();
-    launchSkyJourney(() => { location.hash = 'demo'; });
+    launchSkyJourney(() => { location.hash = 'try'; });
   });
   addEventListener('resize', resizeSky);
   starMotion.addEventListener('change', syncSkyMotion);
@@ -326,21 +376,84 @@ if (starContext) {
   skyVisibility.observe(starCanvas);
 }
 const xlm = atomic => { const n = BigInt(atomic); return `${n / 10000000n}.${(n % 10000000n).toString().padStart(7, '0')} XLM`; };
+const stellarContractUrl = contract => /^C[A-Z2-7]{55}$/.test(contract) ? `https://stellar.expert/explorer/testnet/contract/${contract}` : undefined;
 const isPackageIntegration = run => run.reports.length > 0 && run.reports.every(report => report.serviceId === 'invoice-check');
 const titleOf = run => run.source === 'ARCHIVE' ? (isPackageIntegration(run) ? 'Independent package integration' : 'Saved campaign') : scenarios[run.scenario]?.[0] ?? run.scenario;
 const appOf = (report, run) => apps[run.application] ?? apps[report.serviceId] ?? report.serviceId ?? 'Application not specified';
 function describe() {
+  const testnet = $('source').value === 'TESTNET';
+  const application = $('application');
+  for (const option of application.options) option.disabled = testnet && !testnetApplications.has(option.value);
+  let applicationNotice = '';
+  if (testnet && !testnetApplications.has(application.value)) {
+    application.value = 'csv';
+    applicationNotice = ' Testnet currently supports CSV conversion and JSON receipts only; select this example in simulation mode.';
+  }
   $('description').textContent = scenarios[$('scenario').value]?.[1] ?? '';
-  $('application-description').textContent = $('application').value === 'csv' ? 'The client pays to convert data.' : 'The client pays to generate a receipt, not to pay the invoice.';
-  $('notice').textContent = $('source').value === 'SIMULATED' ? 'No payment: amounts and results are fictional.' : 'Payments use Stellar Testnet and have no real-world value. A comparison may make three test payments. Stop the demo servers before launching.';
+  $('application-description').textContent = (appDescriptions[application.value] ?? 'The client pays to use this service.') + applicationNotice;
+  const notice = $('notice');
+  notice.className = `notice ${testnet ? 'notice-testnet' : 'notice-simulated'}`;
+  notice.textContent = testnet
+    ? 'Stellar Testnet only — test funds have no real-world value. A comparison may make three test payments. Stop the demo servers before launching. '
+    : 'Simulation only — no payment is made; amounts and results are fictional.';
+  if (testnet) {
+    const explorer = el('a', 'Open Stellar Expert ↗');
+    explorer.href = 'https://stellar.expert/explorer/testnet';
+    explorer.target = '_blank';
+    explorer.rel = 'noopener noreferrer';
+    notice.append(explorer);
+  }
 }
 function controls() {
   const disabled = pending || state.busy || !reachable;
   for (const id of ['launch', 'application', 'scenario', 'source']) $(id).disabled = disabled;
-  $('launch').textContent = pending ? 'Starting…' : state.busy ? 'Experiment running…' : 'See what happens to the customer →';
+  $('launch').textContent = pending ? 'Starting…' : state.busy ? 'Experiment running…' : $('source').value === 'TESTNET' ? 'Run Testnet experiment →' : 'Run simulation →';
 }
 function metric(value, label, note) {
   const n = el('div', undefined, 'metric'); n.append(el('span', label), el('strong', value)); if (note) n.append(el('small', note)); return n;
+}
+function plainSummary(report, run, overpaid, paid) {
+  const summary = el('section', undefined, 'plain-summary');
+  summary.setAttribute('aria-label', 'Plain-language summary');
+  summary.append(el('h4', 'What happened'));
+  const points = el('ul');
+  const action = appActions[run.application] ?? appOf(report, run);
+  points.append(el('li', `The agent requested a service to ${action}.`));
+  if (run.source === 'SIMULATED') {
+    points.append(el('li', paid
+      ? `Payment: ${xlm(report.settledAmountAtomic)} is fictional; no real payment was sent.`
+      : 'Payment: this fictional run records no payment.'));
+  } else if (run.source === 'ARCHIVE') {
+    points.append(el('li', `Payment: the archived report records ${xlm(report.settledAmountAtomic)}; no new network verification was performed.`));
+  } else if (overpaid) {
+    points.append(el('li', `Payment: ${xlm(report.settledAmountAtomic)} was observed, more than the expected ${xlm(report.expectedAmountAtomic)}.`));
+  } else if (report.verdict === 'PASS') {
+    points.append(el('li', `Payment: ${paid ? xlm(report.settledAmountAtomic) : 'the expected payment'} was confirmed.`));
+  } else {
+    points.append(el('li', 'Payment: the available evidence does not establish a successful payment.'));
+  }
+  if (run.source === 'SIMULATED') {
+    points.append(el('li', `Result: the simulation marks it as ${report.responseRecovered ? 'received' : 'not confirmed'}; no real service was called.`));
+  } else if (run.source === 'ARCHIVE') {
+    points.append(el('li', `Result: the archived report marks receipt as ${report.responseRecovered ? 'confirmed' : 'not confirmed'}; it was not checked again.`));
+  } else {
+    points.append(el('li', report.responseRecovered
+      ? 'Result: the client software confirmed that it received the service result.'
+      : 'Result: receipt by the client software is not confirmed.'));
+  }
+  if (report.mode === 'naive') {
+    points.append(el('li', 'Retry: this comparison deliberately created a new payment authorization.'));
+  } else if (run.scenario === 'baseline') {
+    points.append(el('li', 'Recovery: the request completed without an interruption.'));
+  } else if (run.scenario === 'concurrent') {
+    points.append(el('li', 'Recovery: two simultaneous requests used the same authorization.'));
+  } else if (run.scenario === 'before-submit') {
+    points.append(el('li', `${run.source === 'SIMULATED' ? 'Simulation: ' : ''}an error happened before payment submission; the runner retried the same signed authorization automatically.`));
+  } else {
+    points.append(el('li', `${run.source === 'SIMULATED' ? 'Simulation: ' : 'Recovery: '}the original purchase was retried instead of creating a new authorization.`));
+  }
+  summary.append(points);
+  return summary;
 }
 function technical(report, run) {
   const d = el('details', undefined, 'technical'); d.dataset.key = report.purchaseId;
@@ -379,6 +492,23 @@ function reportCard(report, run) {
   if (report.mode === 'naive') explanation += ' This demo mode deliberately creates a new payment authorization.';
   if (simulated) explanation = 'Fictional example. ' + explanation;
   card.append(el('p', explanation, 'explanation'));
+  card.append(plainSummary(report, run, overpaid, paid));
+  if (run.source !== 'SIMULATED') {
+    const contracts = [...new Set([report.tokenContract, ...report.transfers.map(transfer => transfer.tokenContract)])]
+      .filter(contract => stellarContractUrl(contract));
+    if (contracts.length) {
+      const explorerLinks = el('div', undefined, 'explorer-links');
+      explorerLinks.append(el('span', 'Testnet contracts'));
+      for (const [index, contract] of contracts.entries()) {
+        const link = el('a', contracts.length === 1 ? 'View contract on Stellar Expert ↗' : `Contract ${index + 1} on Stellar Expert ↗`);
+        link.href = stellarContractUrl(contract);
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        explorerLinks.append(link);
+      }
+      card.append(explorerLinks);
+    }
+  }
   const checkpoint = run.checkpoints?.find(c => c.purchaseId === report.purchaseId);
   if (checkpoint) card.append(el('p', `Before recovery: ${checkpoint.verdict === 'UNKNOWN' ? 'unknown status' : checkpoint.verdict}, receipt ${checkpoint.responseRecovered ? 'confirmed' : 'not confirmed'}. After: ${label.toLowerCase()}.`, 'checkpoint'));
   card.append(technical(report, run)); return card;
@@ -426,7 +556,7 @@ async function refresh() {
     describe(); render();
   } catch { reachable = false; controls(); $('connection').textContent = 'Connection to the lab lost. Showing the latest results received; retrying automatically.'; }
 }
-for (const id of ['scenario', 'source', 'application']) $(id).onchange = describe;
+for (const id of ['scenario', 'source', 'application']) $(id).onchange = () => { describe(); controls(); };
 $('launch').onclick = async () => {
   pending = true; controls(); $('error').textContent = '';
   try {
@@ -436,4 +566,7 @@ $('launch').onclick = async () => {
   } catch (e) { $('error').textContent = e.name === 'TimeoutError' ? 'The start could not be confirmed. Check the experiment list before trying again.' : e.message; }
   finally { pending = false; controls(); }
 };
-await refresh(); setInterval(refresh, 2000);
+if (['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002') {
+  await refresh();
+  setInterval(refresh, 2000);
+}

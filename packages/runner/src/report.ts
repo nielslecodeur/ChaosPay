@@ -1,4 +1,5 @@
 import type { PurchaseReport, Transfer } from '../../evidence/src/index.js';
+import type { Application } from './applications.js';
 
 export type Source = 'SIMULATED' | 'TESTNET' | 'ARCHIVE';
 export interface Event { at: string; kind: string; message: string; }
@@ -7,7 +8,7 @@ export interface RunnerReport extends PurchaseReport {
   recoveryDurationMs?: number | null;
 }
 export interface Run {
-  application?: "csv" | "receipt"; checkpoints?: PurchaseReport[];
+  application?: Application; checkpoints?: PurchaseReport[];
   runId: string; scenario: string; source: Source; status: 'RUNNING' | 'COMPLETE' | 'INTERRUPTED';
   startedAt: string; timeline: Event[]; reports: RunnerReport[];
 }

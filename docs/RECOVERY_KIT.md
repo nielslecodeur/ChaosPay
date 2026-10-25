@@ -34,7 +34,7 @@ La génération peut être rejouée après un crash avant sauvegarde du résulta
 
 | Scénario | Point d'interruption | Reprise |
 | --- | --- | --- |
-| before-submit | Achat PREPARED enregistré, avant appel au facilitator | Soumission de l'autorisation originale |
+| before-submit | Achat PREPARED enregistré, avant appel au facilitator | Le runner resoumet automatiquement l'autorisation originale ; aucune transaction n'a encore été envoyée |
 | confirmation-lost | Demande acceptée dans le journal du facilitator, confirmation masquée | HTTP 202 UNKNOWN puis consultation du reçu et du RPC |
 | crash | Transfert confirmé, avant production/sauvegarde du résultat | Redémarrage du service |
 | drop | Résultat sauvegardé, avant réponse HTTP | Restitution du résultat sauvegardé |
@@ -45,6 +45,10 @@ La génération peut être rejouée après un crash avant sauvegarde du résulta
 Le scénario confirmation-lost ne simule pas une panne du réseau Stellar. Il masque la confirmation d'une soumission asynchrone au facilitator ; le broadcast peut encore être en cours. Aucun PASS n'est accepté avant observation du transfert et accusé.
 
 Une panne après la revendication SUBMITTING mais avant l'appel réseau peut rester UNKNOWN sans reçu. L'absence de reçu ne prouve pas l'absence de paiement : pas de nouvelle soumission automatique. La disponibilité est sacrifiée à cette prudence.
+
+Une transaction confirmée sur Stellar ne peut pas être annulée. Le scénario before-submit ne « rembourse » ni n'annule rien : il provoque une erreur avant l'envoi au facilitator, puis le runner réessaie avec le même identifiant, le même corps et la même autorisation signée. Si le statut est UNKNOWN après une soumission possible, le kit réconcilie les preuves et ne crée pas une nouvelle autorisation à l'aveugle. Un remboursement nécessiterait une transaction séparée.
+
+Le kit serveur ne relance pas lui-même la requête réseau du client après une déconnexion. Le runner de démonstration porte cette boucle de reprise ; un bot intégrateur doit persister l'identifiant, le corps et l'autorisation originaux, puis réessayer avec ces mêmes valeurs. Le package est expérimental, privé, limité à HTTP loopback et au facilitator local décrit dans le guide.
 
 ## Rapports
 

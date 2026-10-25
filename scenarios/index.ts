@@ -1,5 +1,5 @@
 export const scenarios = [
-  { id: 'before-submit', label: 'Avant soumission', description: 'Interruption avant appel au facilitator, puis reprise.' },
+  { id: 'before-submit', label: 'Bug avant règlement · reprise auto', description: 'Une panne arrive avant l’envoi au facilitator. Le runner renvoie automatiquement la même autorisation ; aucune transaction n’est annulée sur Stellar.' },
   { id: 'confirmation-lost', label: 'Confirmation indisponible', description: 'Soumission asynchrone, UNKNOWN puis reconciliation.' },
   { id: 'ack-lost', label: 'Accuse perdu', description: 'Resultat recu, accuse omis, puis reprise et accuse.' },
   { id: 'baseline', label: 'Sans panne', description: 'Un paiement et un résultat accusé.' },

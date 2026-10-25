@@ -75,13 +75,15 @@ Le paiement est en XLM natif sur Stellar Testnet. Dans notre exemple, il achète
 
 ## Règles de reprise
 
-Le client sauvegarde l'identifiant, le corps et l'autorisation avant envoi. Après une interruption ou HTTP 202, il renvoie exactement ces données. Il vérifie SHA-256(JSON.stringify(result)) contre resultHash avant de poster l'accusé.
+Le client sauvegarde l'identifiant, le corps et l'autorisation avant envoi. Après une interruption ou HTTP 202, il renvoie exactement ces données. Il vérifie SHA-256(JSON.stringify(result)) contre resultHash avant de poster l'accusé. Le kit serveur rend la reprise idempotente, mais ne relance pas la requête réseau du client après une déconnexion : le bot/client doit implémenter cette boucle et conserver ces données originales.
 
 produce doit être déterministe et sans effet externe non idempotent. Après un crash entre production et sauvegarde, le kit peut rappeler cette fonction. Une livraison, un email ou un virement supplémentaire doit avoir sa propre protection.
 
 Une réponse de soumission n'est pas une confirmation finale : la documentation Stellar distingue la soumission et la consultation du résultat. [Guide officiel](https://developers.stellar.org/docs/build/guides/transactions/submit-transaction-wait-js)
 
 Le kit conserve UNKNOWN en l'absence de preuve suffisante. Un reçu absent ne déclenche pas de nouvelle autorisation. Une panne après revendication de soumission et avant appel réseau peut nécessiter une intervention manuelle. Ne pas promettre une reprise automatique dans tous les cas.
+
+Une transaction confirmée sur Stellar n'est pas annulable. Le hook before-submit démontre une reprise avant broadcast : le runner réessaie la même autorisation, qui peut alors produire un règlement unique. Si le résultat est UNKNOWN après une soumission possible, réconcilier avant toute nouvelle autorisation ; un remboursement éventuel est une transaction distincte.
 
 ## Tester une panne
 

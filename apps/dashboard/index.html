@@ -2,16 +2,18 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="icon" type="image/svg+xml" href="/lumaid-mark.svg?v=9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head>
 <body>
-<header><a class="brand" href="#home" aria-label="Lumaid home"><img class="brand-mark" src="/lumaid-mark.svg?v=9" alt=""><span>Lumaid</span></a><nav aria-label="Sections"><a href="#demo" id="nav-demo">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
+<header><a class="brand" href="#home" aria-label="Lumaid home"><img class="brand-mark" src="/lumaid-mark.svg?v=9" alt=""><span>Lumaid</span></a><nav aria-label="Sections"><a href="#try" id="nav-try">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
+<div id="astronaut-cursor" aria-hidden="true"><img src="/astronaut.svg" alt=""></div>
 <main>
 <div id="home">
   <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
   <section class="home-hero" aria-labelledby="home-title">
+    <div class="cosmic-scene" aria-hidden="true"></div>
     <div class="home-copy">
       <p class="home-kicker">PAYMENT RECOVERY, REIMAGINED</p>
       <h1 id="home-title">Lumaid</h1>
       <p class="home-tagline">Your payment never failed.</p>
-      <div class="home-actions"><a class="home-cta" href="#demo">Explore the demo <span aria-hidden="true">↗</span></a><a class="home-secondary" href="#docs">How it works</a></div>
+      <div class="home-actions"><a class="home-cta" href="#try">Explore the demo</a><a class="home-secondary" href="#docs">How it works</a></div>
     </div>
     <div class="home-route" aria-label="Payment journey: authorized, settled, result recovered, receipt acknowledged">
       <div><span>01 / REQUEST</span><strong>Authorized</strong></div>
@@ -24,29 +26,60 @@
     <p>ONE INTENT</p><p>ONE VERIFIED PAYMENT</p><p>ONE RESULT THAT GETS THROUGH</p>
   </section>
 </div>
-<div id="demo">
-  <section class="intro"><p class="home-kicker">LUMAID / PAYMENT RECOVERY LAB</p><h1>Recovery lab</h1><p class="tagline">Recreate a failure. Inspect what the customer actually receives.</p>
+<div id="try" hidden>
+  <section class="quick-demo" aria-labelledby="quick-title">
+    <p class="home-kicker">INSTANT DEMO · NO INSTALL</p>
+    <h1 id="quick-title">See payment recovery in action</h1>
+    <p class="quick-intro">Choose a scenario and run a short simulation right here in your browser.</p>
+    <p class="quick-safety">This is an educational simulation using fictional amounts. It makes no payments and sends no requests to a payment network.</p>
+    <div class="quick-controls">
+      <label for="quick-scenario">Scenario
+        <select id="quick-scenario">
+          <option value="lost-response">The payment succeeds, but the response is lost</option>
+          <option value="normal">Everything works normally</option>
+        </select>
+      </label>
+      <label for="quick-usecase">What does the agent request?
+        <select id="quick-usecase">
+          <option value="market-quote">An XLM/EUR quote · sample data</option>
+          <option value="delivery-status">A parcel delivery update · fictional parcel</option>
+          <option value="csv">A budget table converted to CSV</option>
+          <option value="receipt">A JSON receipt for an invoice</option>
+        </select>
+      </label>
+      <button id="quick-run" type="button">Run simulation</button>
+    </div>
+    <p class="quick-safety">The quote and delivery examples use fictional data; none of these examples calls a real service. The Testnet lab below currently runs only CSV conversion and JSON receipt generation.</p>
+    <section id="quick-result" class="quick-result is-empty" aria-live="polite" aria-label="Simulation result">
+      <p class="empty">Pick a scenario, then run the simulation to see what the customer receives.</p>
+    </section>
+    <a class="quick-local-link" href="#local-lab">Continue to the local Testnet lab</a>
+  </section>
+  <section id="local-lab" class="local-lab-section" aria-labelledby="lab-title">
+  <section class="intro"><p class="home-kicker">LUMAID / PAYMENT RECOVERY LAB</p><h1 id="lab-title">Local Testnet lab</h1><p class="tagline">Recreate a failure. Inspect what the customer actually receives.</p>
     <div class="wire" aria-hidden="true"><i></i><span class="ok">Payment confirmed</span><span class="lost">Response lost</span></div></section>
   <section class="panel" aria-label="Set up an experiment">
     <div class="steps">
-      <label><span class="step">1 · Application</span><span>Which service is the client using?</span><select id="application"><option value="csv">Convert data to a CSV file</option><option value="receipt">Generate a JSON receipt</option></select><small id="application-description"></small></label>
+      <label><span class="step">1 · Application</span><span>Which service is the client using?</span><select id="application"><optgroup label="Available on Testnet"><option value="csv">Convert a budget or expense table to CSV</option><option value="receipt">Generate a JSON invoice receipt</option></optgroup><optgroup label="Agent examples · simulation only"><option value="market-quote">Get a market quote for an asset</option><option value="web-research">Buy a short research brief</option><option value="delivery-status">Check a parcel delivery update</option><option value="weather-brief">Get a local weather briefing</option></optgroup></select><small id="application-description"></small></label>
       <label><span class="step">2 · Failure</span><span>What happens?</span><select id="scenario"></select><small id="description"></small></label>
       <div class="execution"><label><span class="step">3 · Run mode</span><span>How would you like to try it?</span><select id="source"><option value="SIMULATED">Simulation · no payment</option><option value="TESTNET">Testnet · real test payment</option></select></label><button id="launch" disabled>See what happens to the customer</button></div>
     </div>
-    <p id="notice" class="notice"></p><p id="error" role="alert"></p><p id="connection" role="status" class="muted"></p>
+    <p id="notice" class="notice" role="status" aria-live="polite"></p><p id="error" role="alert"></p><p id="connection" role="status" class="muted"></p>
   </section>
   <div class="workspace">
     <aside><h2>Your experiments</h2><p class="muted">Select a run or a saved campaign.</p><div id="history"></div></aside>
     <section aria-labelledby="balance-title"><p class="step" id="balance-title">4 · Customer outcome</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="empty">Choose an application and a failure, then run the experiment. Simulation does not make any network payments.</div></div></section>
   </div>
-  <footer>Two applications can be run here. A third API, built by our team and installed from the package, has historical evidence. Integration by an external team has not yet been validated. An acknowledgment confirms receipt by the client software, not that a person has read it.</footer>
+  <footer>The Testnet lab runs two applications: CSV conversion and JSON receipt generation. The instant demo also shows fictional market-quote and parcel-tracking examples; these are not live integrations. A third API, built by our team and installed from the package, has historical evidence. Integration by an external team has not yet been validated. An acknowledgment confirms receipt by the client software, not that a person has read it.</footer>
+  </section>
 </div>
 <div id="docs" hidden>
   <div class="docs-layout">
-    <nav class="toc" aria-label="On this page"><a href="#doc-principe">Overview</a><a href="#doc-bilan">Reading a report</a><a href="#doc-scenarios">Scenarios</a><a href="#doc-modes">Naive vs. durable</a><a href="#doc-limites">Limitations</a></nav>
+    <nav class="toc" aria-label="On this page"><a href="#doc-principe">Overview</a><a href="#doc-bilan">Reading a report</a><a href="#doc-scenarios">Scenarios</a><a href="#doc-modes">Naive vs. durable</a><a href="#doc-bots">Bots and automatic retry</a><a href="#doc-limites">Limitations</a></nav>
     <article class="doc">
       <h1>Documentation</h1>
       <p class="lead">Lumaid replays a failure during an x402 purchase on Stellar Testnet, then compares what the application reports with the transfers actually confirmed on the network.</p>
+    <p>The <b>Demo</b> page combines a browser-only educational simulation with the full Testnet recovery lab. The simulation uses fictional amounts and makes no payments. The Testnet lab runs only when the dashboard is installed locally.</p>
       <h2 id="doc-principe">Overview</h2>
       <p>A purchase has four steps. Lumaid deliberately interrupts one of them in a demo merchant.</p>
       <ol><li>The client requests a service and receives a payment challenge (HTTP 402).</li><li>The client signs an authorization, and the facilitator settles it on Stellar.</li><li>The merchant returns the result.</li><li>The client acknowledges receipt.</li></ol>
@@ -63,7 +96,7 @@
       <h2 id="doc-scenarios">Scenarios</h2>
       <div class="scroll"><table><thead><tr><th>Scenario</th><th>What is interrupted</th></tr></thead><tbody>
       <tr><td>No failure</td><td>Nothing. One payment and an acknowledged result.</td></tr>
-      <tr><td>Before submission</td><td>Interruption before the facilitator call, followed by recovery.</td></tr>
+      <tr><td>Bug before settlement · automatic retry</td><td>The runner injects a failure before submission, then resends the same signed authorization. No first transaction is cancelled; the retry can settle one payment.</td></tr>
       <tr><td>Lost response</td><td>Connection drops after settlement; the same authorization is retried.</td></tr>
       <tr><td>Merchant crash</td><td>Shutdown after settlement, followed by restart and reconciliation.</td></tr>
       <tr><td>Concurrent requests</td><td>Two simultaneous calls with the same authorization.</td></tr>
@@ -72,8 +105,12 @@
       <tr><td>Naive vs. durable</td><td>Lost response, then a comparison between recovering the purchase and deliberately creating a new authorization.</td></tr></tbody></table></div>
       <h2 id="doc-modes">Naive and durable</h2>
       <p><b>Durable</b> mode records a purchase before sending payment. After an interruption, it finds the same purchase and returns the saved result. <b>Naive</b> mode deliberately creates a new payment authorization on retry and pays a second time. This counterexample comes from our demo merchant. It does not demonstrate a flaw in Stellar.</p>
+      <h2 id="doc-bots">Automatic retry and bots</h2>
+      <p>In the “Bug before settlement” Testnet scenario, the runner injects an error before calling the facilitator, then automatically retries with the same purchase ID, request body, and signed authorization. The first attempt does not submit a transaction; the retry can create one real Testnet payment. Nothing is cancelled on-chain.</p>
+      <p>If a transaction may already have been submitted, its status can be uncertain. The kit checks the facilitator receipt and Stellar evidence and does not blindly create a new authorization. A confirmed on-chain transaction cannot be cancelled; a refund would be a separate transaction.</p>
+      <p>This approach can be integrated into a bot or agent that pays for APIs, but it is not automatic just by installing this demo. The recovery kit is a private experimental Express package, currently loopback-only and tied to the local facilitator. The bot/client must persist its purchase ID, exact request body, and authorization, and retry with those same values after a lost response or HTTP 202. The dashboard runner implements that retry loop; a separate bot integration still needs its own client logic and testing.</p>
       <h2 id="doc-limites">Limitations</h2>
-      <ul><li>Local fixture: two services (CSV and JSON receipts), one Testnet asset, and explicit failure points.</li><li>A third service installed from the package has historical evidence; no external team has tried it yet.</li><li>The lab listens only on 127.0.0.1. Do not expose it to the internet or use real money.</li><li>These tests are not a security audit and do not guarantee universal single-payment behavior.</li><li>A known dependency advisory (Zod) is documented in <code>docs/versions.md</code>.</li></ul>
+      <ul><li>Testnet fixture: two services (CSV conversion and JSON receipt generation), one Testnet asset, and explicit failure points. The instant browser demo also illustrates market-quote and parcel-tracking requests with fictional data; these do not call live services.</li><li>A third service installed from the package has historical evidence; no external team has tried it yet.</li><li>The lab listens only on 127.0.0.1. Do not expose it to the internet or use real money.</li><li>These tests are not a security audit and do not guarantee universal single-payment behavior.</li><li>A known dependency advisory (Zod) is documented in <code>docs/versions.md</code>.</li></ul>
     </article>
   </div>
 </div>
@@ -158,14 +195,16 @@ const paid = await createPaidRouter({
 });
 app.use("/paid", paid.router);</code></pre>
       <p>Added routes: <code>POST /paid/purchases/:id</code> (challenge, then signed purchase), <code>POST /paid/purchases/:id/ack</code> (acknowledgment), <code>GET /paid/reports/:id</code> (evidence and verdict), and <code>GET /paid/health</code>. The adapter is limited to loopback HTTP. Full guide: <code>docs/INTEGRATION_A.md</code>.</p>
+      <p>The server kit makes repeat requests recoverable; it does not retry a disconnected client's request for it. A bot must securely persist the original purchase ID, request body, and signed authorization, then retry with exactly those values. Do not create a new authorization while the prior submission may be unknown: a confirmed Stellar transaction cannot be cancelled, and a refund is a separate payment.</p>
     </article>
   </div>
 </div>
 </main><script type="module" src="/app.js"></script>
 <script type="module" src="/copy-commands.js"></script>
+<script type="module" src="/quick-demo.js"></script>
 <script>
-const V={home:document.getElementById("home"),demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};
-const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
+const V={home:document.getElementById("home"),try:document.getElementById("try"),docs:document.getElementById("docs"),install:document.getElementById("install")};
+const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
 </script>
 </body></html>

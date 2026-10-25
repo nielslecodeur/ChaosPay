@@ -37,6 +37,24 @@ test('local API loads archives, runs fixtures, exports and rejects cross-origin 
     assert.match(exported.headers.get('content-disposition')!, /attachment/);
     assert.deepEqual(await exported.json(), run);
     assert.equal((await fetch(base + '/api/runs/missing/export')).status, 404);
+
+    const simulatedAgent = await fetch(base + '/api/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ source: 'SIMULATED', scenario: 'baseline', application: 'web-research' }),
+    });
+    assert.equal(simulatedAgent.status, 201);
+    const simulatedAgentRun = await simulatedAgent.json() as { runId: string; application: string; source: string };
+    files.push(`.local/runner/${simulatedAgentRun.runId}.json`);
+    assert.equal(simulatedAgentRun.application, 'web-research');
+    assert.equal(simulatedAgentRun.source, 'SIMULATED');
+
+    const unsupportedTestnet = await fetch(base + '/api/runs', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ source: 'TESTNET', scenario: 'baseline', application: 'web-research' }),
+    });
+    assert.equal(unsupportedTestnet.status, 400);
   } finally {
     child.kill(); await exited;
     for (const file of files) unlinkSync(file);

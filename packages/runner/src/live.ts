@@ -14,6 +14,9 @@ import { RecoveryTimer } from './recovery.js';
 export async function execute(run: Run, processes: Processes) {
   const c = config();
   const application = run.application ?? 'csv';
+  if (application !== 'csv' && application !== 'receipt') {
+    throw new Error('Testnet execution supports CSV conversion and receipt generation only.');
+  }
   const merchantUrl = application === 'receipt' ? 'http://127.0.0.1:3003' : c.merchantUrl;
   run.checkpoints = [];
   const request = async (path: string, init?: RequestInit) => {

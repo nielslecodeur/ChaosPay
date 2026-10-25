@@ -16,13 +16,20 @@ class Element {
 }
 const report = (change = {}) => ({ purchaseId: 'demo', serviceId: 'csv', mode: 'durable', verdict: 'PASS', expectedAmountAtomic: '100000', settledAmountAtomic: '100000', responseRecovered: true, recoveryMs: 1234, transfers: [{ txHash: 'a'.repeat(64), amountAtomic: '100000', tokenContract: 'token', from: 'buyer', to: 'merchant', ledger: 1 }], ...change });
 const run = (change = {}) => ({ runId: 'run', application: 'csv', scenario: 'comparison', source: 'TESTNET', status: 'COMPLETE', startedAt: '2026-10-25T12:00:00Z', timeline: [], reports: [report()], ...change });
+const testContract = `C${'A'.repeat(55)}`;
+const descendants = node => [node, ...(node.children ?? []).flatMap(descendants)];
 async function mount(current, options = {}) {
   const nodes = new Map();
   for (const id of ['application', 'scenario', 'source', 'launch', 'history', 'detail', 'announcement', 'application-description', 'description', 'notice', 'connection', 'error', 'balance-title']) nodes.set(id, new Element(['application', 'scenario', 'source'].includes(id) ? 'select' : 'div'));
-  nodes.get('application').value = 'receipt'; nodes.get('source').value = 'SIMULATED';
+  nodes.get('application').value = 'receipt';
+  for (const value of ['csv', 'receipt', 'market-quote', 'web-research', 'delivery-status', 'weather-brief']) {
+    nodes.get('application').children.push({ value, disabled: false });
+  }
+  nodes.get('source').value = 'SIMULATED';
   const calls = []; let poll;
   const context = {
     document: { getElementById: id => nodes.get(id), createElement: tag => new Element(tag) }, AbortSignal,
+    location: { hostname: options.hostname ?? (options.hosted ? 'lumaid.example' : '127.0.0.1'), port: options.hosted ? '' : '3002' },
     setInterval: callback => { poll = callback; },
     fetch: async (url, init) => {
       calls.push({ url, init });
@@ -40,6 +47,37 @@ test('UNKNOWN with no transfer never claims no payment or successful receipt', a
   const text = nodes.get('detail').text;
   assert.match(text, /Purchase unresolved/); assert.match(text, /Not established/); assert.match(text, /Not confirmed/); assert.match(text, /Not measured/);
   assert.doesNotMatch(text, /Purchase succeeded/);
+});
+test('plain-language report summary explains the service, payment, result, and recovery', async () => {
+  const { nodes } = await mount(run({
+    source: 'SIMULATED',
+    scenario: 'drop',
+    application: 'receipt',
+  }));
+  const text = nodes.get('detail').text;
+  assert.match(text, /What happened/);
+  assert.match(text, /agent requested a service to generate a JSON receipt/);
+  assert.match(text, /0\.0100000 XLM is fictional; no real payment was sent/);
+  assert.match(text, /simulation marks it as received; no real service was called/);
+  assert.match(text, /Simulation: the original purchase was retried instead of creating a new authorization/);
+  assert.match(text, /invoice itself is not paid/);
+});
+test('pre-submit failure summary explains automatic retry without suggesting on-chain cancellation', async () => {
+  const { nodes } = await mount(run({
+    scenario: 'before-submit',
+    source: 'TESTNET',
+  }));
+  const text = nodes.get('detail').text;
+  assert.match(text, /Bug before settlement · automatic retry/);
+  assert.match(text, /error happened before payment submission/);
+  assert.match(text, /same signed authorization automatically/);
+  assert.doesNotMatch(text, /transaction was cancelled on Stellar/);
+});
+test('documentation distinguishes pre-submit retry from an on-chain cancellation and bot integration', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  assert.match(html, /Nothing is cancelled on-chain/);
+  assert.match(html, /A confirmed on-chain transaction cannot be cancelled/);
+  assert.match(html, /bot\/client must persist.*retry with those same values/s);
 });
 test('comparison shows overpayment first and distinguishes receipt from success', async () => {
   const { nodes } = await mount(run({ reports: [report(), report({ mode: 'naive', verdict: 'FAIL', settledAmountAtomic: '200000', transfers: [report().transfers[0], { ...report().transfers[0], txHash: 'b'.repeat(64) }] })] }));
@@ -72,10 +110,130 @@ test('launch preserves the existing runner contract and selected application', a
   assert.deepEqual(JSON.parse(post.init.body), { scenario: 'comparison', source: 'SIMULATED', application: 'receipt' });
   assert.equal(post.init.headers['X-ChaosPay-Local'], '1');
 });
+test('Testnet results link valid token contracts to Stellar Expert, never simulated contracts', async () => {
+  const testnetReport = report({
+    tokenContract: testContract,
+    transfers: [{ ...report().transfers[0], tokenContract: testContract }],
+  });
+  const testnet = await mount(run({ reports: [testnetReport] }));
+  const link = descendants(testnet.nodes.get('detail')).find(node => node.tag === 'a' && node.href?.includes('/contract/'));
+  assert.ok(link);
+  assert.equal(link.href, `https://stellar.expert/explorer/testnet/contract/${testContract}`);
+  assert.equal(link.target, '_blank');
+  assert.equal(link.rel, 'noopener noreferrer');
+
+  const simulated = await mount(run({ source: 'SIMULATED', reports: [testnetReport] }));
+  assert.doesNotMatch(simulated.nodes.get('detail').text, /Stellar Expert/);
+});
+test('changing run mode updates Testnet safety guidance and launch action', async () => {
+  const { nodes } = await mount(run());
+  const source = nodes.get('source');
+  source.value = 'TESTNET';
+  source.onchange();
+  assert.match(nodes.get('notice').text, /Stellar Testnet only/);
+  assert.match(nodes.get('notice').text, /three test payments/);
+  assert.equal(nodes.get('notice').className, 'notice notice-testnet');
+  assert.match(nodes.get('launch').textContent, /Run Testnet experiment/);
+  const explorer = nodes.get('notice').children.find(node => node.tag === 'a');
+  assert.equal(explorer.href, 'https://stellar.expert/explorer/testnet');
+
+  source.value = 'SIMULATED';
+  source.onchange();
+  assert.match(nodes.get('notice').text, /no payment is made/);
+  assert.equal(nodes.get('launch').textContent, 'Run simulation →');
+});
+test('Testnet mode limits service choices to implemented integrations', async () => {
+  const { nodes } = await mount(run());
+  const application = nodes.get('application');
+  application.value = 'web-research';
+  nodes.get('source').value = 'TESTNET';
+  nodes.get('source').onchange();
+  assert.equal(application.value, 'csv');
+  assert.equal(application.children.find(option => option.value === 'csv').disabled, false);
+  assert.equal(application.children.find(option => option.value === 'receipt').disabled, false);
+  for (const value of ['market-quote', 'web-research', 'delivery-status', 'weather-brief']) {
+    assert.equal(application.children.find(option => option.value === value).disabled, true);
+  }
+  assert.match(nodes.get('application-description').textContent, /Testnet currently supports CSV conversion and JSON receipts only/);
+});
 test('busy and disconnected states disable launching another run', async () => {
   const busy = await mount(run(), { busy: true }); assert.equal(busy.nodes.get('launch').disabled, true);
   const offline = await mount(run(), { offline: true }); assert.equal(offline.nodes.get('launch').disabled, true);
   assert.match(offline.nodes.get('connection').text, /Connection to the lab lost/);
+});
+
+test('public static page does not poll the local lab API', async () => {
+  const { calls, poll } = await mount(run(), { hosted: true });
+  assert.deepEqual(calls, []);
+  assert.equal(poll, undefined);
+});
+
+test('local lab keeps polling when opened through localhost', async () => {
+  const { calls, poll } = await mount(run(), { hostname: 'localhost' });
+  assert.ok(calls.some(call => call.url === '/api/state'));
+  assert.equal(typeof poll, 'function');
+});
+
+test('no-install browser demo renders fictional outcomes without network requests', async () => {
+  const script = readFileSync(new URL('./quick-demo.js', import.meta.url), 'utf8');
+  const node = () => ({
+    children: [],
+    textContent: '',
+    className: '',
+    classList: { remove() {} },
+    append(...children) { this.children.push(...children); },
+    replaceChildren(...children) { this.children = children; },
+    get text() { return [this.textContent, ...this.children.map(child => child.text)].join(' '); },
+  });
+  const scenario = { value: 'lost-response', addEventListener() {} };
+  const useCase = { value: 'market-quote' };
+  const result = node();
+  let run;
+  const runButton = { addEventListener: (_event, callback) => { run = callback; } };
+  const nodes = new Map([['quick-scenario', scenario], ['quick-usecase', useCase], ['quick-run', runButton], ['quick-result', result]]);
+  const context = {
+    document: { getElementById: id => nodes.get(id), createElement: node },
+    fetch: () => { throw new Error('The browser demo must not call an API.'); },
+  };
+
+  runInNewContext(script, context);
+  run();
+  assert.match(result.text, /Simulation complete — no payment was made/);
+  assert.match(result.text, /Naive retry/);
+  assert.match(result.text, /Recover the same purchase/);
+  assert.match(result.text, /0\.0200000 XLM/);
+  assert.match(result.text, /0\.0100000 XLM/);
+  assert.match(result.text, /without creating another settlement/);
+  assert.match(result.text, /sample XLM\/EUR quote/);
+  assert.match(result.text, /2 fictional settlement/);
+  assert.match(result.text, /not paid for twice/);
+
+  scenario.value = 'normal';
+  useCase.value = 'delivery-status';
+  run();
+  assert.match(result.text, /Normal purchase/);
+  assert.match(result.text, /fictional parcel/);
+  assert.match(result.text, /fictional delivery update/);
+  assert.doesNotMatch(result.text, /Naive retry/);
+});
+
+test('quick demo labels extra agent use cases as fictional and keeps Testnet scope clear', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  assert.match(html, /id="quick-usecase"/);
+  assert.match(html, /An XLM\/EUR quote · sample data/);
+  assert.match(html, /A parcel delivery update · fictional parcel/);
+  assert.match(html, /none of these examples calls a real service/);
+  assert.match(html, /Testnet lab below currently runs only CSV conversion and JSON receipt generation/);
+});
+
+test('local service selector offers useful simulation-only agent examples', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
+  for (const id of ['market-quote', 'web-research', 'delivery-status', 'weather-brief']) {
+    assert.match(html, new RegExp(`<option value="${id}">`));
+    assert.match(app, new RegExp(`'${id}':`));
+  }
+  assert.match(html, /Agent examples · simulation only/);
 });
 
 test('Lumaid signal mark is present in the header and browser tab', () => {
@@ -85,10 +243,72 @@ test('Lumaid signal mark is present in the header and browser tab', () => {
   assert.equal((html.match(/src="\/lumaid-mark\.svg\?v=9"/g) ?? []).length, 1);
   assert.match(html, /class="brand-mark"/);
   assert.doesNotMatch(html, /class="home-mark"/);
+  assert.match(html, /href="#try">Explore the demo/);
+  assert.match(html, /id="nav-try">Demo/);
+  assert.doesNotMatch(html, /id="nav-demo"|id="demo"/);
+  assert.match(html, /<div id="try" hidden>[\s\S]*?<section id="local-lab"/);
+  assert.match(html, /h==="#try"\|\|localLab\?"try":"home"/);
+  assert.match(html, /localLab=h==="#local-lab"\|\|h==="#demo"/);
+  assert.match(html, /if\(localLab\)document\.getElementById\("local-lab"\)\.scrollIntoView/);
+  assert.match(html, /href="#local-lab">Continue to the local Testnet lab/);
+  assert.match(readFileSync(new URL('./app.js', import.meta.url), 'utf8'), /location\.hash = 'try'/);
   assert.match(logo, /<svg[^>]*viewBox="0 0 64 64"/);
   assert.match(logo, /M30 5v35a8 8 0 0 0 8 8h22/);
   assert.equal((logo.match(/stroke="#A7FFE4"/g) ?? []).length, 1);
   assert.doesNotMatch(logo, /linearGradient|url\(#|<circle|<polygon/);
+});
+
+test('landing page uses the deep-space visual direction from the reference', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
+  const scene = readFileSync(new URL('./space-scene.svg', import.meta.url), 'utf8');
+  assert.match(html, /class="cosmic-scene"[^>]*aria-hidden="true"/);
+  assert.match(html, /class="cosmic-scene"/);
+  assert.match(css, /space-scene\.svg/);
+  assert.match(css, /--paper:#080d1b/);
+  assert.match(css, /\.home-view \.home-copy\{[^}]*align-items:center/);
+  assert.match(css, /\.home-view \.home-cta\{[^}]*background:#fff0df/);
+  assert.match(app, /rgba\(255, 147, 124/);
+  assert.match(app, /length: 360/);
+  assert.match(app, /starTints = \['255,239,225', '196,210,255', '255,194,178'\]/);
+  assert.match(scene, /nebula-coral/);
+  assert.match(scene, /nebula-violet/);
+  assert.ok((scene.match(/<circle cx=/g) ?? []).length >= 70);
+});
+
+test('astronaut is a mouse-following cursor and has a custom illustration', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
+  const astronaut = readFileSync(new URL('./astronaut.svg', import.meta.url), 'utf8');
+  assert.match(html, /id="astronaut-cursor"[^>]*aria-hidden="true"/);
+  assert.match(html, /src="\/astronaut\.svg"/);
+  assert.match(app, /astronautCursor\.style\.transform = `translate3d/);
+  assert.match(app, /astronautCursor\.classList\.add\('is-visible'\)/);
+  assert.match(app, /!document\.body\.classList\.contains\('home-view'\)/);
+  assert.match(app, /hashchange[\s\S]*?astronautCursor\.classList\.remove\('is-visible'\)/);
+  assert.match(css, /#astronaut-cursor\{[^}]*pointer-events:none/);
+  assert.match(css, /body\.home-view #astronaut-cursor\{display:block\}/);
+  assert.match(css, /@media\(hover:none\),\(pointer:coarse\)\{body\.home-view #astronaut-cursor\{display:none\}\}/);
+  assert.match(css, /@media\(hover:hover\) and \(pointer:fine\)\{body\.home-view,body\.home-view a,body\.home-view button,body\.home-view select\{cursor:none\}\}/);
+  assert.match(astronaut, /<svg[^>]*viewBox="0 0 100 80"/);
+});
+
+test('navigation stays right-aligned and space animations respect reduced motion', () => {
+  const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
+  const scene = readFileSync(new URL('./space-scene.svg', import.meta.url), 'utf8');
+  assert.match(css, /header nav\{[^}]*margin:0 0 0 auto/);
+  assert.match(css, /body:not\(\.home-view\) header \.brand-mark\{display:none\}/);
+  assert.match(css, /@media\(max-width:900px\)[\s\S]*?header nav\{margin:0 0 0 auto\}/);
+  assert.doesNotMatch(css, /header nav\{[^}]*margin-right:auto;margin-left:40px/);
+  assert.match(scene, /\.spin-world\{transform-origin:/);
+  assert.match(scene, /\.spin-moon\{transform-origin:/);
+  assert.match(scene, /\.star-dots circle\{[^}]*animation:twinkle/);
+  assert.match(scene, /@media\(prefers-reduced-motion:reduce\)[\s\S]*?animation:none!important/);
+  assert.match(app, /star\.sparkle/);
+  assert.match(app, /prefers-reduced-motion: reduce/);
 });
 
 test('installation provides Windows, Linux, and macOS tabs with platform-specific commands', () => {
