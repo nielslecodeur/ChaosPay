@@ -1,97 +1,119 @@
 <!doctype html>
-<html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>ChaosPay — retrouver un achat après une panne</title><link rel="stylesheet" href="/style.css"></head>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-<header><a class="brand" href="#demo">ChaosPay</a><nav aria-label="Sections"><a href="#demo" id="nav-demo">Démo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet, argent de test</span></header>
+<header><a class="brand" href="#home" aria-label="Lumaid home">Lumaid</a><nav aria-label="Sections"><a href="#home" id="nav-home">Home</a><a href="#demo" id="nav-demo">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
 <main>
+<div id="home">
+  <section class="home-hero" aria-labelledby="home-title">
+    <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
+    <div class="home-copy">
+      <p class="home-kicker">PAYMENT RECOVERY, REIMAGINED</p>
+      <h1 id="home-title">Lumaid</h1>
+      <p class="home-tagline">Your payment never failed.</p>
+      <p class="home-description">Even when the response disappears, the purchase should still make it home.</p>
+      <div class="home-actions"><a class="home-cta" href="#demo">Explore the demo <span aria-hidden="true">↗</span></a><a class="home-secondary" href="#docs">How it works</a></div>
+    </div>
+    <div class="home-route" aria-label="Payment journey: authorized, settled, result recovered, receipt acknowledged">
+      <div><span>01 / REQUEST</span><strong>Authorized</strong></div>
+      <div><span>02 / NETWORK</span><strong>Settled</strong></div>
+      <div><span>03 / RECOVERY</span><strong>Result found</strong></div>
+      <div><span>04 / RECEIPT</span><strong>Acknowledged</strong></div>
+    </div>
+    <span class="home-coordinate" aria-hidden="true">STELLAR · TESTNET / 00:00:00</span>
+  </section>
+  <section class="home-proof" aria-label="Lumaid recovery checks">
+    <p>ONE INTENT</p><p>ONE VERIFIED PAYMENT</p><p>ONE RESULT THAT GETS THROUGH</p>
+  </section>
+</div>
 <div id="demo">
-  <section class="intro"><h1>ChaosPay</h1>
-    <div class="wire" aria-hidden="true"><i></i><span class="ok">Paiement confirmé</span><span class="lost">Réponse perdue</span></div></section>
-  <section class="panel" aria-label="Préparer une expérience">
+  <section class="intro"><p class="home-kicker">LUMAID / PAYMENT RECOVERY LAB</p><h1>Recovery lab</h1><p class="tagline">Recreate a failure. Inspect what the customer actually receives.</p>
+    <div class="wire" aria-hidden="true"><i></i><span class="ok">Payment confirmed</span><span class="lost">Response lost</span></div></section>
+  <section class="panel" aria-label="Set up an experiment">
     <div class="steps">
-      <label><span class="step">1 · Application</span><span>Quel service utilise le client ?</span><select id="application"><option value="csv">Convertir des données en fichier CSV</option><option value="receipt">Générer un reçu JSON</option></select><small id="application-description"></small></label>
-      <label><span class="step">2 · Panne</span><span>Que se passe-t-il ?</span><select id="scenario"></select><small id="description"></small></label>
-      <div class="execution"><label><span class="step">3 · Exécution</span><span>Comment essayer ?</span><select id="source"><option value="SIMULATED">Simulation · aucun paiement</option><option value="TESTNET">Testnet · paiement de test réel</option></select></label><button id="launch" disabled>Voir ce qui arrive au client</button></div>
+      <label><span class="step">1 · Application</span><span>Which service is the client using?</span><select id="application"><option value="csv">Convert data to a CSV file</option><option value="receipt">Generate a JSON receipt</option></select><small id="application-description"></small></label>
+      <label><span class="step">2 · Failure</span><span>What happens?</span><select id="scenario"></select><small id="description"></small></label>
+      <div class="execution"><label><span class="step">3 · Run mode</span><span>How would you like to try it?</span><select id="source"><option value="SIMULATED">Simulation · no payment</option><option value="TESTNET">Testnet · real test payment</option></select></label><button id="launch" disabled>See what happens to the customer</button></div>
     </div>
     <p id="notice" class="notice"></p><p id="error" role="alert"></p><p id="connection" role="status" class="muted"></p>
   </section>
   <div class="workspace">
-    <aside><h2>Vos expériences</h2><p class="muted">Choisissez un essai ou une campagne enregistrée.</p><div id="history"></div></aside>
-    <section aria-labelledby="balance-title"><p class="step" id="balance-title">4 · Bilan pour le client</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="empty">Choisissez une application et une panne, puis lancez l’expérience. Aucun paiement réseau n’est effectué en simulation.</div></div></section>
+    <aside><h2>Your experiments</h2><p class="muted">Select a run or a saved campaign.</p><div id="history"></div></aside>
+    <section aria-labelledby="balance-title"><p class="step" id="balance-title">4 · Customer outcome</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="empty">Choose an application and a failure, then run the experiment. Simulation does not make any network payments.</div></div></section>
   </div>
-  <footer>Deux applications sont exécutables ici. Une troisième API, écrite par notre équipe et installée depuis le package, dispose de preuves historiques. L’intégration par une équipe externe reste à valider. Un accusé confirme la réception par le client logiciel, pas la lecture par une personne.</footer>
+  <footer>Two applications can be run here. A third API, built by our team and installed from the package, has historical evidence. Integration by an external team has not yet been validated. An acknowledgment confirms receipt by the client software, not that a person has read it.</footer>
 </div>
 <div id="docs" hidden>
   <div class="docs-layout">
-    <nav class="toc" aria-label="Dans cette page"><a href="#doc-principe">Principe</a><a href="#doc-bilan">Lire un bilan</a><a href="#doc-scenarios">Scénarios</a><a href="#doc-modes">Naïf et durable</a><a href="#doc-limites">Limites</a></nav>
+    <nav class="toc" aria-label="On this page"><a href="#doc-principe">Overview</a><a href="#doc-bilan">Reading a report</a><a href="#doc-scenarios">Scenarios</a><a href="#doc-modes">Naive vs. durable</a><a href="#doc-limites">Limitations</a></nav>
     <article class="doc">
       <h1>Documentation</h1>
-      <p class="lead">ChaosPay rejoue une panne pendant un achat x402 sur Stellar Testnet, puis compare ce que l’application raconte avec les transferts réellement confirmés sur le réseau.</p>
-      <h2 id="doc-principe">Principe</h2>
-      <p>Un achat passe par quatre étapes. ChaosPay coupe l’une d’elles, de façon contrôlée, dans un marchand de démonstration.</p>
-      <ol><li>Le client demande le service et reçoit un défi de paiement (HTTP 402).</li><li>Le client signe une autorisation, le facilitator la règle sur Stellar.</li><li>Le marchand renvoie le résultat.</li><li>Le client confirme la réception par un accusé.</li></ol>
-      <p>Le verdict ne s’appuie jamais sur la base du marchand seule : les transferts sont relus sur le réseau (hash, actif, payeur, bénéficiaire, montant).</p>
-      <h2 id="doc-bilan">Lire un bilan</h2>
-      <dl><dt>Paiement observé</dt><dd>Somme des transferts décodés sur Stellar pour cet achat, frais exclus. En simulation, le paiement est fictif.</dd>
-      <dt>Résultat reçu</dt><dd>Réception confirmée par le client logiciel, pas lecture par une personne.</dd>
-      <dt>Temps de reprise</dt><dd>Durée entre l’interruption et le résultat retrouvé. Affichée « Non mesuré » quand rien n’a été mesuré.</dd>
-      <dt>PASS</dt><dd>Un achat, un règlement attendu, un résultat récupéré.</dd>
-      <dt>FAIL</dt><dd>Le client a payé plus que prévu, ou deux achats distincts existent pour une seule intention.</dd>
-      <dt>UNKNOWN</dt><dd>Le réseau n’a pas fourni de preuve. Un timeout ou un RPC indisponible n’est jamais converti en échec ni en réussite.</dd>
-      <dt>UNSUPPORTED</dt><dd>Le scénario ne s’applique pas à cette application.</dd></dl>
-      <p>Trois sources existent : <b>Simulation</b> (aucun paiement), <b>Testnet</b> (paiement de test réel, preuves vérifiables) et <b>Archive</b> (campagne enregistrée).</p>
-      <h2 id="doc-scenarios">Scénarios</h2>
-      <div class="scroll"><table><thead><tr><th>Scénario</th><th>Ce qui est coupé</th></tr></thead><tbody>
-      <tr><td>Sans panne</td><td>Rien. Un paiement et un résultat accusé.</td></tr>
-      <tr><td>Avant soumission</td><td>Interruption avant l’appel au facilitator, puis reprise.</td></tr>
-      <tr><td>Réponse perdue</td><td>Connexion coupée après le règlement, puis reprise de la même autorisation.</td></tr>
-      <tr><td>Crash marchand</td><td>Arrêt après le règlement, redémarrage et réconciliation.</td></tr>
-      <tr><td>Deux requêtes</td><td>Deux appels simultanés avec la même autorisation.</td></tr>
-      <tr><td>Confirmation indisponible</td><td>Soumission asynchrone : l’état reste UNKNOWN jusqu’à la réconciliation.</td></tr>
-      <tr><td>Accusé perdu</td><td>Résultat reçu mais accusé omis, puis reprise et accusé.</td></tr>
-      <tr><td>Naïf contre durable</td><td>Réponse perdue, puis comparaison entre la reprise et une nouvelle autorisation volontaire.</td></tr></tbody></table></div>
-      <h2 id="doc-modes">Naïf et durable</h2>
-      <p>Le mode <b>durable</b> enregistre l’achat avant d’envoyer le paiement. Après une coupure, il retrouve le même achat et renvoie le résultat sauvegardé. Le mode <b>naïf</b> crée volontairement une nouvelle autorisation au nouvel essai et paie une seconde fois. Ce contre-exemple vient de notre marchand de démonstration. Il ne montre pas une faille de Stellar.</p>
-      <h2 id="doc-limites">Limites</h2>
-      <ul><li>Fixture locale : deux services (CSV et reçus JSON), un actif Testnet, des points de panne explicites.</li><li>Un troisième service installé depuis le paquet a des preuves historiques ; aucune équipe externe ne l’a encore essayé.</li><li>Le laboratoire n’écoute que sur 127.0.0.1. Ne pas l’exposer sur Internet ni l’utiliser avec de l’argent réel.</li><li>Les tests ne sont pas un audit de sécurité et ne garantissent pas un paiement unique universel.</li><li>Un avis de dépendance connu (Zod) est documenté dans <code>docs/versions.md</code>.</li></ul>
+      <p class="lead">Lumaid replays a failure during an x402 purchase on Stellar Testnet, then compares what the application reports with the transfers actually confirmed on the network.</p>
+      <h2 id="doc-principe">Overview</h2>
+      <p>A purchase has four steps. Lumaid deliberately interrupts one of them in a demo merchant.</p>
+      <ol><li>The client requests a service and receives a payment challenge (HTTP 402).</li><li>The client signs an authorization, and the facilitator settles it on Stellar.</li><li>The merchant returns the result.</li><li>The client acknowledges receipt.</li></ol>
+      <p>The verdict never relies on the merchant's database alone: transfers are read back from the network (hash, asset, payer, recipient, amount).</p>
+      <h2 id="doc-bilan">Reading a report</h2>
+      <dl><dt>Observed payment</dt><dd>Sum of the transfers decoded on Stellar for this purchase, excluding fees. In simulation, the payment is fictitious.</dd>
+      <dt>Result received</dt><dd>Receipt confirmed by the client software, not proof that a person read it.</dd>
+      <dt>Recovery time</dt><dd>Time between the interruption and recovery of the result. Shown as “Not measured” when no duration was measured.</dd>
+      <dt>PASS</dt><dd>One purchase, one expected settlement, and a recovered result.</dd>
+      <dt>FAIL</dt><dd>The client paid more than expected, or two separate purchases were made for one intent.</dd>
+      <dt>UNKNOWN</dt><dd>The network did not provide proof. A timeout or unavailable RPC is never treated as a failure or a success.</dd>
+      <dt>UNSUPPORTED</dt><dd>This scenario does not apply to this application.</dd></dl>
+      <p>There are three sources: <b>Simulation</b> (no payment), <b>Testnet</b> (real test payment with verifiable evidence), and <b>Archive</b> (a saved campaign).</p>
+      <h2 id="doc-scenarios">Scenarios</h2>
+      <div class="scroll"><table><thead><tr><th>Scenario</th><th>What is interrupted</th></tr></thead><tbody>
+      <tr><td>No failure</td><td>Nothing. One payment and an acknowledged result.</td></tr>
+      <tr><td>Before submission</td><td>Interruption before the facilitator call, followed by recovery.</td></tr>
+      <tr><td>Lost response</td><td>Connection drops after settlement; the same authorization is retried.</td></tr>
+      <tr><td>Merchant crash</td><td>Shutdown after settlement, followed by restart and reconciliation.</td></tr>
+      <tr><td>Concurrent requests</td><td>Two simultaneous calls with the same authorization.</td></tr>
+      <tr><td>Confirmation unavailable</td><td>Asynchronous submission: status remains UNKNOWN until reconciliation.</td></tr>
+      <tr><td>Lost acknowledgment</td><td>Result received without an acknowledgment, followed by recovery and acknowledgment.</td></tr>
+      <tr><td>Naive vs. durable</td><td>Lost response, then a comparison between recovering the purchase and deliberately creating a new authorization.</td></tr></tbody></table></div>
+      <h2 id="doc-modes">Naive and durable</h2>
+      <p><b>Durable</b> mode records a purchase before sending payment. After an interruption, it finds the same purchase and returns the saved result. <b>Naive</b> mode deliberately creates a new payment authorization on retry and pays a second time. This counterexample comes from our demo merchant. It does not demonstrate a flaw in Stellar.</p>
+      <h2 id="doc-limites">Limitations</h2>
+      <ul><li>Local fixture: two services (CSV and JSON receipts), one Testnet asset, and explicit failure points.</li><li>A third service installed from the package has historical evidence; no external team has tried it yet.</li><li>The lab listens only on 127.0.0.1. Do not expose it to the internet or use real money.</li><li>These tests are not a security audit and do not guarantee universal single-payment behavior.</li><li>A known dependency advisory (Zod) is documented in <code>docs/versions.md</code>.</li></ul>
     </article>
   </div>
 </div>
 <div id="install" hidden>
   <div class="docs-layout">
-    <nav class="toc" aria-label="Dans cette page"><a href="#inst-prerequis">Prérequis</a><a href="#inst-local">Lancer le laboratoire</a><a href="#inst-cli">Ligne de commande</a><a href="#inst-verifier">Vérifier</a><a href="#inst-integrer">Intégrer dans une API</a></nav>
+    <nav class="toc" aria-label="On this page"><a href="#inst-prerequis">Prerequisites</a><a href="#inst-local">Run the lab</a><a href="#inst-cli">Command line</a><a href="#inst-verifier">Verify</a><a href="#inst-integrer">Integrate an API</a></nav>
     <article class="doc">
       <h1>Installation</h1>
-      <p class="lead">ChaosPay tourne en local, sur Stellar Testnet. Aucune clé d’IA ni de prestataire financier n’est nécessaire.</p>
-      <h2 id="inst-prerequis">Prérequis</h2>
-      <p>Node.js 24 et npm. Un accès réseau au RPC Stellar Testnet et à Friendbot, pour créer et financer les comptes de test.</p>
-      <h2 id="inst-local">Lancer le laboratoire</h2>
+      <p class="lead">Lumaid runs locally on Stellar Testnet. No AI API key or financial provider is required.</p>
+      <h2 id="inst-prerequis">Prerequisites</h2>
+      <p>Node.js 24 and npm. Network access to the Stellar Testnet RPC and Friendbot is needed to create and fund test accounts.</p>
+      <h2 id="inst-local">Run the lab</h2>
 <pre><code>npm ci
 npm run setup:testnet
 npm run check:connections
 npm run dev:dashboard</code></pre>
-      <p>Ouvrez <code>http://127.0.0.1:3002</code>. Les trois comptes Testnet sont financés gratuitement et le paiement porte sur 0,01 XLM de test. Les clés restent dans <code>.env</code> et <code>.local/</code>, ignorés par Git : ne partagez jamais ce fichier.</p>
-      <h2 id="inst-cli">Ligne de commande</h2>
-      <p>Pour le client seul, arrêtez le dashboard, puis lancez le facilitator et le marchand chacun dans un terminal.</p>
+      <p>Open <code>http://127.0.0.1:3002</code>. The three Testnet accounts are funded for free, and the payment is 0.01 test XLM. Keys stay in <code>.env</code> and <code>.local/</code>, both ignored by Git. Never share these files.</p>
+      <h2 id="inst-cli">Command line</h2>
+      <p>To run the client on its own, stop the dashboard, then start the facilitator and merchant in separate terminals.</p>
 <pre><code>npm run dev:facilitator
 npm run dev:merchant</code></pre>
-      <p>Dans un troisième terminal, le premier appel est interrompu volontairement, le second récupère le résultat sans second paiement.</p>
+      <p>In a third terminal, the first call is deliberately interrupted; the second recovers the result without a second payment.</p>
 <pre><code>npm run smoke:payment -- demo-coupure durable drop
 npm run smoke:payment -- demo-coupure durable none</code></pre>
-      <h2 id="inst-verifier">Vérifier</h2>
+      <h2 id="inst-verifier">Verify</h2>
 <pre><code>npm run typecheck
 npm test
 npm run verify:dashboard</code></pre>
-      <p>Arrêtez d’abord les serveurs lancés à la main. <code>verify:dashboard</code> exécute réellement coupure, redémarrage, concurrence et contre-exemple naïf sur Testnet. Les rapports expurgés sont écrits dans <code>evidence/public/</code>.</p>
-      <h2 id="inst-integrer">Intégrer dans une API</h2>
-      <p>Le kit de reprise est un paquet <code>@chaospay/recovery</code> livré en archive locale. Il n’est pas publié sur npm et reste privé tant que la licence n’est pas choisie.</p>
+      <p>Stop any manually launched servers first. <code>verify:dashboard</code> runs interruption, restart, concurrency, and the naive counterexample on Testnet. Redacted reports are written to <code>evidence/public/</code>.</p>
+      <h2 id="inst-integrer">Integrate an API</h2>
+      <p>The recovery kit is an <code>@chaospay/recovery</code> package delivered as a local archive. It is not published on npm and remains private until a license is chosen.</p>
 <pre><code>npm run build:recovery
 npm pack ./packages/recovery --pack-destination .local/packages
-npm install /chemin/vers/chaospay-recovery-0.1.0.tgz express@5.3.0</code></pre>
+npm install /path/to/chaospay-recovery-0.1.0.tgz express@5.3.0</code></pre>
 <pre><code>import { createPaidRouter } from "@chaospay/recovery/stellar-http";
 
 const paid = await createPaidRouter({
-  serviceId: "mon-service",
+  serviceId: "my-service",
   port: 3004,
   basePath: "/paid",
   databasePath: "./.local/purchases.sqlite",
@@ -99,10 +121,14 @@ const paid = await createPaidRouter({
   produce: text => ({ length: text.length }),
 });
 app.use("/paid", paid.router);</code></pre>
-      <p>Routes ajoutées : <code>POST /paid/purchases/:id</code> (défi puis achat signé), <code>POST /paid/purchases/:id/ack</code> (accusé), <code>GET /paid/reports/:id</code> (preuves et verdict), <code>GET /paid/health</code>. L’adaptateur est limité à HTTP en loopback. Guide complet : <code>docs/INTEGRATION_A.md</code>.</p>
+      <p>Added routes: <code>POST /paid/purchases/:id</code> (challenge, then signed purchase), <code>POST /paid/purchases/:id/ack</code> (acknowledgment), <code>GET /paid/reports/:id</code> (evidence and verdict), and <code>GET /paid/health</code>. The adapter is limited to loopback HTTP. Full guide: <code>docs/INTEGRATION_A.md</code>.</p>
     </article>
   </div>
 </div>
 </main><script type="module" src="/app.js"></script>
-<script>const V={demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":"demo";for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};addEventListener("hashchange",go);go()</script>
+<script>
+const V={home:document.getElementById("home"),demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};
+const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
+addEventListener("hashchange",go);go();
+</script>
 </body></html>

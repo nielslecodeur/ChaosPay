@@ -1,6 +1,6 @@
 {
   "simulated": false,
-  "executedAt": "2026-10-25T14:43:21.184Z",
+  "executedAt": "2026-10-25T15:21:58.079Z",
   "integration": "invoice-check",
   "scope": "Team-authored consumer installed from a tarball outside the source repository; not an external customer pilot.",
   "package": "@chaospay/recovery@0.1.0",
@@ -10,7 +10,7 @@
       "before": null,
       "after": {
         "schemaVersion": 1,
-        "purchaseId": "integration-b863463f-bf98-4492-819f-a270c191f176",
+        "purchaseId": "integration-e97805ab-5679-45a1-8f7d-e1ba2177ceb2",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -18,12 +18,12 @@
         "settledAmountAtomic": "100000",
         "transfers": [
           {
-            "txHash": "e96c7dc68229b8f0c0f684903bf77aa6521f8ede68f06ef4511c9dbc9be05550",
+            "txHash": "85dd47a3c91b656e15276aa5c7beb8ac8fb7faf17a0ea765318509a46b0ed1ae",
             "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+            "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
             "amountAtomic": "100000",
-            "ledger": 5383137
+            "ledger": 5383620
           }
         ],
         "responseRecovered": true,
@@ -38,7 +38,7 @@
       "scenario": "drop",
       "before": {
         "schemaVersion": 1,
-        "purchaseId": "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c",
+        "purchaseId": "integration-6682234d-2527-4dbd-b265-5c831a706b17",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -46,12 +46,12 @@
         "settledAmountAtomic": "100000",
         "transfers": [
           {
-            "txHash": "d7e926bf925c558612f0ceecf379e618619a455d802d496dcf164ee338c8b5d1",
+            "txHash": "8ffdd1ae0bfe96cbbadfdd0155aafba4d7291fb306e052a76b2a26d9461e1b15",
             "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+            "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
             "amountAtomic": "100000",
-            "ledger": 5383139
+            "ledger": 5383622
           }
         ],
         "responseRecovered": false,
@@ -63,7 +63,7 @@
       },
       "after": {
         "schemaVersion": 1,
-        "purchaseId": "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c",
+        "purchaseId": "integration-6682234d-2527-4dbd-b265-5c831a706b17",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -71,19 +71,19 @@
         "settledAmountAtomic": "100000",
         "transfers": [
           {
-            "txHash": "d7e926bf925c558612f0ceecf379e618619a455d802d496dcf164ee338c8b5d1",
+            "txHash": "8ffdd1ae0bfe96cbbadfdd0155aafba4d7291fb306e052a76b2a26d9461e1b15",
             "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+            "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
             "amountAtomic": "100000",
-            "ledger": 5383139
+            "ledger": 5383622
           }
         ],
         "responseRecovered": true,
         "verdict": "PASS",
         "reason": "Verdict reported by the independent engine observer.",
         "serviceId": "invoice-check",
-        "recoveryMs": 344,
+        "recoveryMs": 489,
         "unknownObservations": 0
       }
     },
@@ -91,7 +91,7 @@
       "scenario": "crash",
       "before": {
         "schemaVersion": 1,
-        "purchaseId": "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f",
+        "purchaseId": "integration-01620a76-1bff-49cc-8c52-c0515b6cf9bc",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -99,12 +99,12 @@
         "settledAmountAtomic": "100000",
         "transfers": [
           {
-            "txHash": "9908e9d6b661408cb3e807f696b08f10eb07ade4e78f108b9b28c84f82fa771f",
+            "txHash": "bea6edd45648a5ea3b964823c6e1cb8796fcc32048e0150288c2d33d5d5c5431",
             "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+            "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
             "amountAtomic": "100000",
-            "ledger": 5383141
+            "ledger": 5383624
           }
         ],
         "responseRecovered": false,
@@ -116,7 +116,7 @@
       },
       "after": {
         "schemaVersion": 1,
-        "purchaseId": "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f",
+        "purchaseId": "integration-01620a76-1bff-49cc-8c52-c0515b6cf9bc",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -124,19 +124,19 @@
         "settledAmountAtomic": "100000",
         "transfers": [
           {
-            "txHash": "9908e9d6b661408cb3e807f696b08f10eb07ade4e78f108b9b28c84f82fa771f",
+            "txHash": "bea6edd45648a5ea3b964823c6e1cb8796fcc32048e0150288c2d33d5d5c5431",
             "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+            "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
             "amountAtomic": "100000",
-            "ledger": 5383141
+            "ledger": 5383624
           }
         ],
         "responseRecovered": true,
         "verdict": "PASS",
         "reason": "Verdict reported by the independent engine observer.",
         "serviceId": "invoice-check",
-        "recoveryMs": 1352,
+        "recoveryMs": 1403,
         "unknownObservations": 0
       }
     },
@@ -144,7 +144,7 @@
       "scenario": "confirmation-lost",
       "before": {
         "schemaVersion": 1,
-        "purchaseId": "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69",
+        "purchaseId": "integration-4034626d-c8a8-4234-ab79-2d1fada7a558",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -160,7 +160,7 @@
       },
       "after": {
         "schemaVersion": 1,
-        "purchaseId": "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69",
+        "purchaseId": "integration-4034626d-c8a8-4234-ab79-2d1fada7a558",
         "mode": "durable",
         "network": "stellar:testnet",
         "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -168,27 +168,27 @@
         "settledAmountAtomic": "100000",
         "transfers": [
           {
-            "txHash": "a5fcd8265405301c4f08db3f505c47ef008441b861afc3d2440218acc8684dbd",
+            "txHash": "9cd3bc840b89e0a95847d5ac443c9702e263d42846002a26a7ab4f84209e978f",
             "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+            "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
             "amountAtomic": "100000",
-            "ledger": 5383143
+            "ledger": 5383626
           }
         ],
         "responseRecovered": true,
         "verdict": "PASS",
         "reason": "Verdict reported by the independent engine observer.",
         "serviceId": "invoice-check",
-        "recoveryMs": 6023,
-        "unknownObservations": 6
+        "recoveryMs": 4073,
+        "unknownObservations": 4
       }
     }
   ],
   "reports": {
-    "integration-b863463f-bf98-4492-819f-a270c191f176": {
+    "integration-e97805ab-5679-45a1-8f7d-e1ba2177ceb2": {
       "schemaVersion": 1,
-      "purchaseId": "integration-b863463f-bf98-4492-819f-a270c191f176",
+      "purchaseId": "integration-e97805ab-5679-45a1-8f7d-e1ba2177ceb2",
       "mode": "durable",
       "network": "stellar:testnet",
       "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -196,12 +196,12 @@
       "settledAmountAtomic": "100000",
       "transfers": [
         {
-          "txHash": "e96c7dc68229b8f0c0f684903bf77aa6521f8ede68f06ef4511c9dbc9be05550",
+          "txHash": "85dd47a3c91b656e15276aa5c7beb8ac8fb7faf17a0ea765318509a46b0ed1ae",
           "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+          "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
           "amountAtomic": "100000",
-          "ledger": 5383137
+          "ledger": 5383620
         }
       ],
       "responseRecovered": true,
@@ -211,9 +211,9 @@
       "recoveryMs": null,
       "unknownObservations": 0
     },
-    "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c": {
+    "integration-6682234d-2527-4dbd-b265-5c831a706b17": {
       "schemaVersion": 1,
-      "purchaseId": "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c",
+      "purchaseId": "integration-6682234d-2527-4dbd-b265-5c831a706b17",
       "mode": "durable",
       "network": "stellar:testnet",
       "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -221,24 +221,24 @@
       "settledAmountAtomic": "100000",
       "transfers": [
         {
-          "txHash": "d7e926bf925c558612f0ceecf379e618619a455d802d496dcf164ee338c8b5d1",
+          "txHash": "8ffdd1ae0bfe96cbbadfdd0155aafba4d7291fb306e052a76b2a26d9461e1b15",
           "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+          "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
           "amountAtomic": "100000",
-          "ledger": 5383139
+          "ledger": 5383622
         }
       ],
       "responseRecovered": true,
       "verdict": "PASS",
       "reason": "Verdict reported by the independent engine observer.",
       "serviceId": "invoice-check",
-      "recoveryMs": 344,
+      "recoveryMs": 489,
       "unknownObservations": 0
     },
-    "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f": {
+    "integration-01620a76-1bff-49cc-8c52-c0515b6cf9bc": {
       "schemaVersion": 1,
-      "purchaseId": "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f",
+      "purchaseId": "integration-01620a76-1bff-49cc-8c52-c0515b6cf9bc",
       "mode": "durable",
       "network": "stellar:testnet",
       "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -246,24 +246,24 @@
       "settledAmountAtomic": "100000",
       "transfers": [
         {
-          "txHash": "9908e9d6b661408cb3e807f696b08f10eb07ade4e78f108b9b28c84f82fa771f",
+          "txHash": "bea6edd45648a5ea3b964823c6e1cb8796fcc32048e0150288c2d33d5d5c5431",
           "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+          "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
           "amountAtomic": "100000",
-          "ledger": 5383141
+          "ledger": 5383624
         }
       ],
       "responseRecovered": true,
       "verdict": "PASS",
       "reason": "Verdict reported by the independent engine observer.",
       "serviceId": "invoice-check",
-      "recoveryMs": 1352,
+      "recoveryMs": 1403,
       "unknownObservations": 0
     },
-    "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69": {
+    "integration-4034626d-c8a8-4234-ab79-2d1fada7a558": {
       "schemaVersion": 1,
-      "purchaseId": "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69",
+      "purchaseId": "integration-4034626d-c8a8-4234-ab79-2d1fada7a558",
       "mode": "durable",
       "network": "stellar:testnet",
       "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
@@ -271,20 +271,20 @@
       "settledAmountAtomic": "100000",
       "transfers": [
         {
-          "txHash": "a5fcd8265405301c4f08db3f505c47ef008441b861afc3d2440218acc8684dbd",
+          "txHash": "9cd3bc840b89e0a95847d5ac443c9702e263d42846002a26a7ab4f84209e978f",
           "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
-          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "from": "GBEMLRZI3BWWVG6T3ZZQM2CC2OFGYDD6PJ54IT3HF2JJEEK45UVXUQPA",
+          "to": "GCKLD6EHIY4I3CG4HDHSIRS634ATRZUE2VMXSFFT3EPRF4JD7VYNHWMY",
           "amountAtomic": "100000",
-          "ledger": 5383143
+          "ledger": 5383626
         }
       ],
       "responseRecovered": true,
       "verdict": "PASS",
       "reason": "Verdict reported by the independent engine observer.",
       "serviceId": "invoice-check",
-      "recoveryMs": 6023,
-      "unknownObservations": 6
+      "recoveryMs": 4073,
+      "unknownObservations": 4
     }
   }
 }
