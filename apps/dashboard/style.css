@@ -5,7 +5,8 @@ h1,h2,h3,.brand,.run-heading h2{font-family:"Space Grotesk","IBM Plex Sans",sans
 a{color:inherit;text-underline-offset:3px}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;padding:18px 4vw;border-bottom:1px solid var(--ink)}
-.brand{font-size:20px;font-weight:800;letter-spacing:-.04em;text-decoration:none}
+.brand{display:inline-flex;align-items:center;gap:9px;font-size:20px;font-weight:800;letter-spacing:-.04em;text-decoration:none}
+.brand-mark{display:block;width:32px;height:32px}
 .network{font-size:13px;color:var(--mute)}
 main{max-width:1320px;margin:auto;padding:0 4vw 64px}
 .eyebrow,.step{display:block;margin:0 0 14px;font-size:13px;font-weight:500;color:var(--mute)}
