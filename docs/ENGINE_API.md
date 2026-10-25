@@ -65,3 +65,5 @@ GET /api/state : scénarios, exécutions, état busy.
 GET /api/runs/:id/export : exécution filtrée avec reports finaux et checkpoints avant reprise.
 
 Les simulations sont fictives. ARCHIVE désigne une preuve historique, pas une nouvelle vérification réseau. Les contrôles restent locaux ; aucun CORS public ni secret dans l'export.
+
+Le runner ajoute recoveryDurationMs à ses rapports finaux : temps monotone côté client entre détection de l'interruption et premier accusé réussi, ou null sans reprise mesurée. Ce champ est calculé par le runner après filtrage du rapport moteur. Il est distinct de recoveryMs, mesuré par le journal serveur. Les exports conservent les deux mesures.

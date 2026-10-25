@@ -34,7 +34,7 @@ function render() {
     const metrics = el('div', undefined, 'metrics');
     const settlements = new Set(report.transfers.map(t => t.txHash).filter(Boolean)).size;
     const duration = run.source === 'SIMULATED' ? 'Non mesuré' : Number.isFinite(report.recoveryDurationMs) ? `${(report.recoveryDurationMs / 1000).toFixed(3)} s` : 'Non mesuré';
-    for (const [value, label] of [[settlements, 'Règlements observés (transactions uniques)'], [xlm(report.settledAmountAtomic), 'Montant payé observé · hors frais'], [xlm(report.expectedAmountAtomic), 'Prix de l’achat'], [report.responseRecovered ? 'Oui' : 'Non', 'Résultat récupéré et accusé'], [duration, 'Délai de reprise (runner)'], [report.recoveryMs == null ? 'Non mesuré' : report.recoveryMs + ' ms', 'Délai de reprise (moteur)'], [report.unknownObservations ?? 'Non mesuré', 'Observations inconnues']]) {
+    for (const [value, label] of [[settlements, 'Règlements observés (transactions uniques)'], [xlm(report.settledAmountAtomic), 'Montant payé observé · hors frais'], [xlm(report.expectedAmountAtomic), 'Prix de l’achat'], [report.responseRecovered ? 'Oui' : 'Non', 'Résultat récupéré et accusé'], [duration, 'Reprise mesurée côté client'], [report.recoveryMs == null ? 'Non mesuré' : report.recoveryMs + ' ms', 'Reprise mesurée côté serveur'], [report.unknownObservations ?? '—', 'Observations inconnues']]) {
       const metric = el('div', undefined, 'metric'); metric.append(el('strong', String(value)), el('span', label)); metrics.append(metric);
     }
     card.append(metrics, el('p', report.reason));

@@ -25,29 +25,6 @@ Les huit scénarios sont : sans panne, avant soumission, confirmation indisponib
 SIMULATED fonctionne sans clés et produit des résultats fictifs, y compris dans l'export.
 ARCHIVE charge les preuves de evidence/public/ ; aucune nouvelle vérification réseau n'est effectuée.
 
-La comparaison affiche le montant observé en XLM (sept décimales exactes, hors frais), le prix, le nombre de transactions distinctes et le résultat récupéré et accusé. Les unités atomiques restent visibles. Le nombre de règlements est distinct du nombre d’événements de transfert.
-
-Le champ optionnel `recoveryDurationMs` appartient au runner : il mesure, avec une horloge monotone, la durée entre la détection de l’interruption et le premier accusé réussi, redémarrage et nouvelle autorisation naïve inclus. Il ne mesure pas la durée depuis le règlement sur la blockchain. Sans interruption mesurée, sans accusé, en simulation ou pour les anciennes archives, afficher « Non mesuré ». Un montant observé nul avec UNKNOWN ne prouve pas qu’aucun paiement n’a eu lieu.
-
-## Reference historique CSV
-
-Campagne du 25 octobre 2026 sur le moteur `38d4d1c`, avant integration du kit et de la seconde API.
-
-| Scénario | Verdict | Règlements | Reprise mesurée |
-| --- | --- | --- | --- |
-| Sans panne | PASS | 1 | Non applicable |
-| Réponse perdue | PASS | 1 | 296 ms |
-| Crash | PASS | 1 | 4 780 ms |
-| Concurrence | PASS | 1 | Non applicable |
-| Comparaison durable | PASS | 1 | 145 ms |
-| Comparaison naïve | FAIL attendu | 2 | 14 057 ms |
-
-Chaque règlement valait 100000 unités atomiques (0,01 XLM Testnet). Ces mesures décrivent une campagne, pas une garantie de performance. Son export complet reste local dans `.local/runner/validation-1792937083322.json` ; il n’est pas livré dans Git. La commande de validation ci-dessous permet de produire une nouvelle référence.
-
-### Contrat integre
-
-Voir `ENGINE_API.md` : application csv/receipt, rapport serviceId, enveloppe result/resultHash et accuse resultHash. Le runner verifie digest(result). Le hook confirmation-lost expose UNKNOWN avant reprise avec la meme autorisation. recoveryMs appartient au moteur ; recoveryDurationMs reste la mesure monotone du runner.
-
 ## Exécution Testnet
 
 Suivre [SETUP_A.md](SETUP_A.md) pour créer .env et financer les comptes de test. Arrêter les serveurs manuels avant une exécution : le runner démarre et arrête ses propres processus, et refuse de prendre le contrôle d'un serveur existant.
@@ -78,18 +55,23 @@ npm test
 npm run verify:dashboard
 ```
 
-Le serveur écoute uniquement sur loopback, vérifie Host et Origin et exige un en-tête personnalisé pour lancer une expérience. Aucun CORS n’est ouvert. Ce laboratoire est exclusivement local et Testnet.
-
-Pour rejouer automatiquement les cinq scénarios via la même API que le dashboard, laisser le runner démarré puis lancer :
-
-```sh
-node --import tsx packages/runner/verify-testnet.ts
-```
-
-Cette commande effectue de nouveaux paiements Testnet. Elle vérifie les verdicts, le nombre de règlements, les montants exacts, l’accusé, les délais de reprise et l’export JSON. Elle s’arrête au premier échec et conserve les autorisations. La campagne réussie est sauvegardée dans `.local/runner/validation-<timestamp>.json`.
-
 Exécuter ces commandes successivement : les tests HTTP et le dashboard utilisent le même port. La campagne couvre huit scénarios sur deux applications et écrit evidence/public/recovery-campaign.json.
 
-La campagne vérifie aussi le nombre exact de transactions distinctes, le montant payé, l’accusé du résultat, les mesures de reprise du moteur et du runner et l’identité de l’export avec le rapport affiché. Hors comparaison naïve, une seule autorisation doit apparaître dans la timeline. Chaque panne doit produire un checkpoint UNKNOWN avant la récupération ; `confirmation-lost` doit enregistrer au moins une observation inconnue.
+Les contrôles vérifient aussi le nombre exact de transactions distinctes, les montants, les accusés, les deux mesures de reprise et l’identité de l’export avec le rapport affiché. Hors comparaison naïve, la timeline doit contenir une seule autorisation. Chaque panne doit produire UNKNOWN avant récupération.
+
+La campagne de référence B est conservée dans `evidence/public/recovery-campaign.json`. La campagne publiée par A au commit `64bd455` reste disponible séparément dans `evidence/public/recovery-campaign-A-64bd455.json`.
 
 Le laboratoire est local et exclusivement Testnet. Il reste à éprouver le kit sur une application externe ; les deux intégrations actuelles appartiennent à ce dépôt.
+
+
+## Mesures et validation ajoutées par B
+
+Les montants en XLM conservent les sept décimales exactes, sans conversion flottante. Le nombre de règlements compte les transactions distinctes ; les unités atomiques restent visibles.
+
+recoveryDurationMs mesure côté runner le temps monotone entre la détection de l’interruption et le premier accusé réussi. recoveryMs mesure côté moteur le temps depuis l’interruption enregistrée dans le journal. Les deux durées ont des points de départ différents ; elles incluent le redémarrage et la reprise. Sans mesure terminée, afficher « Non mesuré ». Un montant observé nul avec UNKNOWN ne prouve pas l’absence de paiement.
+
+La validation complémentaire de B couvre les cinq scénarios CSV initiaux. Avec le dashboard déjà lancé :
+
+    node --import tsx packages/runner/verify-testnet.ts
+
+Elle vérifie verdicts, transactions distinctes, montants, accusés, durée côté runner et export. Les résultats restent dans .local/runner/validation-<timestamp>.json. Pour les huit scénarios sur les deux API, arrêter le dashboard et lancer npm run verify:dashboard.
