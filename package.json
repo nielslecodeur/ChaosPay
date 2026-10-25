@@ -18,6 +18,7 @@
     "dev:dashboard": "tsx packages/runner/src/server.ts",
     "dev:receipt": "tsx --env-file=.env apps/receipt-api/src/server.ts",
     "verify:dashboard": "node scripts/verify-dashboard.mjs",
+    "verify:evidence": "tsx scripts/verify-evidence.ts",
     "build:recovery": "npm run build --prefix packages/recovery",
     "verify:integration": "tsx --env-file=.env scripts/verify-integration.ts"
   },
