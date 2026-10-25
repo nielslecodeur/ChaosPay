@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChaosPay — laboratoire de reprise</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+  <header><a class="brand" href="/">◈ ChaosPay <span>LAB</span></a><span class="network">● Stellar Testnet · local</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">PAYMENT RESILIENCE LAB</p><h1>Le paiement passe.<br><em>La réponse disparaît.</em></h1><p>Injectez une panne. Reprenez le même achat. Comparez les transferts réellement observés.</p></section>
+    <section class="panel controls" aria-label="Configurer une expérience">
+      <label>Scénario<select id="scenario"></select></label>
+      <label>Source<select id="source"><option value="SIMULATED">SIMULATED · sans paiement</option><option value="TESTNET">TESTNET · exécution réelle</option></select></label>
+      <button id="launch">Lancer l’expérience →</button>
+      <p id="description"></p><p id="notice">Simulation : les transferts et verdicts sont fictifs.</p>
+      <p id="error" role="alert"></p>
+    </section>
+    <div class="workspace"><aside class="panel"><h2>Expériences</h2><div id="history"></div></aside>
+    <section id="detail" aria-live="polite"><div class="panel empty">Lancez une simulation ou sélectionnez une campagne historique.</div></section></div>
+    <footer>Un PASS exige un transfert attendu et un accusé applicatif. Une interruption reste inconnue sans preuve. La fixture naïve crée volontairement une nouvelle autorisation ; elle ne démontre pas une faille Stellar.</footer>
+  </main><script type="module" src="/app.js"></script>
+</body></html>
