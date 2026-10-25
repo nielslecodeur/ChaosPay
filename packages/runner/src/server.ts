@@ -6,6 +6,7 @@ import { resolve } from 'node:path';
 import { isScenario, scenarios } from '../../../scenarios/index.js';
 import { simulate } from './fixture.js';
 import { event, publicReport, type Run } from './report.js';
+import { archiveRuns } from './archives.js';
 import { Processes } from './processes.js';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -31,10 +32,10 @@ function save(run: Run) {
 if (existsSync('evidence/public')) for (const name of readdirSync('evidence/public').filter(n => n.endsWith('.json'))) {
   try {
     const data = JSON.parse(readFileSync(resolve('evidence/public', name), 'utf8'));
-    if (data.simulated !== false) continue;
-    const run: Run = { runId: name.replace(/\.json$/, ''), source: 'ARCHIVE', scenario: 'campagne moteur A', status: 'COMPLETE', startedAt: data.executedAt, timeline: [], reports: Object.values(data.reports).map(publicReport) };
-    event(run, 'archive', 'Preuves historiques chargées du dépôt ; aucune nouvelle exécution réseau.');
-    runs.set(run.runId, run);
+    for (const run of archiveRuns(data,name.replace(/\.json$/, ""))) {
+      event(run, "archive", "Preuves historiques chargées ; aucune nouvelle exécution réseau.");
+      runs.set(run.runId,run);
+    }
   } catch { /* Ignore unsupported archives. */ }
 }
 app.get('/api/state', (_req, res) => res.json({ busy, scenarios, runs: [...runs.values()].reverse() }));

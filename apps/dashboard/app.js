@@ -1,7 +1,7 @@
 const $ = id => document.getElementById(id);
 const el = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
 const badge = (text, tone = '') => el('span', text, `badge ${tone}`);
-const apps = { csv: 'Conversion CSV', receipt: 'Génération de reçus' };
+const apps = { csv: 'Conversion CSV', receipt: 'Génération de reçus', 'invoice-check': 'Vérification de facture · paquet installé séparément' };
 const scenarios = {
   comparison: ['Comparer deux façons de reprendre', 'Après une réponse perdue, comparer un nouveau paiement et la récupération de l’achat existant.'],
   drop: ['La réponse disparaît', 'Le paiement est confirmé, mais le client ne reçoit pas sa réponse.'],
@@ -16,7 +16,7 @@ const sourceText = { SIMULATED: 'SIMULATION · données fictives', TESTNET: 'TES
 const statusText = { RUNNING: 'En cours', COMPLETE: 'Terminé', INTERRUPTED: 'Interrompu' };
 let state = { scenarios: [], runs: [], busy: false }, selected, previous = '', pending = false, reachable = false;
 const xlm = atomic => { const n = BigInt(atomic); return `${n / 10000000n},${(n % 10000000n).toString().padStart(7, '0')} XLM`; };
-const titleOf = run => run.source === 'ARCHIVE' ? 'Campagne enregistrée' : scenarios[run.scenario]?.[0] ?? run.scenario;
+const titleOf = run => run.integrationEvidence ? 'Intégration indépendante · ' + (scenarios[run.scenario]?.[0] ?? run.scenario) : run.source === 'ARCHIVE' ? 'Campagne enregistrée' : scenarios[run.scenario]?.[0] ?? run.scenario;
 const appOf = (report, run) => apps[run.application] ?? apps[report.serviceId] ?? report.serviceId ?? 'Application non précisée';
 function describe() {
   $('description').textContent = scenarios[$('scenario').value]?.[1] ?? '';
@@ -88,6 +88,12 @@ function render() {
   const heading = el('div', undefined, 'panel run-heading'); const title = el('div');
   title.append(badge(sourceText[run.source], run.source), el('h2', titleOf(run)), el('p', statusText[run.status]));
   if (run.source === 'ARCHIVE') title.append(el('p', 'Résultats enregistrés, sans nouvelle vérification réseau. Plusieurs achats peuvent provenir de scénarios différents.'));
+  if (run.integrationEvidence) {
+    const proof=run.integrationEvidence;
+    title.append(el('p','API écrite par notre équipe, installée depuis une archive hors du dépôt. Validation technique ; aucun pilote client externe revendiqué.'));
+    title.append(el('p',proof.package + ' · ' + proof.authorizationCount + ' autorisation(s) créée(s) · même autorisation réutilisée : ' + (proof.originalAuthorizationReused ? 'oui' : run.scenario === 'baseline' ? 'sans reprise à tester' : 'non')));
+    title.append(el('p','Archive SHA-256 : ' + proof.archiveSha256));
+  }
   if (run.source === 'SIMULATED') title.append(el('p', 'Ces résultats sont fictifs. Aucun paiement réseau.'));
   const download = el('a', '↓ Télécharger les preuves (JSON)'); download.href = `/api/runs/${encodeURIComponent(run.runId)}/export`; download.download = '';
   heading.append(title, download); detail.append(heading);

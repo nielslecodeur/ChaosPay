@@ -9,7 +9,24 @@ npm run dev:dashboard
 
 Ouvrir **http://127.0.0.1:3002**. Le dashboard est en HTML/CSS/JavaScript natif.
 
-## Démo de deux minutes
+
+## Démo de deux minutes : installation indépendante et reprise
+
+Préparation : suivre [QUICKSTART.md](QUICKSTART.md), conserver le dossier indépendant et ses journaux, puis ouvrir dans le dashboard les archives « Intégration indépendante ». Le réseau est utilisé avant la présentation pour préparer les preuves. Dire clairement qu'une archive est un résultat historique.
+
+| Temps | Action | Message |
+| --- | --- | --- |
+| 0:00–0:20 | Montrer le dossier indépendant, son package.json et l'import @chaospay/recovery/stellar-http | « Cette API installe une archive npm. Elle ne copie pas notre marchand et n'importe pas les sources du dépôt. » |
+| 0:20–0:40 | Montrer le montage sous /paid et la fonction métier | « Le service vérifie le calcul d'une facture. Le paiement rémunère cette vérification ; il ne règle pas la facture. » |
+| 0:40–1:00 | Montrer la commande client avec drop et son interruption préparée | « Le paiement est passé, mais le client n'a pas reçu la réponse. Il conserve son identifiant et son autorisation. » |
+| 1:00–1:20 | Montrer la commande du même identifiant avec none et la sortie PASS | « La reprise restitue le résultat sans créer une nouvelle autorisation. » |
+| 1:20–1:45 | Ouvrir l'archive du scénario réponse perdue | « Avant : inconnu et réception non confirmée. Après : résultat accusé et un seul transfert attendu. Voici l'empreinte du paquet testé. » |
+| 1:45–2:00 | Télécharger l'export et afficher les limites | « Cette intégration a été répétée par notre agent, pas encore par une équipe extérieure. Nous conservons les journaux ; les effets métier doivent pouvoir être rejoués sans dommage. » |
+
+Si un achat est exécuté en direct, annoncer qu'il s'agit de Testnet et attendre sa preuve : ne pas promettre que les opérations réseau tiendront dans ces deux minutes. Ne jamais supprimer le journal ou changer l'identifiant pour obtenir artificiellement un résultat vert.
+
+
+## Variante : comparaison des deux applications de démonstration
 
 Préparer les essais **avant** la présentation pour ne pas dépendre des délais Testnet : CSV / « Comparer deux façons de reprendre », puis Reçus / « L’application s’arrête ». Garder le runner ouvert : son historique local n’est pas rechargé après redémarrage. Vérifier que les rapports sont bien TESTNET et les exports disponibles. Ne jamais présenter une simulation comme une preuve réseau.
 

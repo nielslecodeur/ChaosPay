@@ -55,3 +55,7 @@ A ne modifie pas les fichiers du dashboard ou du runner. Ses seuls nouveaux scri
 ## Cadrage de la distribution locale
 
 Le contrat courant est [PACKAGE_CONTRACT.md](PACKAGE_CONTRACT.md) : exports publics, archive, preuves et responsabilités A/B. Base commune : 8d33eaa. Pas de publication npm avant validation et décision séparée ; le package client pour agents reste ultérieur.
+
+## Partie B reprise par le même agent
+
+Branche feat/developer-experience-b depuis dd7ab1f. Livrables : QUICKSTART.md, QUICKSTART_REVIEW.md, client pédagogique, démo et affichage des archives d'intégration. Le runner ajoute une lecture filtrée des métadonnées prévues par PACKAGE_CONTRACT.md ; aucun nouveau scénario interactif ni package client publié. L'essai du guide est une répétition automatisée, pas un retour d'un développeur extérieur.

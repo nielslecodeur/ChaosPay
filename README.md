@@ -54,6 +54,10 @@ La campagne exécute réellement coupure, redémarrage, concurrence et contre-ex
 
 ## Documentation
 
+- [Démarrer depuis un dossier vierge](docs/QUICKSTART.md)
+- [Retours de validation du guide](docs/QUICKSTART_REVIEW.md)
+
+
 - [Intégrer le paquet dans une API existante](docs/INTEGRATION_A.md)
 - [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
 - [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)

@@ -71,3 +71,13 @@ test('busy and disconnected states disable launching another run', async () => {
   const offline = await mount(run(), { offline: true }); assert.equal(offline.nodes.get('launch').disabled, true);
   assert.match(offline.nodes.get('connection').text, /Connexion au laboratoire interrompue/);
 });
+
+test('isolated package archive shows provenance, authorization and before/after without live claims', async () => {
+ const current=run({source:'ARCHIVE',scenario:'drop',application:undefined,reports:[report({serviceId:'invoice-check'})],checkpoints:[report({verdict:'UNKNOWN',responseRecovered:false})],integrationEvidence:{package:'@chaospay/recovery@0.1.0',archiveSha256:'a'.repeat(64),authorizationCount:1,originalAuthorizationReused:true}});
+ const {nodes}=await mount(current);
+ const text=nodes.get('detail').text;
+ assert.match(text,/Vérification de facture/); assert.match(text,/1 autorisation/);
+ assert.match(text,/même autorisation réutilisée : oui/); assert.match(text,/état inconnu/);
+ assert.match(text,/hors du dépôt/); assert.match(text,/aucun pilote client externe/);
+ assert.match(text,/sans nouvelle vérification/);
+});

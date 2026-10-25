@@ -7,6 +7,7 @@ export interface RunnerReport extends PurchaseReport {
   recoveryDurationMs?: number | null;
 }
 export interface Run {
+  integrationEvidence?: {package:string;archiveSha256:string;authorizationCount:number;originalAuthorizationReused:boolean};
   application?: "csv" | "receipt"; checkpoints?: PurchaseReport[];
   runId: string; scenario: string; source: Source; status: 'RUNNING' | 'COMPLETE' | 'INTERRUPTED';
   startedAt: string; timeline: Event[]; reports: RunnerReport[];
