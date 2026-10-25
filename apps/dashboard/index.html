@@ -1,17 +1,16 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="stylesheet" href="/style.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="icon" type="image/svg+xml" href="/lumaid-mark.svg?v=9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head>
 <body>
-<header><a class="brand" href="#home" aria-label="Lumaid home">Lumaid</a><nav aria-label="Sections"><a href="#home" id="nav-home">Home</a><a href="#demo" id="nav-demo">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
+<header><a class="brand" href="#home" aria-label="Lumaid home"><img class="brand-mark" src="/lumaid-mark.svg?v=9" alt=""><span>Lumaid</span></a><nav aria-label="Sections"><a href="#demo" id="nav-demo">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
 <main>
 <div id="home">
+  <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
   <section class="home-hero" aria-labelledby="home-title">
-    <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
     <div class="home-copy">
       <p class="home-kicker">PAYMENT RECOVERY, REIMAGINED</p>
       <h1 id="home-title">Lumaid</h1>
       <p class="home-tagline">Your payment never failed.</p>
-      <p class="home-description">Even when the response disappears, the purchase should still make it home.</p>
       <div class="home-actions"><a class="home-cta" href="#demo">Explore the demo <span aria-hidden="true">↗</span></a><a class="home-secondary" href="#docs">How it works</a></div>
     </div>
     <div class="home-route" aria-label="Payment journey: authorized, settled, result recovered, receipt acknowledged">
@@ -20,7 +19,6 @@
       <div><span>03 / RECOVERY</span><strong>Result found</strong></div>
       <div><span>04 / RECEIPT</span><strong>Acknowledged</strong></div>
     </div>
-    <span class="home-coordinate" aria-hidden="true">STELLAR · TESTNET / 00:00:00</span>
   </section>
   <section class="home-proof" aria-label="Lumaid recovery checks">
     <p>ONE INTENT</p><p>ONE VERIFIED PAYMENT</p><p>ONE RESULT THAT GETS THROUGH</p>
@@ -141,7 +139,23 @@ app.use("/paid", paid.router);</code></pre>
 </main><script type="module" src="/app.js"></script>
 <script>
 const V={home:document.getElementById("home"),demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};
-const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
+const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
+for(const code of document.querySelectorAll("#install pre > code")){
+  const button=document.createElement("button");
+  button.type="button";button.className="copy-code";button.setAttribute("aria-label","Copy code");button.title="Copy code";
+  button.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="11" height="11" rx="1.5"/><path d="M13 4V3.5A1.5 1.5 0 0 0 11.5 2h-8A1.5 1.5 0 0 0 2 3.5v8A1.5 1.5 0 0 0 3.5 13H4"/></svg><span class="sr-only">Copy code</span>';
+  button.addEventListener("click",async()=>{
+    try{
+      await navigator.clipboard.writeText(code.textContent);
+      button.classList.add("copied");button.setAttribute("aria-label","Copied");button.title="Copied";
+      setTimeout(()=>{button.classList.remove("copied");button.setAttribute("aria-label","Copy code");button.title="Copy code"},1400);
+    }catch{
+      button.classList.add("copy-failed");button.setAttribute("aria-label","Clipboard unavailable");button.title="Clipboard unavailable";
+      setTimeout(()=>{button.classList.remove("copy-failed");button.setAttribute("aria-label","Copy code");button.title="Copy code"},1800);
+    }
+  });
+  code.parentElement.append(button);
+}
 </script>
 </body></html>

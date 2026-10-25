@@ -20,9 +20,9 @@ const starContext = starCanvas?.getContext?.('2d');
 let launchSkyJourney = () => {};
 if (starContext) {
   const starMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const intro = starCanvas.closest('.home-hero');
-  const stars = Array.from({ length: 176 }, () => ({
-    x: 0.12 + Math.random() * 0.88,
+  const home = starCanvas.closest('#home');
+  const stars = Array.from({ length: 232 }, () => ({
+    x: 0.01 + Math.random() * 0.98,
     y: Math.random(),
     radius: Math.random() * 1.4 + 0.35,
     phase: Math.random() * Math.PI * 2,
@@ -120,7 +120,7 @@ if (starContext) {
         const [x, y] = route.at(-1);
         pulses.push({ x: x * skyWidth, y: y * skyHeight, started: time, delay: 0 });
         addSparks(x * skyWidth, y * skyHeight, 36, 5.5);
-        intro.classList.remove('is-charging');
+        home.classList.remove('is-charging');
         journey.onComplete?.();
         journeys.splice(index, 1);
         continue;
@@ -275,9 +275,9 @@ if (starContext) {
     }
     journeys.push({ started: performance.now(), checkpoint: 1, onComplete });
     while (journeys.length > 2) journeys.shift();
-    intro.classList.add('is-charging');
+    home.classList.add('is-charging');
     clearTimeout(chargingTimer);
-    chargingTimer = setTimeout(() => intro.classList.remove('is-charging'), 2800);
+    chargingTimer = setTimeout(() => home.classList.remove('is-charging'), 2800);
     const [x, y] = route[0];
     pulses.push({ x: x * skyWidth, y: y * skyHeight, started: performance.now(), delay: 0 });
     addSparks(x * skyWidth, y * skyHeight, 28, 4.5);
@@ -306,9 +306,9 @@ if (starContext) {
     else animateSky(performance.now());
   }
 
-  intro.addEventListener('pointermove', movePointer);
-  intro.addEventListener('pointerleave', () => { pointer.active = false; if (starMotion.matches) drawSky(performance.now()); });
-  intro.addEventListener('pointerdown', event => { if (event.isPrimary) burst(event); });
+  home.addEventListener('pointermove', movePointer);
+  home.addEventListener('pointerleave', () => { pointer.active = false; if (starMotion.matches) drawSky(performance.now()); });
+  home.addEventListener('pointerdown', event => { if (event.isPrimary) burst(event); });
   document.querySelector('.home-cta')?.addEventListener('click', event => {
     event.preventDefault();
     launchSkyJourney(() => { location.hash = 'demo'; });

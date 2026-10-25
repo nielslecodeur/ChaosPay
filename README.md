@@ -1,10 +1,10 @@
-# ChaosPay — HackMeridian
+# Lumaid — HackMeridian
 
 [GitHub](https://github.com/nielslecodeur/Lumaid) · [Install on Windows, macOS or Linux](INSTALL.md)
 
 What happens to a purchase when payment is confirmed but the HTTP response disappears?
 
-ChaosPay is a local failure-and-recovery lab for paid applications on Stellar. The x402 engine, runner and dashboard are integrated. A shared recovery kit powers two APIs: CSV conversion and JSON receipt generation. Reports compare evidence before and after recovery, as well as naive and durable modes.
+Lumaid is a local failure-and-recovery lab for paid applications on Stellar. The x402 engine, runner and dashboard are integrated. A shared recovery kit powers two APIs: CSV conversion and JSON receipt generation. Reports compare evidence before and after recovery, as well as naive and durable modes.
 
 ## Quick start
 
@@ -28,17 +28,17 @@ npm run smoke:payment -- first-purchase durable none
 
 No AI API key or financial-service provider account is required. Three dedicated accounts are funded for free on Testnet. The payment is 0.01 test XLM and has no real-world value. Keys and logs stay in `.env` and `.local/`, which are excluded from Git.
 
-## How ChaosPay differs
+## How Lumaid differs
 
-Existing tools such as Wasit, SELO and official end-to-end suites validate protocol conformance. ChaosPay complements them: it injects a deterministic failure after settlement and before HTTP delivery, then compares the intended purchase, observed transfers and recovered response. Its verdict is economic and application-level, not a protocol-conformance verdict.
+Existing tools such as Wasit, SELO and official end-to-end suites validate protocol conformance. Lumaid complements them: it injects a deterministic failure after settlement and before HTTP delivery, then compares the intended purchase, observed transfers and recovered response. Its verdict is economic and application-level, not a protocol-conformance verdict.
 
 The comparison is explicit: the durable and naive cards are separate demonstration purchases. In the local naive fixture, a new payment authorization is deliberately created after the interruption; the two observed transfers are not evidence of a Stellar replay vulnerability.
 
 ### What we do not claim
 
-- ChaosPay is not a security audit.
-- ChaosPay is not a replacement for Wasit, SELO or official conformance suites.
-- ChaosPay does not guarantee exactly-once payments.
+- Lumaid is not a security audit.
+- Lumaid is not a replacement for Wasit, SELO or official conformance suites.
+- Lumaid does not guarantee exactly-once payments.
 - Fault injection is explicit in our local fixture; we do not inject faults into third-party services.
 - The two demo APIs are team-built examples; we do not claim an external customer pilot.
 

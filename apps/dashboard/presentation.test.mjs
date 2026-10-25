@@ -95,3 +95,16 @@ test('isolated package archive shows provenance and before/after without live cl
  assert.match(text,/has not been piloted by an external customer/);
  assert.match(text,/no new network verification/);
 });
+
+test('Lumaid signal mark is present in the header and browser tab', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const logo = readFileSync(new URL('./lumaid-mark.svg', import.meta.url), 'utf8');
+  assert.match(html, /rel="icon"[^>]*href="\/lumaid-mark\.svg\?v=9"/);
+  assert.equal((html.match(/src="\/lumaid-mark\.svg\?v=9"/g) ?? []).length, 1);
+  assert.match(html, /class="brand-mark"/);
+  assert.doesNotMatch(html, /class="home-mark"/);
+  assert.match(logo, /<svg[^>]*viewBox="0 0 64 64"/);
+  assert.match(logo, /M30 5v35a8 8 0 0 0 8 8h22/);
+  assert.equal((logo.match(/stroke="#A7FFE4"/g) ?? []).length, 1);
+  assert.doesNotMatch(logo, /linearGradient|url\(#|<circle|<polygon/);
+});
