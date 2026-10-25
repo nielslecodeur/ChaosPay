@@ -13,8 +13,11 @@
     "check:connections": "tsx --env-file=.env scripts/check-connections.ts",
     "smoke:payment": "tsx --env-file=.env scripts/smoke-payment.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
-    "verify:engine": "tsx --env-file=.env scripts/verify-engine.ts"
+    "test": "tsx --test tests/*.test.ts packages/runner/tests/*.test.ts",
+    "verify:engine": "tsx --env-file=.env scripts/verify-engine.ts",
+    "dev:dashboard": "tsx packages/runner/src/server.ts",
+    "dev:receipt": "tsx --env-file=.env apps/receipt-api/src/server.ts",
+    "verify:dashboard": "node scripts/verify-dashboard.mjs"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "16.4.1",

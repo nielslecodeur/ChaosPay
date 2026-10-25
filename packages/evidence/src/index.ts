@@ -7,6 +7,7 @@ export interface Transfer {
 export interface PaymentExpectation { tokenContract: string; from: string; to: string; amountAtomic: string; }
 export interface Observation { status: "CONFIRMED" | "FAILED" | "UNKNOWN" | "UNSUPPORTED"; txHash: string; transfers: Transfer[]; reason: string; }
 export interface PurchaseReport {
+  serviceId?: string; recoveryMs?: number | null; unknownObservations?: number;
   schemaVersion: 1; purchaseId: string; mode: "naive" | "durable"; network: "stellar:testnet";
   tokenContract: string; expectedAmountAtomic: string; settledAmountAtomic: string;
   transfers: Transfer[]; responseRecovered: boolean; verdict: Verdict; reason: string;
@@ -26,6 +27,7 @@ export function verdict(observations: Observation[], e: PaymentExpectation, reco
   if (BigInt(total) > BigInt(e.amountAtomic)) return { ...base, verdict: "FAIL", reason: "Confirmed payments exceed the price of one logical purchase." };
   if (!all.length || all.some(o => o.status === "UNKNOWN")) return { ...base, verdict: "UNKNOWN", reason: "Payment observation is incomplete." };
   if (all.some(o => o.status === "UNSUPPORTED")) return { ...base, verdict: "UNSUPPORTED", reason: "Transfer events cannot be interpreted." };
+  if (!recovered && paid.length === 1 && matches(paid[0]!, e) && all.every(o => o.status === "CONFIRMED")) return { ...base, verdict: "UNKNOWN", reason: "Payment confirmed; client acknowledgment missing." };
   if (paid.length === 1 && matches(paid[0]!, e) && recovered && all.every(o => o.status === "CONFIRMED"))
     return { ...base, verdict: "PASS", reason: "One expected payment confirmed and result recovered." };
   return { ...base, verdict: "FAIL", reason: "Payment or result does not satisfy the purchase invariant." };

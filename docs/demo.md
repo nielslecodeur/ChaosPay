@@ -1,50 +1,60 @@
-# Démonstration du rôle B
+# Démonstration ChaosPay
 
-Le runner et le dashboard restent dans leur périmètre : aucun changement du moteur A, du package.json, du lockfile ou du tsconfig racine. Le contrat utilisé est celui de `ENGINE_API.md` et le type `PurchaseReport` du package evidence.
-
-## Lancer
-
-Depuis la racine, avec Node 24 et les dépendances installées (`npm ci`) :
+Depuis la racine du projet, avec Node 24 :
 
 ```sh
-node --import tsx packages/runner/src/server.ts
+npm ci
+npm run dev:dashboard
 ```
 
-Ouvrir **http://127.0.0.1:3002** (utiliser cette adresse, pas localhost).
+Ouvrir **http://127.0.0.1:3002**. Le dashboard est en HTML/CSS/JavaScript natif.
 
-Le dashboard initial est en HTML/CSS/JavaScript natif, sans dépendance supplémentaire. React/Vite reste une évolution à coordonner avec le responsable des fichiers partagés.
+## Parcours conseillé
 
-## Sans clés : simulation et archives
+1. Choisir **CSV**, **TESTNET**, puis **Naïf vs durable**. Montrer les deux rapports : un paiement en mode durable, deux dans la fixture naïve.
+2. Choisir **Confirmation indisponible**. Montrer le checkpoint UNKNOWN, puis le transfert confirmé et le résultat accusé après reprise.
+3. Choisir **API de reçus JSON**, puis **Crash marchand**. Montrer que la seconde application utilise la même reprise après redémarrage.
+4. Télécharger l'export JSON et ouvrir un hash de transaction sur l'explorateur Testnet.
 
-Choisir une simulation puis lancer l’expérience. Les cinq scénarios sont : sans panne, réponse perdue, crash marchand, deux requêtes simultanées et comparaison naïf/durable. Toutes les simulations portent le marqueur **SIMULATED**, y compris dans l’export. Leurs PASS et FAIL sont des résultats fictifs.
+Le paiement de la seconde API achète la génération d'un reçu ; il ne paie pas la facture représentée.
 
-Les campagnes de `evidence/public/` sont chargées avec le marqueur **ARCHIVE**. Ce sont les preuves historiques du moteur A, pas de nouvelles vérifications réseau. La timeline indique seulement leur chargement. Les liens de transactions ciblent l’explorateur Testnet.
+Les huit scénarios sont : sans panne, avant soumission, confirmation indisponible, réponse perdue, crash, accusé perdu, deux requêtes et comparaison naïf/durable. Leur définition précise figure dans [RECOVERY_KIT.md](RECOVERY_KIT.md).
 
-Sélectionner une expérience pour voir les montants atomiques, transferts, ledger, adresses, accusé du résultat et timeline. Utiliser « Export JSON expurgé » pour télécharger le rapport. Les champs privés du moteur sont exclus par liste blanche ; les payloads et sorties brutes des processus ne sont jamais exposés.
+## Simulation et archives
+
+SIMULATED fonctionne sans clés et produit des résultats fictifs, y compris dans l'export.
+ARCHIVE charge les preuves de evidence/public/ ; aucune nouvelle vérification réseau n'est effectuée.
 
 ## Exécution Testnet
 
-Suivre `SETUP_A.md` pour créer `.env` et financer les comptes de test, puis arrêter les serveurs lancés manuellement. Choisir **TESTNET** dans l’interface. Le runner lance ses propres processus avec les journaux existants, vérifie leur santé, exécute le scénario et les arrête à la fin. Il refuse de prendre le contrôle d’un serveur déjà présent. Une seule exécution est autorisée à la fois.
+Suivre [SETUP_A.md](SETUP_A.md) pour créer .env et financer les comptes de test. Arrêter les serveurs manuels avant une exécution : le runner démarre et arrête ses propres processus, et refuse de prendre le contrôle d'un serveur existant.
 
-La comparaison utilise un achat durable puis un achat naïf : elle peut produire trois règlements de test au prix configuré. La seconde autorisation du mode naïf est intentionnelle. Le scénario crash redémarre uniquement le marchand appartenant au runner. Le scénario concurrent utilise le même payload pour les deux requêtes.
+Une exécution à la fois. La comparaison peut effectuer trois règlements Testnet au prix configuré. Le mode naïf crée intentionnellement une seconde autorisation ; ce résultat ne révèle pas une faille de replay Stellar.
 
-Chaque requête HTTP du client est enregistrée dans la timeline, distinctement des autorisations. Le CSV reçu est vérifié puis accusé. Le verdict provient du rapport de l’observateur ; aucune réponse HTTP ne suffit à annoncer PASS. Un PASS sans transfert exact ou sans accusé est dégradé en UNKNOWN.
+## Lire les résultats
 
-Les autorisations sont écrites avant l’envoi dans `.local/client-<mode>-<purchaseId>.json`, au même format que le client A. Si le runner est interrompu, conserver ces fichiers et reprendre avec :
+Les cartes affichent les transferts, montants atomiques, accusé, durée de reprise et nombre de retours UNKNOWN. Les checkpoints montrent l'état avant reprise ; la timeline sépare les requêtes HTTP des autorisations.
 
-```sh
-npm run smoke:payment -- <purchaseId> durable none
-```
+Un PASS exige un transfert exact observé et un accusé applicatif. Une réponse HTTP seule ne suffit pas. La durée inclut l'attente et les redémarrages ; elle ne mesure pas uniquement Stellar.
 
-Pour le mode naïf, remplacer durable par naive **sans** `--new-authorization` pour réconcilier le dernier payload. Les rapports du runner sont conservés dans `.local/runner/`. Cette première version recharge les archives publiques au démarrage, mais pas l’historique local du runner. Une exécution interrompue peut nécessiter une reprise manuelle ; elle ne déclenche pas de nouvelle autorisation durable.
+L'export utilise une liste explicite de champs publics : pas de clés, signatures ou corps applicatifs.
+
+## Reprise après interruption du runner
+
+Conserver .local et .env. Le runner sauvegarde l'autorisation dans .local/client-<mode>-<purchaseId>.json et le corps original avec l'application et l'URL dans .local/request-<mode>-<purchaseId>.json.
+
+Pour une reprise manuelle, redémarrer le facilitator et l'application concernée, puis envoyer le même corps au même achat avec le payload original en PAYMENT-SIGNATURE (JSON/base64). Vérifier resultHash avant d'envoyer l'accusé. Le client smoke:payment est réservé à son propre format CSV ; il ne reprend pas les reçus JSON.
+
+Les rapports locaux restent dans .local/runner/. Ils ne sont pas rechargés automatiquement dans l'historique au démarrage. Aucun renouvellement automatique d'autorisation après un état incertain.
 
 ## Vérifier
 
 ```sh
-node node_modules/typescript/bin/tsc --noEmit -p packages/runner/tsconfig.json
-node --import tsx --test packages/runner/tests/*.test.ts
 npm run typecheck
 npm test
+npm run verify:dashboard
 ```
 
-Le serveur écoute uniquement sur loopback, vérifie Host et Origin et exige un en-tête personnalisé pour lancer une expérience. Aucun CORS n’est ouvert. Ce laboratoire est exclusivement local et Testnet.
+Exécuter ces commandes successivement : les tests HTTP et le dashboard utilisent le même port. La campagne couvre huit scénarios sur deux applications et écrit evidence/public/recovery-campaign.json.
+
+Le laboratoire est local et exclusivement Testnet. Il reste à éprouver le kit sur une application externe ; les deux intégrations actuelles appartiennent à ce dépôt.

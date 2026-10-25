@@ -90,3 +90,7 @@ Lire docs/ENGINE_API.md pour les routes et les rapports. Le serveur est local et
 Fixture locale, un actif, un service déterministe et deux modes pédagogiques. Le rapport prouve les transferts observés et un accusé applicatif du résultat ; il ne prouve pas qu'un humain a lu le fichier. Un RPC indisponible produit UNKNOWN. Les SDK et le stockage ne rendent pas SQLite et Stellar atomiques.
 
 SQLite natif de Node émet un avertissement expérimental sur le runtime vérifié. Les dépendances x402 ont un avis npm transitoire concernant Zod, décrit dans docs/versions.md. Ne pas exposer ce laboratoire sur Internet ni utiliser de fonds réels.
+
+## Dashboard et kit partagé
+
+Après configuration Testnet, lancer npm run dev:dashboard et ouvrir http://127.0.0.1:3002. Arrêter les serveurs manuels avant une expérience TESTNET. Le runner gère les deux API. npm run verify:dashboard lance la campagne complète ; voir [RECOVERY_KIT.md](RECOVERY_KIT.md).

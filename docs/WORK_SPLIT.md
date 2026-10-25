@@ -37,3 +37,9 @@ Types : Purchase, Attempt, Evidence, Delivery et Verdict. Rapport : schemaVersio
 5. Installation propre, tests, README et vidéo.
 
 Les IA accélèrent le développement ; les tests réseau et la relecture déterminent si les fonctions marchent réellement. Aucune donnée simulée présentée comme réelle et aucun secret dans Git.
+
+## Intégration du kit de reprise
+
+La branche feat/recovery-kit part de feat/runner-dashboard. Elle modifie le moteur, le runner et le dashboard pour intégrer les deux API et les nouveaux rapports. Intégrer cette branche avant de reprendre le travail B.
+
+Le cœur est dans packages/recovery/ ; apps/demo-merchant/ et apps/receipt-api/ utilisent le même adaptateur. Suite proposée pour B : présentation de la démo et vidéo ; pour A : essai chez une API externe et préparation d’un package distribuable. Voir ENGINE_API.md et RECOVERY_KIT.md.

@@ -3,13 +3,14 @@ import { setTimeout as delay } from 'node:timers/promises';
 
 export class Processes {
   private children = new Map<string, ChildProcess>();
-  async start(name: 'merchant' | 'facilitator', url: string) {
+  async start(name: 'merchant' | 'facilitator', url: string, application: 'csv' | 'receipt' = 'csv') {
     const existing = this.children.get(name);
     if (existing && existing.exitCode === null && existing.signalCode === null) return;
     const occupied = await fetch(url + '/health', { signal: AbortSignal.timeout(700) }).then(() => true, () => false);
     if (occupied) throw new Error('Port already occupied');
     const file = name === 'merchant' ? 'server' : 'facilitator';
-    const child = spawn(process.execPath, ['--import', 'tsx', '--env-file=.env', `apps/demo-merchant/src/${file}.ts`], { stdio: 'ignore', windowsHide: true });
+    const entry = name === 'merchant' && application === 'receipt' ? 'apps/receipt-api/src/server.ts' : `apps/demo-merchant/src/${file}.ts`;
+    const child = spawn(process.execPath, ['--import', 'tsx', '--env-file=.env', entry], { stdio: 'ignore', windowsHide: true });
     let failed = false;
     child.on('error', () => { failed = true; });
     this.children.set(name, child);

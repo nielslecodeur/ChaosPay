@@ -3,6 +3,7 @@ import type { PurchaseReport, Transfer } from '../../evidence/src/index.js';
 export type Source = 'SIMULATED' | 'TESTNET' | 'ARCHIVE';
 export interface Event { at: string; kind: string; message: string; }
 export interface Run {
+  application?: "csv" | "receipt"; checkpoints?: PurchaseReport[];
   runId: string; scenario: string; source: Source; status: 'RUNNING' | 'COMPLETE' | 'INTERRUPTED';
   startedAt: string; timeline: Event[]; reports: PurchaseReport[];
 }
@@ -29,6 +30,9 @@ export function publicReport(value: unknown): PurchaseReport {
     transfers, responseRecovered: r.responseRecovered, verdict: r.verdict as PurchaseReport['verdict'],
     reason: 'Verdict reported by the independent engine observer.',
   };
+  if (typeof r.serviceId === 'string') report.serviceId = r.serviceId;
+  if (r.recoveryMs === null || (Number.isSafeInteger(r.recoveryMs) && Number(r.recoveryMs) >= 0)) report.recoveryMs = r.recoveryMs as number | null;
+  if (Number.isSafeInteger(r.unknownObservations) && Number(r.unknownObservations) >= 0) report.unknownObservations = Number(r.unknownObservations);
   // A successful HTTP response alone can never become a PASS.
   if (report.verdict === 'PASS' && (!report.responseRecovered || transfers.length !== 1 ||
       transfers[0]!.tokenContract !== report.tokenContract || transfers[0]!.amountAtomic !== report.expectedAmountAtomic ||

@@ -55,21 +55,30 @@ app.get("/receipts/:digest", async (req,res) => {
   if (!row) { res.status(404).json({ error: "No receipt; not proof of nonpayment." }); return; }
   try { res.json(await recover(row)); } catch { res.status(503).json({ error: "Receipt temporarily unavailable." }); }
 });
-app.post("/settle", async (req,res) => {
+app.post(["/settle","/submit"], async (req,res) => {
   try {
     const p = parse(req.body);
     const id = digest(p.paymentPayload);
-    const result = await queue.run(async () => {
+    let accepted!: () => void;
+    let rejected!: (e: unknown) => void;
+    const ready = new Promise<void>((resolve,reject) => { accepted=resolve; rejected=reject; });
+    void ready.catch(() => {});
+    const pending = queue.run(async () => {
       const previous = journal.db.prepare("SELECT * FROM settlements WHERE digest=?").get(id) as unknown as Receipt | undefined;
-      if (previous) return recover(previous); // Never resubmit an uncertain settlement.
+      if (previous) { accepted!(); return recover(previous); } // Never resubmit an uncertain settlement.
       const verification = await facilitator.verify(p.paymentPayload,p.paymentRequirements);
-      if (!verification.isValid || !verification.payer) return { success: false, transaction: "", network: NETWORK, errorReason: "verification_failed" };
+      if (!verification.isValid || !verification.payer) throw new Error("Verification failed");
       journal.db.prepare("INSERT INTO settlements(digest,payer) VALUES(?,?)").run(id,verification.payer);
+      accepted!();
       const result = await context.run(id, () => facilitator.settle(p.paymentPayload,p.paymentRequirements));
       if (result.success) journal.db.prepare("UPDATE settlements SET result=? WHERE digest=?").run(JSON.stringify(result),id);
       return result;
     });
-    res.json(result);
+    if (req.path === "/submit") {
+      void pending.catch(rejected);
+      await ready;
+      res.status(202).json({status:"UNKNOWN"});
+    } else res.json(await pending);
   } catch { res.status(503).json({ error: "Settlement unknown; consult the durable receipt before retrying." }); }
 });
 const port = Number(process.env.FACILITATOR_PORT ?? 4022);

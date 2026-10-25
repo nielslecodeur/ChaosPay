@@ -1,77 +1,67 @@
-# Contrat du moteur pour l'IA B
+# Contrat moteur et runner
 
-Serveur marchand : http://127.0.0.1:3001. Facilitator : http://127.0.0.1:4022. Réseau exclusivement stellar:testnet. Les montants sont des chaînes d'entiers atomiques, jamais des nombres flottants.
-
-## Santé
-
-GET /health : status, network, tokenContract, amountAtomic, assetSymbol et assetDecimals. Aucun secret.
+Réseau : stellar:testnet uniquement. CSV : http://127.0.0.1:3001 ; reçus JSON : http://127.0.0.1:3003 ; facilitator : http://127.0.0.1:4022 ; dashboard : http://127.0.0.1:3002.
 
 ## Achat
 
-POST /purchases/:purchaseId?mode=durable (ou naive)
+POST /purchases/:purchaseId?mode=durable (ou naive). Identifiant : 1 à 80 caractères alphanumériques, tirets ou underscores.
 
-Corps : {"rows":[{"item":"demo","amount":42}]}
+Corps CSV :
+```json
+{"rows":[{"item":"demo","amount":42}]}
+```
 
-Identifiant : 1 à 80 caractères alphanumériques, tirets ou underscores.
+Corps reçus :
+```json
+{"invoice":{"reference":"demo","amountMinor":"4200","currency":"EUR"}}
+```
 
-Sans PAYMENT-SIGNATURE : HTTP 402, corps x402 PaymentRequired v2 et en-tête PAYMENT-REQUIRED encodé JSON/base64.
+Le reçu est un exemple : le paiement rémunère sa génération, pas la facture.
 
-Avec PAYMENT-SIGNATURE : payload x402 v2 encodé JSON/base64. Le script scripts/smoke-payment.ts est le client de référence pour signer le challenge et conserver le payload avant envoi.
+Sans PAYMENT-SIGNATURE : HTTP 402, corps x402 PaymentRequired v2 et en-tête PAYMENT-REQUIRED JSON/base64. Avec PAYMENT-SIGNATURE : payload x402 v2 JSON/base64. Conserver le payload, le corps et l'identifiant avant envoi. L'URL du challenge doit correspondre au service et à l'achat.
 
-X-Chaos-Fault : none, drop ou crash. Le hook agit seulement sur la première exécution de ce payload :
-- drop : coupe la socket après paiement confirmé et sauvegarde du CSV.
-- crash : quitte le marchand, code 86, après paiement confirmé avant sauvegarde du CSV.
-- none : réponse normale.
+X-Chaos-Fault : none, before-submit, confirmation-lost, crash, drop, ack-lost. Points précis et limites dans [RECOVERY_KIT.md](RECOVERY_KIT.md). Le runner simule ack-lost en omettant l'accusé ; le hook moteur enregistre le début de cette interruption.
 
-HTTP 200 : purchaseId, mode, txHash, recovered, csv, csvHash et evidence. csvHash est SHA-256 de JSON.stringify(csv). evidence contient status, txHash, transfers et reason.
+HTTP 200 : purchaseId, mode, status READY, txHash, recovered, result, resultHash, evidence. Le CSV conserve aussi les alias csv et csvHash. Hash : SHA-256 de JSON.stringify(result).
 
-HTTP 202 : observation incomplète/échec/non supporté, avec status, txHash et reason. Réutiliser le payload original pour réconcilier ; ne pas créer automatiquement de nouvelle autorisation.
+HTTP 202 : status UNKNOWN, FAILED ou UNSUPPORTED, txHash et reason ; aucune preuve de livraison. Reprendre avec l'autorisation originale, sans re-signature automatique.
 
-HTTP 409 : identifiant durable réutilisé avec un contenu ou un payload différent. HTTP 402 : vérification du paiement rejetée. HTTP 400 : entrée invalide. HTTP 503 : interruption ou erreur à réconcilier.
+HTTP 409 : corps ou autorisation en conflit, ou autre URL de ressource. HTTP 402 : vérification rejetée. HTTP 400 : entrée invalide. HTTP 503 : erreur à réconcilier.
 
-## Accusé du résultat
+## Accusé
 
-POST /purchases/:purchaseId/ack?mode=durable
+POST /purchases/:purchaseId/ack?mode=durable avec PAYMENT-SIGNATURE original et corps {"resultHash":"hash retourné"}. csvHash reste accepté pour les clients CSV existants.
 
-En-tête PAYMENT-SIGNATURE original. Corps : {"csvHash":"hash renvoyé par le moteur"}.
-
-Le client vérifie le CSV, puis accuse sa réception. Sans accusé, le rapport ne doit pas annoncer la récupération. Cet accusé est applicatif, pas une preuve de lecture humaine.
+Le client vérifie le résultat avant d'accuser. Sans accusé, un paiement correct reste UNKNOWN.
 
 ## Rapport
 
-GET /reports/:purchaseId?mode=durable
+GET /reports/:purchaseId?mode=durable retourne :
+- schemaVersion: 1, purchaseId, mode, network, serviceId, tokenContract ;
+- expectedAmountAtomic et settledAmountAtomic (chaînes d'entiers) ;
+- transfers: [{txHash, tokenContract, from, to, amountAtomic, ledger}] ;
+- responseRecovered, verdict, reason, observations et attempts ;
+- recoveryMs (nombre ou null), unknownObservations (entier).
 
-Champs :
-- schemaVersion : 1
-- purchaseId, mode, network, tokenContract
-- expectedAmountAtomic et settledAmountAtomic
-- transfers : [{txHash, tokenContract, from, to, amountAtomic, ledger}]
-- responseRecovered : accusé du client reçu
-- verdict : PASS, FAIL, UNKNOWN ou UNSUPPORTED
-- reason, observations, attempts
+PASS exige transfert exact et accusé ; dépassement du prix confirmé : FAIL ; absence de preuve : UNKNOWN. attempts compte les autorisations, pas les appels HTTP.
 
-Le runner ajoute runId, scenario et sa timeline autour de ce rapport. Le nombre de lignes attempts correspond aux autorisations enregistrées, pas à toutes les requêtes HTTP ; instrumenter chaque appel dans le runner.
+## Facilitator
 
-Un PASS exige un transfert attendu et un accusé du résultat. Deux transferts confirmés dépassant le prix d'un achat produisent FAIL. Un RPC indisponible ou un hash manquant reste UNKNOWN.
+POST /verify et POST /settle : interfaces x402.
+POST /submit : extension locale, HTTP 202 après enregistrement durable de la demande, sans attendre la confirmation ; peut rester UNKNOWN après une panne.
+GET /receipts/:authDigest : reçu durable local. Un 404 ne prouve pas le non-paiement. Le hash final est enregistré avant broadcast ; un règlement incertain n'est pas soumis une seconde fois.
 
-## Modes de démonstration
+## Runner
 
-durable : l'identifiant d'achat et son contenu restent attachés à une autorisation. La reprise ne soumet pas un autre paiement.
+POST /api/runs, en-tête X-ChaosPay-Local: 1 :
+```json
+{"scenario":"confirmation-lost","source":"TESTNET","application":"receipt"}
+```
 
-naive : une nouvelle autorisation pour le même identifiant est traitée délibérément comme un nouvel achat. Pour reproduire :
-npm run smoke:payment -- demo-naive naive drop
-npm run smoke:payment -- demo-naive naive none --new-authorization
+application : csv (défaut) ou receipt. source : SIMULATED ou TESTNET.
+Scénarios : baseline, before-submit, confirmation-lost, crash, drop, ack-lost, concurrent, comparison.
 
-La faille appartient à notre fixture. Ce test ne démontre pas une double dépense en rejouant une autorisation Stellar.
+GET /api/state : scénarios, exécutions, état busy.
+GET /api/runs/:id/export : exécution filtrée avec reports finaux et checkpoints avant reprise.
 
-## Reprise
-
-Le marchand sauvegarde l'empreinte du payload avant de demander le règlement. Le facilitator sauvegarde le hash de transaction avant le broadcast. Après une interruption, le marchand consulte le reçu du facilitator, puis vérifie le transfert via RPC. Un règlement incertain n'est jamais soumis à nouveau par le journal.
-
-Les bases SQLite et fichiers .local/ doivent être conservés. Perdre les deux journaux peut empêcher la réconciliation ; aucune garantie universelle annoncée.
-
-Le facilitator traite séquentiellement les règlements pour éviter les conflits de numéros de séquence du compte unique. Les routes /verify et /settle sont les interfaces standard x402. GET /receipts/:authDigest est une extension locale de reprise ; elle ne retourne aucune clé ni autorisation.
-
-## Intégration UI
-
-Utiliser un backend du runner ou un proxy de développement local. Le moteur ne fournit pas de CORS. Ne pas exposer le facilitator, les contrôles de panne ou les autorisations à un service public. Un dashboard peut consommer les preuves publiques sans connaître les clés.
+Les simulations sont fictives. ARCHIVE désigne une preuve historique, pas une nouvelle vérification réseau. Les contrôles restent locaux ; aucun CORS public ni secret dans l'export.
