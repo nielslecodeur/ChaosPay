@@ -57,6 +57,10 @@ npm run verify:dashboard
 
 Exécuter ces commandes successivement : les tests HTTP et le dashboard utilisent le même port. La campagne couvre huit scénarios sur deux applications et écrit evidence/public/recovery-campaign.json.
 
+Les contrôles vérifient aussi le nombre exact de transactions distinctes, les montants, les accusés, les deux mesures de reprise et l’identité de l’export avec le rapport affiché. Hors comparaison naïve, la timeline doit contenir une seule autorisation. Chaque panne doit produire UNKNOWN avant récupération.
+
+La campagne de référence B est conservée dans `evidence/public/recovery-campaign.json`. La campagne publiée par A au commit `64bd455` reste disponible séparément dans `evidence/public/recovery-campaign-A-64bd455.json`.
+
 Le laboratoire est local et exclusivement Testnet. Il reste à éprouver le kit sur une application externe ; les deux intégrations actuelles appartiennent à ce dépôt.
 
 
