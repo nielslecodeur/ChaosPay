@@ -1,0 +1,36 @@
+{
+  "name": "chaospay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev:merchant": "tsx --env-file=.env apps/demo-merchant/src/server.ts",
+    "dev:facilitator": "tsx --env-file=.env apps/demo-merchant/src/facilitator.ts",
+    "setup:testnet": "tsx scripts/setup-testnet.ts",
+    "check:connections": "tsx --env-file=.env scripts/check-connections.ts",
+    "smoke:payment": "tsx --env-file=.env scripts/smoke-payment.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts packages/runner/tests/*.test.ts",
+    "verify:engine": "tsx --env-file=.env scripts/verify-engine.ts",
+    "dev:dashboard": "tsx packages/runner/src/server.ts",
+    "dev:receipt": "tsx --env-file=.env apps/receipt-api/src/server.ts",
+    "verify:dashboard": "node scripts/verify-dashboard.mjs",
+    "build:recovery": "npm run build --prefix packages/recovery",
+    "verify:integration": "tsx --env-file=.env scripts/verify-integration.ts"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "16.4.1",
+    "@x402/core": "2.23.0",
+    "@x402/stellar": "2.23.0",
+    "express": "5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

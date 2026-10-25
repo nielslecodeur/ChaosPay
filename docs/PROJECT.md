@@ -10,13 +10,15 @@ Un paiement est confirmé, puis la réponse HTTP disparaît. Après redémarrage
 
 ## MVP
 
-- [ ] Paiement x402 réel sur Stellar Testnet.
-- [ ] Vérification indépendante du transfert : hash, actif, payeur, bénéficiaire et montant.
-- [ ] Coupure contrôlée dans notre marchand après règlement, avant réponse.
-- [ ] Redémarrage et récupération du même achat avec stockage durable.
-- [ ] Comparaison entre modes naïf et durable.
-- [ ] Deux requêtes simultanées pour le même achat.
-- [ ] Dashboard avec timeline, preuves et export JSON expurgé.
+- [x] Paiement x402 réel sur Stellar Testnet.
+- [x] Vérification indépendante du transfert : hash, actif, payeur, bénéficiaire et montant.
+- [x] Coupure contrôlée dans notre marchand après règlement, avant réponse.
+- [x] Redémarrage et récupération du même achat avec stockage durable.
+- [x] Comparaison entre modes naïf et durable.
+- [x] Deux requêtes simultanées pour le même achat.
+- [x] Dashboard avec timeline, preuves et export JSON expurgé.
+- [x] Kit source partagé, seconde API et trois nouveaux points de panne.
+- [x] Rapports avant/après avec durée de reprise et états inconnus.
 - [ ] Tests, installation reproductible, documentation et vidéo.
 
 ## Première décision technique
@@ -25,7 +27,7 @@ Obtenir dans les deux premières heures un paiement Testnet confirmé et son tra
 
 ## Architecture prévue
 
-TypeScript ; exemple x402 officiel versionné ; serveur Node ; SQLite pour les achats ; React/Vite pour le dashboard. Versions à valider lors de l'installation. Le service vendu est une conversion déterministe JSON vers CSV.
+TypeScript, x402, Node 24, SQLite et dashboard HTML/CSS/JavaScript. Le même kit équipe la conversion CSV et les reçus JSON. Versions verrouillées dans package-lock.json.
 
 ## Invariants
 
@@ -44,3 +46,7 @@ Mainnet, argent réel, MPP, LLM, nouveau wallet et prise en charge arbitraire de
 ## Validation utilisateur
 
 Faire confirmer le besoin par un mentor et chercher une équipe API prête à essayer le scénario.
+
+## Validation du moteur A
+
+Les huit scénarios du runner ont réussi sur chacune des deux API sur Testnet. Les preuves publiques sont dans evidence/public/recovery-campaign.json. Guide : docs/RECOVERY_KIT.md ; contrat : docs/ENGINE_API.md.

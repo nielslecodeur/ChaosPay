@@ -1,30 +1,76 @@
-# HackMeridian — Tristana
+# ChaosPay — HackMeridian
 
-Projet pour le hackathon HackMeridian à Lisbonne.
+Que devient un achat quand le paiement est confirmé mais que la réponse HTTP disparaît ?
 
-## État
+ChaosPay est un laboratoire local de pannes et de reprise pour les applications payantes sur Stellar. Le moteur x402, le runner et le dashboard sont intégrés. Un kit de reprise partagé équipe deux API : conversion CSV et génération de reçus JSON. Les rapports comparent les preuves avant/après reprise et les modes naïf/durable.
 
-Préparation du MVP. Langage et framework à choisir.
+## Démarrage
 
-## Démarrer
+Prérequis : Node.js 24 et npm.
 
-1. Cloner : `git clone https://github.com/nielslecodeur/hackmeridian_tristana.git`
-2. Ouvrir le dossier dans son éditeur.
-3. Lire [CONTRIBUTING.md](CONTRIBUTING.md) et [docs/PROJECT.md](docs/PROJECT.md).
-4. Créer une branche pour sa tâche.
+```sh
+npm ci
+npm run setup:testnet
+npm run check:connections
+```
 
-Les commandes d'installation, de lancement et de tests seront ajoutées après le choix de la stack.
+Pour le dashboard, lancer npm run dev:dashboard, puis ouvrir http://127.0.0.1:3002. Choisir CSV ou reçus JSON, TESTNET et un scénario ; le runner gère ses serveurs.
 
-## Configuration
+Pour le client CLI seul, arrêter le dashboard, puis lancer npm run dev:facilitator dans un terminal et npm run dev:merchant dans un deuxième.
 
-Documenter les variables nécessaires dans `.env.example` et garder les valeurs réelles dans `.env`. Ne jamais committer de token, clé privée ou phrase de récupération.
+Dans un troisième :
 
-## Organisation
+```sh
+npm run smoke:payment -- premier-achat durable none
+```
 
-- `docs/PROJECT.md` : cadrage et MVP.
-- `docs/GITHUB_SETUP.md` : réglages GitHub et publication.
-- `.github/` : modèles d'issues et de pull requests.
+Aucune clé d'API IA ou de prestataire financier nécessaire. Trois comptes dédiés sont financés gratuitement sur Testnet. Le paiement porte sur 0,01 XLM de test, sans valeur réelle. Les clés et journaux restent dans .env et .local/, ignorés par Git.
+
+## Panne et reprise
+
+```sh
+npm run smoke:payment -- demo-coupure durable drop
+npm run smoke:payment -- demo-coupure durable none
+```
+
+Le premier appel est volontairement interrompu. Le second réutilise l'autorisation originale et récupère le résultat sans second paiement.
+
+## Vérifier
+
+```sh
+npm run typecheck
+npm test
+```
+
+Après arrêt des serveurs manuels :
+
+```sh
+npm run verify:dashboard
+# Ancienne campagne CLI CSV, également disponible :
+npm run verify:engine
+```
+
+La campagne exécute réellement coupure, redémarrage, concurrence et contre-exemple naïf sur Testnet. Les rapports expurgés sont écrits dans evidence/public/. Les hashes et événements de transfert permettent une vérification indépendante de la réponse du marchand.
+
+## Documentation
+
+- [Intégrer le paquet dans une API existante](docs/INTEGRATION_A.md)
+- [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
+- [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
+- [Guide de connexion et lancement A](docs/SETUP_A.md)
+- [API pour le runner et le dashboard B](docs/ENGINE_API.md)
+- [Cadrage et limites](docs/PROJECT.md)
+- [Répartition entre deux IA](docs/WORK_SPLIT.md)
+- [Versions et dépendances](docs/versions.md)
+- [Contribution](CONTRIBUTING.md)
+- [Crédits](THIRD_PARTY_NOTICES.md)
+
+## Limites
+
+Fixture locale : deux services déterministes (CSV et reçus JSON), un actif Testnet et des hooks de panne explicites. Un timeout reste UNKNOWN tant que le réseau n'a pas fourni de preuve. Les tests ne constituent pas un audit de sécurité ni une garantie universelle de paiement unique.
+
+Le mode naïf introduit volontairement une nouvelle autorisation au retry ; il ne démontre pas une faille de replay de Stellar. Le laboratoire ne doit pas gérer d'argent réel ni être exposé sur Internet. Les dépendances ont une limite connue documentée dans docs/versions.md.
 
 ## Licence
 
-À choisir avec l'équipe avant une réutilisation externe.
+La licence du code propre à l'équipe reste à choisir. Les composants tiers conservent leurs licences et mentions.

@@ -1,0 +1,290 @@
+{
+  "simulated": false,
+  "executedAt": "2026-10-25T14:43:21.184Z",
+  "integration": "invoice-check",
+  "scope": "Team-authored consumer installed from a tarball outside the source repository; not an external customer pilot.",
+  "package": "@chaospay/recovery@0.1.0",
+  "scenarios": [
+    {
+      "scenario": "baseline",
+      "before": null,
+      "after": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-b863463f-bf98-4492-819f-a270c191f176",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "100000",
+        "transfers": [
+          {
+            "txHash": "e96c7dc68229b8f0c0f684903bf77aa6521f8ede68f06ef4511c9dbc9be05550",
+            "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "amountAtomic": "100000",
+            "ledger": 5383137
+          }
+        ],
+        "responseRecovered": true,
+        "verdict": "PASS",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": null,
+        "unknownObservations": 0
+      }
+    },
+    {
+      "scenario": "drop",
+      "before": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "100000",
+        "transfers": [
+          {
+            "txHash": "d7e926bf925c558612f0ceecf379e618619a455d802d496dcf164ee338c8b5d1",
+            "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "amountAtomic": "100000",
+            "ledger": 5383139
+          }
+        ],
+        "responseRecovered": false,
+        "verdict": "UNKNOWN",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": null,
+        "unknownObservations": 0
+      },
+      "after": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "100000",
+        "transfers": [
+          {
+            "txHash": "d7e926bf925c558612f0ceecf379e618619a455d802d496dcf164ee338c8b5d1",
+            "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "amountAtomic": "100000",
+            "ledger": 5383139
+          }
+        ],
+        "responseRecovered": true,
+        "verdict": "PASS",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": 344,
+        "unknownObservations": 0
+      }
+    },
+    {
+      "scenario": "crash",
+      "before": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "100000",
+        "transfers": [
+          {
+            "txHash": "9908e9d6b661408cb3e807f696b08f10eb07ade4e78f108b9b28c84f82fa771f",
+            "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "amountAtomic": "100000",
+            "ledger": 5383141
+          }
+        ],
+        "responseRecovered": false,
+        "verdict": "UNKNOWN",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": null,
+        "unknownObservations": 0
+      },
+      "after": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "100000",
+        "transfers": [
+          {
+            "txHash": "9908e9d6b661408cb3e807f696b08f10eb07ade4e78f108b9b28c84f82fa771f",
+            "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "amountAtomic": "100000",
+            "ledger": 5383141
+          }
+        ],
+        "responseRecovered": true,
+        "verdict": "PASS",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": 1352,
+        "unknownObservations": 0
+      }
+    },
+    {
+      "scenario": "confirmation-lost",
+      "before": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "0",
+        "transfers": [],
+        "responseRecovered": false,
+        "verdict": "UNKNOWN",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": null,
+        "unknownObservations": 1
+      },
+      "after": {
+        "schemaVersion": 1,
+        "purchaseId": "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69",
+        "mode": "durable",
+        "network": "stellar:testnet",
+        "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+        "expectedAmountAtomic": "100000",
+        "settledAmountAtomic": "100000",
+        "transfers": [
+          {
+            "txHash": "a5fcd8265405301c4f08db3f505c47ef008441b861afc3d2440218acc8684dbd",
+            "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+            "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+            "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+            "amountAtomic": "100000",
+            "ledger": 5383143
+          }
+        ],
+        "responseRecovered": true,
+        "verdict": "PASS",
+        "reason": "Verdict reported by the independent engine observer.",
+        "serviceId": "invoice-check",
+        "recoveryMs": 6023,
+        "unknownObservations": 6
+      }
+    }
+  ],
+  "reports": {
+    "integration-b863463f-bf98-4492-819f-a270c191f176": {
+      "schemaVersion": 1,
+      "purchaseId": "integration-b863463f-bf98-4492-819f-a270c191f176",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "e96c7dc68229b8f0c0f684903bf77aa6521f8ede68f06ef4511c9dbc9be05550",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5383137
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "invoice-check",
+      "recoveryMs": null,
+      "unknownObservations": 0
+    },
+    "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c": {
+      "schemaVersion": 1,
+      "purchaseId": "integration-56a3ea32-23fc-4b79-ae2c-c8d31743863c",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "d7e926bf925c558612f0ceecf379e618619a455d802d496dcf164ee338c8b5d1",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5383139
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "invoice-check",
+      "recoveryMs": 344,
+      "unknownObservations": 0
+    },
+    "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f": {
+      "schemaVersion": 1,
+      "purchaseId": "integration-a2e5facb-9a36-4266-beae-dc44a6f8b69f",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "9908e9d6b661408cb3e807f696b08f10eb07ade4e78f108b9b28c84f82fa771f",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5383141
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "invoice-check",
+      "recoveryMs": 1352,
+      "unknownObservations": 0
+    },
+    "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69": {
+      "schemaVersion": 1,
+      "purchaseId": "integration-7e13c85b-fdbb-457e-b0ec-6a2ba6c20e69",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "a5fcd8265405301c4f08db3f505c47ef008441b861afc3d2440218acc8684dbd",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5383143
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "invoice-check",
+      "recoveryMs": 6023,
+      "unknownObservations": 6
+    }
+  }
+}

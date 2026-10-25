@@ -35,3 +35,9 @@ venv/
 target/
 
 # Committer les lockfiles de l'application.
+
+# Local development: keys, database, upstream checkout
+.local/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
