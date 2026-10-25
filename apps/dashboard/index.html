@@ -79,35 +79,73 @@
 </div>
 <div id="install" hidden>
   <div class="docs-layout">
-    <nav class="toc" aria-label="On this page"><a href="#inst-prerequis">Prerequisites</a><a href="#inst-local">Run the lab</a><a href="#inst-cli">Command line</a><a href="#inst-verifier">Verify</a><a href="#inst-integrer">Integrate an API</a></nav>
+    <div class="install-platforms" role="tablist" aria-label="Choose your operating system" aria-orientation="vertical">
+      <button id="tab-windows" class="install-platform" type="button" role="tab" aria-selected="true" aria-controls="panel-windows" tabindex="0">Windows</button>
+      <button id="tab-linux" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-linux" tabindex="-1">Linux</button>
+      <button id="tab-macos" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
+    </div>
     <article class="doc">
       <h1>Installation</h1>
       <p class="lead">Lumaid runs locally on Stellar Testnet. No AI API key or financial provider is required.</p>
-      <h2 id="inst-prerequis">Prerequisites</h2>
-      <p>Node.js 24 and npm. Network access to the Stellar Testnet RPC and Friendbot is needed to create and fund test accounts.</p>
-      <h2 id="inst-local">Run the lab</h2>
-<pre><code>npm ci
+      <section id="panel-windows" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-windows">
+        <h2>Windows setup</h2>
+        <p>Open PowerShell and install Git and Node.js 24 with Windows Package Manager (winget):</p>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>winget install --id Git.Git --exact
+winget install --id OpenJS.NodeJS.LTS --exact</code><span class="copy-status sr-only" role="status"></span></pre>
+        <p>Close and reopen PowerShell, then clone the project and start the dashboard:</p>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>git clone https://github.com/nielslecodeur/Lumaid.git
+cd Lumaid
+npm ci
 npm run setup:testnet
 npm run check:connections
-npm run dev:dashboard</code></pre>
+npm run dev:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
+      </section>
+      <section id="panel-linux" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
+        <h2>Linux setup</h2>
+        <p>In Bash, install Node Version Manager (nvm):</p>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash</code><span class="copy-status sr-only" role="status"></span></pre>
+        <p>Open a new terminal, install Node.js 24, then clone the project and start the dashboard:</p>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>nvm install 24
+nvm use 24
+git clone https://github.com/nielslecodeur/Lumaid.git
+cd Lumaid
+npm ci
+npm run setup:testnet
+npm run check:connections
+npm run dev:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
+      </section>
+      <section id="panel-macos" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-macos" hidden>
+        <h2>macOS setup</h2>
+        <p>Install Node Version Manager (nvm) from Terminal:</p>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash</code><span class="copy-status sr-only" role="status"></span></pre>
+        <p>Quit and reopen Terminal, install Node.js 24, then clone the project and start the dashboard:</p>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>nvm install 24
+nvm use 24
+git clone https://github.com/nielslecodeur/Lumaid.git
+cd Lumaid
+npm ci
+npm run setup:testnet
+npm run check:connections
+npm run dev:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
+      </section>
       <p>Open <code>http://127.0.0.1:3002</code>. The three Testnet accounts are funded for free, and the payment is 0.01 test XLM. Keys stay in <code>.env</code> and <code>.local/</code>, both ignored by Git. Never share these files.</p>
       <h2 id="inst-cli">Command line</h2>
       <p>To run the client on its own, stop the dashboard, then start the facilitator and merchant in separate terminals.</p>
-<pre><code>npm run dev:facilitator
-npm run dev:merchant</code></pre>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>npm run dev:facilitator
+npm run dev:merchant</code><span class="copy-status sr-only" role="status"></span></pre>
       <p>In a third terminal, the first call is deliberately interrupted; the second recovers the result without a second payment.</p>
-<pre><code>npm run smoke:payment -- demo-coupure durable drop
-npm run smoke:payment -- demo-coupure durable none</code></pre>
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>npm run smoke:payment -- demo-coupure durable drop
+npm run smoke:payment -- demo-coupure durable none</code><span class="copy-status sr-only" role="status"></span></pre>
       <h2 id="inst-verifier">Verify</h2>
-<pre><code>npm run typecheck
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>npm run typecheck
 npm test
-npm run verify:dashboard</code></pre>
+npm run verify:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
       <p>Stop any manually launched servers first. <code>verify:dashboard</code> runs interruption, restart, concurrency, and the naive counterexample on Testnet. Redacted reports are written to <code>evidence/public/</code>.</p>
       <h2 id="inst-integrer">Integrate an API</h2>
       <p>The recovery kit is an <code>@chaospay/recovery</code> package delivered as a local archive. It is not published on npm and remains private until a license is chosen.</p>
-<pre><code>npm run build:recovery
+<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>npm run build:recovery
 npm pack ./packages/recovery --pack-destination .local/packages
-npm install /path/to/chaospay-recovery-0.1.0.tgz express@5.3.0</code></pre>
+npm install /path/to/chaospay-recovery-0.1.0.tgz express@5.3.0</code><span class="copy-status sr-only" role="status"></span></pre>
 <pre><code>import { createPaidRouter } from "@chaospay/recovery/stellar-http";
 
 const paid = await createPaidRouter({
@@ -124,25 +162,10 @@ app.use("/paid", paid.router);</code></pre>
   </div>
 </div>
 </main><script type="module" src="/app.js"></script>
+<script type="module" src="/copy-commands.js"></script>
 <script>
 const V={home:document.getElementById("home"),demo:document.getElementById("demo"),docs:document.getElementById("docs"),install:document.getElementById("install")};
 const go=()=>{const h=location.hash,k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#demo"?"demo":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(h===""||h==="#home"||h==="#demo"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
-for(const code of document.querySelectorAll("#install pre > code")){
-  const button=document.createElement("button");
-  button.type="button";button.className="copy-code";button.setAttribute("aria-label","Copy code");button.title="Copy code";
-  button.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="11" height="11" rx="1.5"/><path d="M13 4V3.5A1.5 1.5 0 0 0 11.5 2h-8A1.5 1.5 0 0 0 2 3.5v8A1.5 1.5 0 0 0 3.5 13H4"/></svg><span class="sr-only">Copy code</span>';
-  button.addEventListener("click",async()=>{
-    try{
-      await navigator.clipboard.writeText(code.textContent);
-      button.classList.add("copied");button.setAttribute("aria-label","Copied");button.title="Copied";
-      setTimeout(()=>{button.classList.remove("copied");button.setAttribute("aria-label","Copy code");button.title="Copy code"},1400);
-    }catch{
-      button.classList.add("copy-failed");button.setAttribute("aria-label","Clipboard unavailable");button.title="Clipboard unavailable";
-      setTimeout(()=>{button.classList.remove("copy-failed");button.setAttribute("aria-label","Copy code");button.title="Copy code"},1800);
-    }
-  });
-  code.parentElement.append(button);
-}
 </script>
 </body></html>
