@@ -10,12 +10,12 @@ Un paiement est confirmé, puis la réponse HTTP disparaît. Après redémarrage
 
 ## MVP
 
-- [ ] Paiement x402 réel sur Stellar Testnet.
-- [ ] Vérification indépendante du transfert : hash, actif, payeur, bénéficiaire et montant.
-- [ ] Coupure contrôlée dans notre marchand après règlement, avant réponse.
-- [ ] Redémarrage et récupération du même achat avec stockage durable.
-- [ ] Comparaison entre modes naïf et durable.
-- [ ] Deux requêtes simultanées pour le même achat.
+- [x] Paiement x402 réel sur Stellar Testnet.
+- [x] Vérification indépendante du transfert : hash, actif, payeur, bénéficiaire et montant.
+- [x] Coupure contrôlée dans notre marchand après règlement, avant réponse.
+- [x] Redémarrage et récupération du même achat avec stockage durable.
+- [x] Comparaison entre modes naïf et durable.
+- [x] Deux requêtes simultanées pour le même achat.
 - [ ] Dashboard avec timeline, preuves et export JSON expurgé.
 - [ ] Tests, installation reproductible, documentation et vidéo.
 
@@ -44,3 +44,7 @@ Mainnet, argent réel, MPP, LLM, nouveau wallet et prise en charge arbitraire de
 ## Validation utilisateur
 
 Faire confirmer le besoin par un mentor et chercher une équipe API prête à essayer le scénario.
+
+## Validation du moteur A
+
+Les contrôles de types, 9 tests automatisés et une campagne réelle sur Testnet ont réussi. Les preuves publiques sont dans evidence/public/. Le dashboard et le runner interactif restent à construire. Guide : docs/SETUP_A.md ; contrat pour B : docs/ENGINE_API.md.
