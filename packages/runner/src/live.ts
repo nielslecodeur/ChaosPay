@@ -9,6 +9,7 @@ import { config, secret, NETWORK, RPC_URL } from '../../../apps/demo-merchant/sr
 import { digest } from '../../evidence/src/index.js';
 import { event, publicReport, type Run } from './report.js';
 import { Processes } from './processes.js';
+import { RecoveryTimer } from './recovery.js';
 
 export async function execute(run: Run, processes: Processes) {
   const c = config();
@@ -31,6 +32,7 @@ export async function execute(run: Run, processes: Processes) {
   event(run, 'process', 'Facilitator et marchand prêts (processus locaux du runner).');
   for (const mode of run.scenario === 'comparison' ? ['durable', 'naive'] as const : ['durable'] as const) {
     const id = `runner-${randomUUID()}`;
+    const recovery = new RecoveryTimer();
     const path = `/purchases/${id}?mode=${mode}`;
     const body = JSON.stringify(application === 'receipt' ? { invoice: { reference: id, amountMinor: '4200', currency: 'EUR' } } : { rows: [{ item: 'demo', amount: 42 }, { item: 'second', amount: 10 }] });
     async function authorize() {
@@ -52,13 +54,14 @@ export async function execute(run: Run, processes: Processes) {
     async function send(fault: string) {
       const headers = { 'Content-Type': 'application/json', 'PAYMENT-SIGNATURE': signature, 'X-Chaos-Fault': fault };
       const r = await request(path, { method: 'POST', headers, body });
-      if (r.status === 202) { event(run,'unknown','Confirmation unavailable; preserve the original authorization.'); return false; }
+      if (r.status === 202) { recovery.interrupted(); event(run,'unknown','Confirmation unavailable; preserve the original authorization.'); return false; }
       if (r.status !== 200) throw new Error('Unexpected purchase HTTP ' + r.status);
       const result = await r.json() as Record<string, unknown>;
       if (result.result === undefined || digest(result.result) !== result.resultHash) throw new Error('Result integrity mismatch');
-      if (fault === 'ack-lost') { event(run,'interruption','Result received; client acknowledgment deliberately omitted.'); return false; }
+      if (fault === 'ack-lost') { recovery.interrupted(); event(run,'interruption','Result received; client acknowledgment deliberately omitted.'); return false; }
       const ack = await request(`/purchases/${id}/ack?mode=${mode}`, { method: 'POST', headers, body: JSON.stringify({ resultHash: result.resultHash }) });
       if (!ack.ok) throw new Error('Acknowledgment failed');
+      recovery.acknowledged();
       event(run, 'delivery', `${id} : intégrité du résultat vérifiée, accusé reçu par le marchand.`);
       return true;
     }
@@ -67,6 +70,7 @@ export async function execute(run: Run, processes: Processes) {
     else {
       try { await send(run.scenario === 'comparison' ? 'drop' : run.scenario); } catch (error) {
         if (!(error instanceof Error) || error.message !== 'Request interrupted') throw error;
+        recovery.interrupted();
       }
       if (run.scenario === 'crash') {
         await processes.stop('merchant');
@@ -92,7 +96,8 @@ export async function execute(run: Run, processes: Processes) {
     }
     const response = await request(`/reports/${id}?mode=${mode}`);
     if (!response.ok) throw new Error('Report unavailable');
-    run.reports.push(publicReport(await response.json()));
+    const report = publicReport(await response.json());
+    run.reports.push({ ...report, recoveryDurationMs: report.responseRecovered ? recovery.durationMs : null });
     event(run, 'evidence', `${id} : rapport de l’observateur reçu.`);
   }
 }

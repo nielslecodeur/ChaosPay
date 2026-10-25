@@ -58,3 +58,16 @@ npm run verify:dashboard
 Exécuter ces commandes successivement : les tests HTTP et le dashboard utilisent le même port. La campagne couvre huit scénarios sur deux applications et écrit evidence/public/recovery-campaign.json.
 
 Le laboratoire est local et exclusivement Testnet. Il reste à éprouver le kit sur une application externe ; les deux intégrations actuelles appartiennent à ce dépôt.
+
+
+## Mesures et validation ajoutées par B
+
+Les montants en XLM conservent les sept décimales exactes, sans conversion flottante. Le nombre de règlements compte les transactions distinctes ; les unités atomiques restent visibles.
+
+recoveryDurationMs mesure côté runner le temps monotone entre la détection de l’interruption et le premier accusé réussi. recoveryMs mesure côté moteur le temps depuis l’interruption enregistrée dans le journal. Les deux durées ont des points de départ différents ; elles incluent le redémarrage et la reprise. Sans mesure terminée, afficher « Non mesuré ». Un montant observé nul avec UNKNOWN ne prouve pas l’absence de paiement.
+
+La validation complémentaire de B couvre les cinq scénarios CSV initiaux. Avec le dashboard déjà lancé :
+
+    node --import tsx packages/runner/verify-testnet.ts
+
+Elle vérifie verdicts, transactions distinctes, montants, accusés, durée côté runner et export. Les résultats restent dans .local/runner/validation-<timestamp>.json. Pour les huit scénarios sur les deux API, arrêter le dashboard et lancer npm run verify:dashboard.

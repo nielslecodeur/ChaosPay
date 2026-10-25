@@ -36,6 +36,7 @@ try {
       assert.ok(run.checkpoints.length);
       for (const checkpoint of run.checkpoints) assert.equal(checkpoint.verdict,'UNKNOWN');
       assert.ok(run.reports.every(r=>r.recoveryMs!==null && r.recoveryMs>=0));
+      assert.ok(run.reports.every(r=>typeof r.recoveryDurationMs === "number" && r.recoveryDurationMs>=0));
     }
     if (scenario==='confirmation-lost') assert.ok(run.reports[0].unknownObservations>=1);
     const exported=await fetch(url+'/api/runs/'+runId+'/export').then(r=>r.json());
