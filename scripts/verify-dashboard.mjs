@@ -30,16 +30,25 @@ try {
       await delay(1000);
     }
     assert.equal(run.status,'COMPLETE',JSON.stringify(run));
-    assert.ok(run.reports.length);
-    for(const r of run.reports) assert.equal(r.verdict,r.mode==='naive'?'FAIL':'PASS',JSON.stringify(r));
+    assert.equal(run.reports.length, scenario==='comparison'?2:1);
+    for(const r of run.reports) {
+      const count=r.mode==='naive'?2:1;
+      assert.equal(r.verdict,r.mode==='naive'?'FAIL':'PASS',JSON.stringify(r));
+      assert.equal(r.responseRecovered,true);
+      assert.equal(new Set(r.transfers.map(t=>t.txHash)).size,count);
+      assert.equal(BigInt(r.settledAmountAtomic),BigInt(r.expectedAmountAtomic)*BigInt(count));
+    }
     if (!['baseline','concurrent'].includes(scenario)) {
       assert.ok(run.checkpoints.length);
       for (const checkpoint of run.checkpoints) assert.equal(checkpoint.verdict,'UNKNOWN');
       assert.ok(run.reports.every(r=>r.recoveryMs!==null && r.recoveryMs>=0));
+      assert.ok(run.reports.every(r=>Number.isFinite(r.recoveryDurationMs) && r.recoveryDurationMs>=0));
     }
     if (scenario==='confirmation-lost') assert.ok(run.reports[0].unknownObservations>=1);
+    if (scenario!=='comparison') assert.equal(run.timeline.filter(e=>e.kind==='authorization').length,1,'Recovery must retain the original authorization');
     const exported=await fetch(url+'/api/runs/'+runId+'/export').then(r=>r.json());
     assert.equal(exported.source,'TESTNET');
+    assert.deepEqual(exported,run);
     assert.ok(!JSON.stringify(exported).includes('PAYMENT-SIGNATURE'));
     console.log(application+'/'+scenario+': '+run.reports.map(r=>r.mode+' '+r.verdict).join(', '));
     results.push(exported);

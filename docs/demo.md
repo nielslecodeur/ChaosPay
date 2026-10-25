@@ -90,4 +90,6 @@ Cette commande effectue de nouveaux paiements Testnet. Elle vérifie les verdict
 
 Exécuter ces commandes successivement : les tests HTTP et le dashboard utilisent le même port. La campagne couvre huit scénarios sur deux applications et écrit evidence/public/recovery-campaign.json.
 
+La campagne vérifie aussi le nombre exact de transactions distinctes, le montant payé, l’accusé du résultat, les mesures de reprise du moteur et du runner et l’identité de l’export avec le rapport affiché. Hors comparaison naïve, une seule autorisation doit apparaître dans la timeline. Chaque panne doit produire un checkpoint UNKNOWN avant la récupération ; `confirmation-lost` doit enregistrer au moins une observation inconnue.
+
 Le laboratoire est local et exclusivement Testnet. Il reste à éprouver le kit sur une application externe ; les deux intégrations actuelles appartiennent à ce dépôt.
