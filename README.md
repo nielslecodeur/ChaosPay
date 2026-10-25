@@ -6,15 +6,71 @@ Lumaid is a local failure-and-recovery lab for paid applications on Stellar. The
 
 ## Getting started
 
-Requirements: Node.js 24 and npm.
+Choose your operating system and follow its setup instructions. You will need Git and Node.js 24 to clone the project and prepare the Stellar Testnet demo.
 
-```sh
+### Windows
+
+Open PowerShell and install Git and Node.js 24 with Windows Package Manager (`winget`):
+
+```powershell
+winget install --id Git.Git --exact
+winget install --id OpenJS.NodeJS.LTS --exact
+```
+
+Close and reopen PowerShell, then clone and set up Lumaid:
+
+```powershell
+git clone https://github.com/nielslecodeur/Lumaid.git
+cd Lumaid
 npm ci
 npm run setup:testnet
 npm run check:connections
+npm run dev:dashboard
 ```
 
-To use the dashboard, run `npm run dev:dashboard` and open http://127.0.0.1:3002. Choose CSV or JSON receipts, select TESTNET and a scenario; the runner manages its servers.
+### Linux
+
+Install Git with your distribution's package manager if needed. In Bash, install Node Version Manager (`nvm`):
+
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+```
+
+Open a new terminal, install Node.js 24, then clone and set up Lumaid:
+
+```sh
+nvm install 24
+nvm use 24
+git clone https://github.com/nielslecodeur/Lumaid.git
+cd Lumaid
+npm ci
+npm run setup:testnet
+npm run check:connections
+npm run dev:dashboard
+```
+
+### macOS
+
+Install Git with Apple's Command Line Tools or Homebrew if needed. In Terminal, install Node Version Manager (`nvm`):
+
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+```
+
+Quit and reopen Terminal, install Node.js 24, then clone and set up Lumaid:
+
+```sh
+nvm install 24
+nvm use 24
+git clone https://github.com/nielslecodeur/Lumaid.git
+cd Lumaid
+npm ci
+npm run setup:testnet
+npm run check:connections
+npm run dev:dashboard
+```
+
+Open http://127.0.0.1:3002. Choose CSV or JSON receipts, select TESTNET and a scenario; the runner manages its servers.
 
 To run the CLI client on its own, stop the dashboard, then run `npm run dev:facilitator` in one terminal and `npm run dev:merchant` in a second.
 
