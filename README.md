@@ -1,5 +1,7 @@
 # ChaosPay — HackMeridian
 
+[GitHub](https://github.com/nielslecodeur/Lumaid) · [Installation Windows, macOS et Linux](INSTALL.md)
+
 Que devient un achat quand le paiement est confirmé mais que la réponse HTTP disparaît ?
 
 ChaosPay est un laboratoire local de pannes et de reprise pour les applications payantes sur Stellar. Le moteur x402, le runner et le dashboard sont intégrés. Un kit de reprise partagé équipe deux API : conversion CSV et génération de reçus JSON. Les rapports comparent les preuves avant/après reprise et les modes naïf/durable.
@@ -26,6 +28,20 @@ npm run smoke:payment -- premier-achat durable none
 
 Aucune clé d'API IA ou de prestataire financier nécessaire. Trois comptes dédiés sont financés gratuitement sur Testnet. Le paiement porte sur 0,01 XLM de test, sans valeur réelle. Les clés et journaux restent dans .env et .local/, ignorés par Git.
 
+## Différenciation
+
+Existing tools such as Wasit, SELO and official end-to-end suites validate protocol conformance. ChaosPay complements them: it injects a deterministic failure after settlement and before HTTP delivery, then compares the intended purchase, observed transfers and recovered response. Its verdict is economic and application-level, not a protocol-conformance verdict.
+
+The comparison is explicit: the durable and naive cards are separate demonstration purchases. In the local naive fixture, a new payment authorization is deliberately created after the interruption; the two observed transfers are not evidence of a Stellar replay vulnerability.
+
+### What we do NOT claim
+
+- ChaosPay is not a security audit.
+- ChaosPay is not a replacement for Wasit, SELO or official conformance suites.
+- ChaosPay does not guarantee exactly-once payments.
+- Fault injection is explicit in our local fixture; we do not inject faults into third-party services.
+- The two demo APIs are team-built examples; we do not claim an external customer pilot.
+
 ## Panne et reprise
 
 ```sh
@@ -51,6 +67,8 @@ npm run verify:engine
 ```
 
 La campagne exécute réellement coupure, redémarrage, concurrence et contre-exemple naïf sur Testnet. Les rapports expurgés sont écrits dans evidence/public/. Les hashes et événements de transfert permettent une vérification indépendante de la réponse du marchand.
+
+Pour vérifier les hashes de la campagne et consulter les trois scénarios documentés, voir [les preuves publiques Testnet](evidence/public/README.md). Le script de présentation vidéo de 90 secondes est dans [docs/demo-video-90s.md](docs/demo-video-90s.md).
 
 ## Documentation
 
