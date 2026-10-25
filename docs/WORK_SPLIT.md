@@ -51,3 +51,7 @@ Base commune : feat/recovery-kit, commit 64bd455. A travaille sur feat/integrati
 B crée sa propre branche depuis la base commune et travaille sur apps/dashboard/ et docs/demo.md : parcours application → panne → exécution → bilan, paiements observés/résultat/durée en premier, détails Stellar ensuite, puis démo de deux minutes. B peut utiliser les deux API existantes ; la troisième intégration n’est pas ajoutée au dashboard dans cette étape A.
 
 A ne modifie pas les fichiers du dashboard ou du runner. Ses seuls nouveaux scripts racine sont build:recovery et verify:integration ; conserver ces entrées lors de la fusion de package.json. Les champs et routes des deux API existantes restent compatibles. Toute évolution du contrat ou du runner doit être coordonnée.
+
+## Cadrage de la distribution locale
+
+Le contrat courant est [PACKAGE_CONTRACT.md](PACKAGE_CONTRACT.md) : exports publics, archive, preuves et responsabilités A/B. Base commune : 8d33eaa. Pas de publication npm avant validation et décision séparée ; le package client pour agents reste ultérieur.

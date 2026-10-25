@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { x402Client } from "@x402/core/client";
 import { PaymentRequiredV2Schema } from "@x402/core/schemas";
@@ -61,15 +61,21 @@ async function report(id:string) {
 }
 try {
   for(const url of [base,c.facilitatorUrl])assert.equal(await fetch(url+"/health",{signal:AbortSignal.timeout(500)}).then(()=>true,()=>false),false,"Stop manually running services first.");
-  await command([npmCli,"run","build","--prefix","packages/recovery"]);
+  // npm pack rebuilds the package through prepack; no prebuilt dist is required.
   cpSync(join(root,"examples/invoice-check-api"),consumer,{recursive:true,filter:path=>!/(?:^|[\\/])(?:node_modules|vendor|\.local)(?:[\\/]|$)/.test(path)});
   const vendor=join(consumer,"vendor");mkdirSync(vendor);
-  const packed = JSON.parse(await command([npmCli,"pack",join(root,"packages/recovery"),"--pack-destination",vendor,"--json"])) as {files:{path:string}[]}[];
+  const packed = JSON.parse(await command([npmCli,"--silent","pack",join(root,"packages/recovery"),"--pack-destination",vendor,"--json"])) as {name:string;version:string;integrity:string;files:{path:string}[]}[];
   assert.ok(packed[0]?.files.length);
-  for (const file of packed[0]!.files) assert.ok(file.path.startsWith("dist/") || ["README.md","package.json"].includes(file.path),"Unexpected package file: "+file.path);
+  assert.equal(packed[0]!.name,"@chaospay/recovery");
+  const publicExports = [".","./stellar-http","./evidence"];
+  for (const file of packed[0]!.files) assert.ok(/^dist\/(recovery|evidence|stellar-observer)\/src\/[a-z-]+\.(js|d\.ts)$/.test(file.path) || ["README.md","package.json"].includes(file.path),"Unexpected package file: "+file.path);
   const archives=readdirSync(vendor);
   assert.deepEqual(archives,["chaospay-recovery-0.1.0.tgz"]);
+  const archiveSha256=createHash("sha256").update(readFileSync(join(vendor,archives[0]!))).digest("hex");
   await command([npmCli,"install","--ignore-scripts","--no-audit","--no-fund"],consumer);
+  const installed=JSON.parse(readFileSync(join(consumer,"node_modules/@chaospay/recovery/package.json"),"utf8"));
+  assert.deepEqual(Object.keys(installed.exports),publicExports);
+  assert.equal(installed.private,true,"Publication remains disabled");
   await command(["--test","domain.test.mjs"],consumer);
   await command([npmCli,"run","typecheck"],consumer);
   console.log("Isolated tarball installation, domain tests and TypeScript consumer: PASS");
@@ -94,11 +100,19 @@ try {
     assert.equal(term.amount,c.amount);assert.equal(term.payTo,c.recipient);
     const client=x402Client.fromConfig({schemes:[{network:NETWORK,client:new ExactStellarScheme(createEd25519Signer(secret("BUYER_SECRET"),NETWORK),{url:RPC_URL})}],
       spendControls:{allowedAssets:[{network:NETWORK,asset:c.token,maxAmountPerPayment:c.amount}]}});
-    const payload=await client.createPaymentPayload(challenge as unknown as PaymentRequired);
+    let authorizationCount=0;
+    const authorize=async()=>{authorizationCount++;return client.createPaymentPayload(challenge as unknown as PaymentRequired);};
+    const payload=await authorize();
+    const originalAuthorizationDigest=digest(payload);
     mkdirSync(".local/integration-authorizations",{recursive:true});
     writeFileSync(".local/integration-authorizations/"+id+".json",JSON.stringify({url,input,payload}),{mode:0o600});
     const headers={"Content-Type":"application/json","PAYMENT-SIGNATURE":Buffer.from(JSON.stringify(payload)).toString("base64")};
-    const send=(hook="none",data=body)=>fetch(url,{method:"POST",headers:{...headers,"X-Chaos-Fault":hook},body:data,signal:AbortSignal.timeout(180000)});
+    let purchaseRequests=0;
+    const send=(hook="none",data=body)=>{
+      assert.equal(digest(JSON.parse(Buffer.from(headers["PAYMENT-SIGNATURE"],"base64").toString("utf8"))),originalAuthorizationDigest);
+      purchaseRequests++;
+      return fetch(url,{method:"POST",headers:{...headers,"X-Chaos-Fault":hook},body:data,signal:AbortSignal.timeout(180000)});
+    };
     if(fault==="baseline"){
       assert.equal((await send("drop")).status,403,"Consumer must reject fault injection by default");
       assert.equal((await fetch(base+"/paid/reports/"+id)).status,404,"Rejected hook must not create a purchase");
@@ -131,7 +145,8 @@ try {
     const after=await report(id);
     assert.equal(after.verdict,"PASS");assert.equal(after.transfers.length,1);
     assert.equal(after.settledAmountAtomic,c.amount);
-    results.push({scenario:fault,before,after});
+    assert.equal(authorizationCount,1);
+    results.push({scenario:fault,authorizationCount,purchaseRequests,originalAuthorizationReused:true,before,after});
     console.log(fault+": PASS, one confirmed payment and verified result");
     if(fault==="baseline"){await stop(app);app=await startConsumer(true);}
   }
@@ -139,7 +154,7 @@ try {
   writeFileSync("evidence/public/integration-a.json",JSON.stringify({
     simulated:false,executedAt:new Date().toISOString(),integration:"invoice-check",
     scope:"Team-authored consumer installed from a tarball outside the source repository; not an external customer pilot.",
-    package:"@chaospay/recovery@0.1.0",scenarios:results,
+    package:"@chaospay/recovery@0.1.0",archiveSha256,archiveIntegrity:packed[0]!.integrity,publicExports,scenarios:results,
     reports:Object.fromEntries(results.map(r=>[r.after.purchaseId,r.after])),
   },null,2));
   console.log("Evidence: evidence/public/integration-a.json");

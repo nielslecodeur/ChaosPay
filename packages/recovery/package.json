@@ -27,7 +27,8 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "16.4.1",
