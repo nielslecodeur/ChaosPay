@@ -1,0 +1,231 @@
+{
+  "executedAt": "2026-10-25T14:23:32.294Z",
+  "network": "stellar:testnet",
+  "simulated": false,
+  "reports": {
+    "verify-1792938144053-drop": {
+      "schemaVersion": 1,
+      "purchaseId": "verify-1792938144053-drop",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "serviceId": "csv",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "responseRecovered": true,
+      "transfers": [
+        {
+          "txHash": "a2a9e0308d13809966a260d72142cd9f334832547e09fdd41e04520d958259aa",
+          "ledger": 5382895,
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000"
+        }
+      ],
+      "settledAmountAtomic": "100000",
+      "verdict": "PASS",
+      "reason": "One expected payment confirmed and result recovered.",
+      "recoveryMs": 4022,
+      "unknownObservations": 0,
+      "observations": [
+        {
+          "status": "CONFIRMED",
+          "txHash": "a2a9e0308d13809966a260d72142cd9f334832547e09fdd41e04520d958259aa",
+          "transfers": [
+            {
+              "txHash": "a2a9e0308d13809966a260d72142cd9f334832547e09fdd41e04520d958259aa",
+              "ledger": 5382895,
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000"
+            }
+          ],
+          "reason": "Exact transfer confirmed from contract events."
+        }
+      ],
+      "attempts": [
+        {
+          "state": "DELIVERY_STORED",
+          "txHash": "a2a9e0308d13809966a260d72142cd9f334832547e09fdd41e04520d958259aa",
+          "deliveries": 1
+        }
+      ]
+    },
+    "verify-1792938144053-crash": {
+      "schemaVersion": 1,
+      "purchaseId": "verify-1792938144053-crash",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "serviceId": "csv",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "responseRecovered": true,
+      "transfers": [
+        {
+          "txHash": "40a91554840ade70b28c2414cc9cce7eb816da561fede682122e0666a62d3841",
+          "ledger": 5382898,
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000"
+        }
+      ],
+      "settledAmountAtomic": "100000",
+      "verdict": "PASS",
+      "reason": "One expected payment confirmed and result recovered.",
+      "recoveryMs": 2708,
+      "unknownObservations": 0,
+      "observations": [
+        {
+          "status": "CONFIRMED",
+          "txHash": "40a91554840ade70b28c2414cc9cce7eb816da561fede682122e0666a62d3841",
+          "transfers": [
+            {
+              "txHash": "40a91554840ade70b28c2414cc9cce7eb816da561fede682122e0666a62d3841",
+              "ledger": 5382898,
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000"
+            }
+          ],
+          "reason": "Exact transfer confirmed from contract events."
+        }
+      ],
+      "attempts": [
+        {
+          "state": "DELIVERY_STORED",
+          "txHash": "40a91554840ade70b28c2414cc9cce7eb816da561fede682122e0666a62d3841",
+          "deliveries": 1
+        }
+      ]
+    },
+    "verify-1792938144053-concurrent": {
+      "schemaVersion": 1,
+      "purchaseId": "verify-1792938144053-concurrent",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "serviceId": "csv",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "responseRecovered": true,
+      "transfers": [
+        {
+          "txHash": "b3fe298fec99b2a62137711cfe812503733f7689f6728b92f02d67859d737852",
+          "ledger": 5382900,
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000"
+        }
+      ],
+      "settledAmountAtomic": "100000",
+      "verdict": "PASS",
+      "reason": "One expected payment confirmed and result recovered.",
+      "recoveryMs": null,
+      "unknownObservations": 0,
+      "observations": [
+        {
+          "status": "CONFIRMED",
+          "txHash": "b3fe298fec99b2a62137711cfe812503733f7689f6728b92f02d67859d737852",
+          "transfers": [
+            {
+              "txHash": "b3fe298fec99b2a62137711cfe812503733f7689f6728b92f02d67859d737852",
+              "ledger": 5382900,
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000"
+            }
+          ],
+          "reason": "Exact transfer confirmed from contract events."
+        }
+      ],
+      "attempts": [
+        {
+          "state": "DELIVERY_STORED",
+          "txHash": "b3fe298fec99b2a62137711cfe812503733f7689f6728b92f02d67859d737852",
+          "deliveries": 1
+        }
+      ]
+    },
+    "verify-1792938144053-naive": {
+      "schemaVersion": 1,
+      "purchaseId": "verify-1792938144053-naive",
+      "mode": "naive",
+      "network": "stellar:testnet",
+      "serviceId": "csv",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "responseRecovered": true,
+      "transfers": [
+        {
+          "txHash": "3945d11071ee9db8d07f1c04249e33a77dd27c1b2a22c8f0ff42b3b6d3c86b26",
+          "ledger": 5382902,
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000"
+        },
+        {
+          "txHash": "0b6089970323e3ae7b9eb138caaf16fae0c3a57d780f6279cfb2e869d05e1f0e",
+          "ledger": 5382904,
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000"
+        }
+      ],
+      "settledAmountAtomic": "200000",
+      "verdict": "FAIL",
+      "reason": "Confirmed payments exceed the price of one logical purchase.",
+      "recoveryMs": 10893,
+      "unknownObservations": 0,
+      "observations": [
+        {
+          "status": "CONFIRMED",
+          "txHash": "3945d11071ee9db8d07f1c04249e33a77dd27c1b2a22c8f0ff42b3b6d3c86b26",
+          "transfers": [
+            {
+              "txHash": "3945d11071ee9db8d07f1c04249e33a77dd27c1b2a22c8f0ff42b3b6d3c86b26",
+              "ledger": 5382902,
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000"
+            }
+          ],
+          "reason": "Exact transfer confirmed from contract events."
+        },
+        {
+          "status": "CONFIRMED",
+          "txHash": "0b6089970323e3ae7b9eb138caaf16fae0c3a57d780f6279cfb2e869d05e1f0e",
+          "transfers": [
+            {
+              "txHash": "0b6089970323e3ae7b9eb138caaf16fae0c3a57d780f6279cfb2e869d05e1f0e",
+              "ledger": 5382904,
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000"
+            }
+          ],
+          "reason": "Exact transfer confirmed from contract events."
+        }
+      ],
+      "attempts": [
+        {
+          "state": "DELIVERY_STORED",
+          "txHash": "3945d11071ee9db8d07f1c04249e33a77dd27c1b2a22c8f0ff42b3b6d3c86b26",
+          "deliveries": 0
+        },
+        {
+          "state": "DELIVERY_STORED",
+          "txHash": "0b6089970323e3ae7b9eb138caaf16fae0c3a57d780f6279cfb2e869d05e1f0e",
+          "deliveries": 1
+        }
+      ]
+    }
+  }
+}

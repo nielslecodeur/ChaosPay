@@ -22,7 +22,7 @@ test("missing observer cannot turn into a pass", () => {
   assert.equal(verdict([],expected,true).verdict,"UNKNOWN");
 });
 test("payment without recovered result is not a successful recovery", () => {
-  assert.equal(verdict([confirmed()],expected,false).verdict,"FAIL");
+  assert.equal(verdict([confirmed()],expected,false).verdict,"UNKNOWN");
 });
 test("wrong amount and wrong recipient cannot pass", () => {
   const o = confirmed(); o.transfers[0]!.amountAtomic = "99999";

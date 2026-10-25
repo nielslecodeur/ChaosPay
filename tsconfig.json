@@ -13,9 +13,9 @@
     "noEmit": true
   },
   "include": [
-    "apps/demo-merchant/**/*.ts",
-    "packages/evidence/**/*.ts",
-    "packages/stellar-observer/**/*.ts",
+    "apps/**/*.ts",
+    "packages/**/*.ts",
+    "scenarios/**/*.ts",
     "scripts/**/*.ts",
     "tests/**/*.ts"
   ]

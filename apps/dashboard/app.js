@@ -22,7 +22,7 @@ function render() {
   if (!run) return;
   const detail = $('detail'); detail.replaceChildren();
   const heading = el('div', undefined, 'panel run-heading');
-  const title = el('div'); title.append(badge(run.source), el('h3', run.scenario), badge(run.status));
+  const title = el('div'); title.append(badge(run.source), el('h3', (run.application ?? 'csv') + ' · ' + run.scenario), badge(run.status));
   if (run.source === 'SIMULATED') title.append(el('p', 'Données fictives — aucun paiement réseau.'));
   if (run.source === 'ARCHIVE') title.append(el('p', 'Preuves historiques du moteur A — non revérifiées en direct.'));
   const download = el('a', '↓ Export JSON expurgé'); download.href = `/api/runs/${encodeURIComponent(run.runId)}/export`; download.download = '';
@@ -34,7 +34,7 @@ function render() {
     const metrics = el('div', undefined, 'metrics');
     const settlements = new Set(report.transfers.map(t => t.txHash).filter(Boolean)).size;
     const duration = run.source === 'SIMULATED' ? 'Non mesuré' : Number.isFinite(report.recoveryDurationMs) ? `${(report.recoveryDurationMs / 1000).toFixed(3)} s` : 'Non mesuré';
-    for (const [value, label] of [[settlements, 'Règlements observés (transactions uniques)'], [xlm(report.settledAmountAtomic), 'Montant payé observé · hors frais'], [xlm(report.expectedAmountAtomic), 'Prix de l’achat'], [report.responseRecovered ? 'Oui' : 'Non', 'Résultat récupéré et accusé'], [duration, 'Délai de reprise']]) {
+    for (const [value, label] of [[settlements, 'Règlements observés (transactions uniques)'], [xlm(report.settledAmountAtomic), 'Montant payé observé · hors frais'], [xlm(report.expectedAmountAtomic), 'Prix de l’achat'], [report.responseRecovered ? 'Oui' : 'Non', 'Résultat récupéré et accusé'], [duration, 'Délai de reprise (runner)'], [report.recoveryMs == null ? 'Non mesuré' : report.recoveryMs + ' ms', 'Délai de reprise (moteur)'], [report.unknownObservations ?? 'Non mesuré', 'Observations inconnues']]) {
       const metric = el('div', undefined, 'metric'); metric.append(el('strong', String(value)), el('span', label)); metrics.append(metric);
     }
     card.append(metrics, el('p', report.reason));
@@ -51,6 +51,7 @@ function render() {
     reports.append(card);
   }
   detail.append(reports);
+  for (const checkpoint of run.checkpoints ?? []) detail.append(el('p', 'Avant reprise (' + checkpoint.mode + ') : ' + checkpoint.verdict + ' · résultat accusé : ' + (checkpoint.responseRecovered ? 'oui' : 'non')));
   if (!run.reports.length) detail.append(el('div', 'Aucune preuve disponible — verdict UNKNOWN.', 'panel empty'));
   const panel = el('section', undefined, 'panel'); panel.append(el('h2', 'Timeline'));
   const timeline = el('ol', undefined, 'timeline');
@@ -71,7 +72,7 @@ $('scenario').onchange = describe; $('source').onchange = describe;
 $('launch').onclick = async () => {
   $('launch').disabled = true; $('error').textContent = '';
   try {
-    const r = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ChaosPay-Local': '1' }, body: JSON.stringify({ scenario: $('scenario').value, source: $('source').value }) });
+    const r = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ChaosPay-Local': '1' }, body: JSON.stringify({ scenario: $('scenario').value, source: $('source').value, application: $('application').value }) });
     const result = await r.json(); if (!r.ok) throw new Error(result.error);
     selected = result.runId; await refresh();
   } catch (e) { $('error').textContent = e.message; }

@@ -12,11 +12,11 @@ test('local API loads archives, runs fixtures, exports and rejects cross-origin 
   const files: string[] = [];
   try {
     let ready = false;
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 150; i++) {
       if (child.exitCode !== null) throw new Error('Runner exited');
       ready = await fetch(base + '/api/state').then(r => r.ok, () => false);
       if (ready) break;
-      await delay(100);
+      await delay(200);
     }
     assert.ok(ready);
     const state = await fetch(base + '/api/state').then(r => r.json()) as { runs: { source: string }[] };

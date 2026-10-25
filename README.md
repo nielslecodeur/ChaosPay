@@ -2,7 +2,7 @@
 
 Que devient un achat quand le paiement est confirmé mais que la réponse HTTP disparaît ?
 
-ChaosPay est un laboratoire local de pannes et de reprise pour les applications payantes sur Stellar. Le périmètre A fournit un marchand x402, un facilitator local, une vérification des transferts et un journal SQLite. Le dashboard et le runner interactif du périmètre B restent à construire.
+ChaosPay est un laboratoire local de pannes et de reprise pour les applications payantes sur Stellar. Le moteur x402, le runner et le dashboard sont intégrés. Un kit de reprise partagé équipe deux API : conversion CSV et génération de reçus JSON. Les rapports comparent les preuves avant/après reprise et les modes naïf/durable.
 
 ## Démarrage
 
@@ -14,7 +14,9 @@ npm run setup:testnet
 npm run check:connections
 ```
 
-Lancer npm run dev:facilitator dans un terminal, puis npm run dev:merchant dans un deuxième.
+Pour le dashboard, lancer npm run dev:dashboard, puis ouvrir http://127.0.0.1:3002. Choisir CSV ou reçus JSON, TESTNET et un scénario ; le runner gère ses serveurs.
+
+Pour le client CLI seul, arrêter le dashboard, puis lancer npm run dev:facilitator dans un terminal et npm run dev:merchant dans un deuxième.
 
 Dans un troisième :
 
@@ -43,6 +45,8 @@ npm test
 Après arrêt des serveurs manuels :
 
 ```sh
+npm run verify:dashboard
+# Ancienne campagne CLI CSV, également disponible :
 npm run verify:engine
 ```
 
@@ -50,6 +54,8 @@ La campagne exécute réellement coupure, redémarrage, concurrence et contre-ex
 
 ## Documentation
 
+- [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
+- [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
 - [Guide de connexion et lancement A](docs/SETUP_A.md)
 - [API pour le runner et le dashboard B](docs/ENGINE_API.md)
 - [Cadrage et limites](docs/PROJECT.md)
@@ -60,7 +66,7 @@ La campagne exécute réellement coupure, redémarrage, concurrence et contre-ex
 
 ## Limites
 
-Fixture locale : un service déterministe JSON vers CSV, un actif Testnet et des hooks de panne explicites. Un timeout reste UNKNOWN tant que le réseau n'a pas fourni de preuve. Les tests ne constituent pas un audit de sécurité ni une garantie universelle de paiement unique.
+Fixture locale : deux services déterministes (CSV et reçus JSON), un actif Testnet et des hooks de panne explicites. Un timeout reste UNKNOWN tant que le réseau n'a pas fourni de preuve. Les tests ne constituent pas un audit de sécurité ni une garantie universelle de paiement unique.
 
 Le mode naïf introduit volontairement une nouvelle autorisation au retry ; il ne démontre pas une faille de replay de Stellar. Le laboratoire ne doit pas gérer d'argent réel ni être exposé sur Internet. Les dépendances ont une limite connue documentée dans docs/versions.md.
 

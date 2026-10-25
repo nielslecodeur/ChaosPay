@@ -39,14 +39,14 @@ if (existsSync('evidence/public')) for (const name of readdirSync('evidence/publ
 }
 app.get('/api/state', (_req, res) => res.json({ busy, scenarios, runs: [...runs.values()].reverse() }));
 app.post('/api/runs', (req, res) => {
-  const { scenario, source } = req.body ?? {};
-  if (!isScenario(scenario) || !['SIMULATED', 'TESTNET'].includes(source)) { res.status(400).json({ error: 'Scénario ou source invalide.' }); return; }
+  const { scenario, source, application = "csv" } = req.body ?? {};
+  if (!["csv","receipt"].includes(application) || !isScenario(scenario) || !['SIMULATED', 'TESTNET'].includes(source)) { res.status(400).json({ error: 'Scénario ou source invalide.' }); return; }
   if (busy) { res.status(409).json({ error: 'Une exécution est déjà en cours.' }); return; }
   if (source === 'SIMULATED') {
-    const run = simulate(scenario); runs.set(run.runId, run); save(run); res.status(201).json(run); return;
+    const run = simulate(scenario); run.application = application; runs.set(run.runId, run); save(run); res.status(201).json(run); return;
   }
   if (!existsSync('.env')) { res.status(409).json({ error: 'Configurer Testnet avec npm run setup:testnet avant une exécution réelle.' }); return; }
-  const run: Run = { runId: randomUUID(), scenario, source, status: 'RUNNING', startedAt: new Date().toISOString(), timeline: [], reports: [] };
+  const run: Run = { runId: randomUUID(), scenario, source, application, status: 'RUNNING', startedAt: new Date().toISOString(), timeline: [], reports: [] };
   busy = true; runs.set(run.runId, run);
   res.status(202).json(run);
   void (async () => {

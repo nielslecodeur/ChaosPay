@@ -16,7 +16,9 @@ Un paiement est confirmé, puis la réponse HTTP disparaît. Après redémarrage
 - [x] Redémarrage et récupération du même achat avec stockage durable.
 - [x] Comparaison entre modes naïf et durable.
 - [x] Deux requêtes simultanées pour le même achat.
-- [ ] Dashboard avec timeline, preuves et export JSON expurgé.
+- [x] Dashboard avec timeline, preuves et export JSON expurgé.
+- [x] Kit source partagé, seconde API et trois nouveaux points de panne.
+- [x] Rapports avant/après avec durée de reprise et états inconnus.
 - [ ] Tests, installation reproductible, documentation et vidéo.
 
 ## Première décision technique
@@ -25,7 +27,7 @@ Obtenir dans les deux premières heures un paiement Testnet confirmé et son tra
 
 ## Architecture prévue
 
-TypeScript ; exemple x402 officiel versionné ; serveur Node ; SQLite pour les achats ; React/Vite pour le dashboard. Versions à valider lors de l'installation. Le service vendu est une conversion déterministe JSON vers CSV.
+TypeScript, x402, Node 24, SQLite et dashboard HTML/CSS/JavaScript. Le même kit équipe la conversion CSV et les reçus JSON. Versions verrouillées dans package-lock.json.
 
 ## Invariants
 
@@ -47,4 +49,4 @@ Faire confirmer le besoin par un mentor et chercher une équipe API prête à es
 
 ## Validation du moteur A
 
-Les contrôles de types, 9 tests automatisés et une campagne réelle sur Testnet ont réussi. Les preuves publiques sont dans evidence/public/. Le dashboard et le runner interactif restent à construire. Guide : docs/SETUP_A.md ; contrat pour B : docs/ENGINE_API.md.
+Les huit scénarios du runner ont réussi sur chacune des deux API sur Testnet. Les preuves publiques sont dans evidence/public/recovery-campaign.json. Guide : docs/RECOVERY_KIT.md ; contrat : docs/ENGINE_API.md.

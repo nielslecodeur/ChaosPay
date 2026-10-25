@@ -1,0 +1,3104 @@
+{
+  "simulated": false,
+  "executedAt": "2026-10-25T14:12:42.557Z",
+  "runs": [
+    {
+      "runId": "d35d082f-41a1-4ac9-ba70-85192e910f04",
+      "scenario": "before-submit",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:08:55.981Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:08:59.371Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:08:59.371Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:08:59.394Z",
+          "kind": "http",
+          "message": "/purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:09:00.666Z",
+          "kind": "authorization",
+          "message": "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:09:00.666Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:01.656Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:09:01.656Z",
+          "kind": "http",
+          "message": "GET /reports/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:01.663Z",
+          "kind": "http",
+          "message": "/reports/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:01.664Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:09:01.664Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:06.765Z",
+          "kind": "http",
+          "message": "/purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:06.766Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:06.776Z",
+          "kind": "http",
+          "message": "/purchases/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:06.776Z",
+          "kind": "delivery",
+          "message": "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:09:06.776Z",
+          "kind": "http",
+          "message": "GET /reports/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:07.055Z",
+          "kind": "http",
+          "message": "/reports/runner-749d8d31-9f99-48d9-93a4-5824a90adfa2?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:07.055Z",
+          "kind": "evidence",
+          "message": "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "9c8faa35c8b5a43b509cfa932d996f03213bdf2f7f931ee7799003005571d832",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382732
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 5119,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "0",
+          "transfers": [],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "d11cf848-8d09-4876-8099-e85d1102631a",
+      "scenario": "confirmation-lost",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:09:07.882Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:09:10.496Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:09:10.496Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:10.524Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:09:11.619Z",
+          "kind": "authorization",
+          "message": "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:09:11.619Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:13.031Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:09:13.032Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:09:13.032Z",
+          "kind": "http",
+          "message": "GET /reports/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:13.036Z",
+          "kind": "http",
+          "message": "/reports/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:13.036Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:09:13.036Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:13.041Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:09:13.041Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:09:14.057Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:14.280Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:09:14.280Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:09:15.292Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:15.406Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:09:15.406Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:09:16.415Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:16.546Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:16.546Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:16.552Z",
+          "kind": "http",
+          "message": "/purchases/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:16.552Z",
+          "kind": "delivery",
+          "message": "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:09:16.552Z",
+          "kind": "http",
+          "message": "GET /reports/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:16.718Z",
+          "kind": "http",
+          "message": "/reports/runner-a36c87a2-7514-4285-a8f6-ee66075d8a11?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:16.719Z",
+          "kind": "evidence",
+          "message": "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "c654df5b8392cc0e55b8065c99a63920f6731d383ed4e102051686e45e4c3faf",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382734
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 3522,
+          "unknownObservations": 4
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "0",
+          "transfers": [],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 1
+        }
+      ]
+    },
+    {
+      "runId": "956c37ed-e8a5-4dfe-a369-9e5ab2655a58",
+      "scenario": "ack-lost",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:09:17.043Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:09:19.618Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:09:19.618Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:19.641Z",
+          "kind": "http",
+          "message": "/purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:09:20.843Z",
+          "kind": "authorization",
+          "message": "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:09:20.843Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:26.744Z",
+          "kind": "http",
+          "message": "/purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:26.744Z",
+          "kind": "interruption",
+          "message": "Result received; client acknowledgment deliberately omitted."
+        },
+        {
+          "at": "2026-10-25T14:09:26.744Z",
+          "kind": "http",
+          "message": "GET /reports/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:26.874Z",
+          "kind": "http",
+          "message": "/reports/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:26.875Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:09:26.875Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:27.009Z",
+          "kind": "http",
+          "message": "/purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:27.009Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:27.016Z",
+          "kind": "http",
+          "message": "/purchases/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:27.016Z",
+          "kind": "delivery",
+          "message": "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:09:27.016Z",
+          "kind": "http",
+          "message": "GET /reports/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:27.132Z",
+          "kind": "http",
+          "message": "/reports/runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:27.132Z",
+          "kind": "evidence",
+          "message": "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "ffb07a866fd7a4a66c5136de13bd508edf159200e221e2011690e74875f1becb",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382736
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 273,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "ffb07a866fd7a4a66c5136de13bd508edf159200e221e2011690e74875f1becb",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382736
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "61877266-1e8a-4ed9-a8f5-d864ffb53b89",
+      "scenario": "baseline",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:09:27.186Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:09:29.845Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:09:29.845Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c86e90a3-348b-4463-98f3-af24d4d6046c?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:29.860Z",
+          "kind": "http",
+          "message": "/purchases/runner-c86e90a3-348b-4463-98f3-af24d4d6046c?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:09:31.219Z",
+          "kind": "authorization",
+          "message": "runner-c86e90a3-348b-4463-98f3-af24d4d6046c : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:09:31.219Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c86e90a3-348b-4463-98f3-af24d4d6046c?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:36.505Z",
+          "kind": "http",
+          "message": "/purchases/runner-c86e90a3-348b-4463-98f3-af24d4d6046c?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:36.505Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c86e90a3-348b-4463-98f3-af24d4d6046c/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:36.514Z",
+          "kind": "http",
+          "message": "/purchases/runner-c86e90a3-348b-4463-98f3-af24d4d6046c/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:36.514Z",
+          "kind": "delivery",
+          "message": "runner-c86e90a3-348b-4463-98f3-af24d4d6046c : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:09:36.514Z",
+          "kind": "http",
+          "message": "GET /reports/runner-c86e90a3-348b-4463-98f3-af24d4d6046c?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:36.759Z",
+          "kind": "http",
+          "message": "/reports/runner-c86e90a3-348b-4463-98f3-af24d4d6046c?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:36.760Z",
+          "kind": "evidence",
+          "message": "runner-c86e90a3-348b-4463-98f3-af24d4d6046c : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-c86e90a3-348b-4463-98f3-af24d4d6046c",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "b91716623b346ca51b7b665e2788ea8016370c3763ad5014070366e8458041ed",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382738
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": []
+    },
+    {
+      "runId": "08bef14d-d93c-456f-b7a5-5a8fd0df7519",
+      "scenario": "drop",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:09:37.309Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:09:39.892Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:09:39.892Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:39.917Z",
+          "kind": "http",
+          "message": "/purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:09:41.474Z",
+          "kind": "authorization",
+          "message": "runner-c0423783-6e78-4d23-907a-ad72018ccdb3 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:09:41.474Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:45.910Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:09:45.910Z",
+          "kind": "http",
+          "message": "GET /reports/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:46.038Z",
+          "kind": "http",
+          "message": "/reports/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:46.039Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:09:46.039Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:46.186Z",
+          "kind": "http",
+          "message": "/purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:46.187Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:46.192Z",
+          "kind": "http",
+          "message": "/purchases/runner-c0423783-6e78-4d23-907a-ad72018ccdb3/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:46.192Z",
+          "kind": "delivery",
+          "message": "runner-c0423783-6e78-4d23-907a-ad72018ccdb3 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:09:46.192Z",
+          "kind": "http",
+          "message": "GET /reports/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:46.307Z",
+          "kind": "http",
+          "message": "/reports/runner-c0423783-6e78-4d23-907a-ad72018ccdb3?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:46.307Z",
+          "kind": "evidence",
+          "message": "runner-c0423783-6e78-4d23-907a-ad72018ccdb3 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-c0423783-6e78-4d23-907a-ad72018ccdb3",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "c898bca65cc95b4ab69310a15185cc133db1e9ba088ce36ae5987c6d937ebc96",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382740
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 282,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-c0423783-6e78-4d23-907a-ad72018ccdb3",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "c898bca65cc95b4ab69310a15185cc133db1e9ba088ce36ae5987c6d937ebc96",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382740
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "d1761905-d1d3-48aa-92fe-f1af0d1ba525",
+      "scenario": "crash",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:09:46.417Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:09:49.522Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:09:49.523Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:49.538Z",
+          "kind": "http",
+          "message": "/purchases/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:09:50.797Z",
+          "kind": "authorization",
+          "message": "runner-37002dde-db68-4aa8-9750-679781f0b696 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:09:50.797Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:56.955Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:09:58.504Z",
+          "kind": "process",
+          "message": "Marchand redémarré ; journaux conservés."
+        },
+        {
+          "at": "2026-10-25T14:09:58.504Z",
+          "kind": "http",
+          "message": "GET /reports/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:58.640Z",
+          "kind": "http",
+          "message": "/reports/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:58.640Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:09:58.640Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:58.776Z",
+          "kind": "http",
+          "message": "/purchases/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:58.776Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-37002dde-db68-4aa8-9750-679781f0b696/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:58.781Z",
+          "kind": "http",
+          "message": "/purchases/runner-37002dde-db68-4aa8-9750-679781f0b696/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:58.781Z",
+          "kind": "delivery",
+          "message": "runner-37002dde-db68-4aa8-9750-679781f0b696 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:09:58.781Z",
+          "kind": "http",
+          "message": "GET /reports/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:09:58.907Z",
+          "kind": "http",
+          "message": "/reports/runner-37002dde-db68-4aa8-9750-679781f0b696?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:09:58.908Z",
+          "kind": "evidence",
+          "message": "runner-37002dde-db68-4aa8-9750-679781f0b696 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-37002dde-db68-4aa8-9750-679781f0b696",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "2c5800dcb20d142a95b358dca189c315c58f6ca7408323a214966a9bc11996b4",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382742
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 1843,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-37002dde-db68-4aa8-9750-679781f0b696",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "2c5800dcb20d142a95b358dca189c315c58f6ca7408323a214966a9bc11996b4",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382742
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "2ecbc2b1-a9cb-4866-ba92-6bc0106a9d6b",
+      "scenario": "concurrent",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:09:59.585Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:10:02.696Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:10:02.696Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:02.711Z",
+          "kind": "http",
+          "message": "/purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:10:04.291Z",
+          "kind": "authorization",
+          "message": "runner-ccec160f-164b-4788-8ad5-badc51e391ca : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:10:04.291Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:04.292Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:11.785Z",
+          "kind": "http",
+          "message": "/purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:11.786Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:11.793Z",
+          "kind": "http",
+          "message": "/purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:11.793Z",
+          "kind": "delivery",
+          "message": "runner-ccec160f-164b-4788-8ad5-badc51e391ca : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:10:11.912Z",
+          "kind": "http",
+          "message": "/purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:11.913Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:11.915Z",
+          "kind": "http",
+          "message": "/purchases/runner-ccec160f-164b-4788-8ad5-badc51e391ca/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:11.915Z",
+          "kind": "delivery",
+          "message": "runner-ccec160f-164b-4788-8ad5-badc51e391ca : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:10:11.915Z",
+          "kind": "http",
+          "message": "GET /reports/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:12.032Z",
+          "kind": "http",
+          "message": "/reports/runner-ccec160f-164b-4788-8ad5-badc51e391ca?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:12.032Z",
+          "kind": "evidence",
+          "message": "runner-ccec160f-164b-4788-8ad5-badc51e391ca : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-ccec160f-164b-4788-8ad5-badc51e391ca",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "a50eb42f646adc0dc41a271006efc3a9e662f979a12e679741cf29e624f15097",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382745
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": []
+    },
+    {
+      "runId": "a45618e7-fe26-4e85-998a-0636588db30a",
+      "scenario": "comparison",
+      "source": "TESTNET",
+      "application": "csv",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:10:12.749Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:10:16.381Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:10:16.381Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:16.406Z",
+          "kind": "http",
+          "message": "/purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:10:17.428Z",
+          "kind": "authorization",
+          "message": "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:10:17.428Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:27.120Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:10:27.120Z",
+          "kind": "http",
+          "message": "GET /reports/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:27.295Z",
+          "kind": "http",
+          "message": "/reports/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:27.296Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:10:27.296Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:27.430Z",
+          "kind": "http",
+          "message": "/purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:27.430Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:27.436Z",
+          "kind": "http",
+          "message": "/purchases/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:27.436Z",
+          "kind": "delivery",
+          "message": "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:10:27.436Z",
+          "kind": "http",
+          "message": "GET /reports/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:27.604Z",
+          "kind": "http",
+          "message": "/reports/runner-38728b8d-b9a7-4dca-90f0-24244e2144d0?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:27.604Z",
+          "kind": "evidence",
+          "message": "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0 : rapport de l’observateur reçu."
+        },
+        {
+          "at": "2026-10-25T14:10:27.604Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:27.608Z",
+          "kind": "http",
+          "message": "/purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:10:29.447Z",
+          "kind": "authorization",
+          "message": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:10:29.447Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:36.121Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:10:36.121Z",
+          "kind": "http",
+          "message": "GET /reports/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:36.256Z",
+          "kind": "http",
+          "message": "/reports/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:36.256Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:10:36.256Z",
+          "kind": "authorization",
+          "message": "Fixture naïve : création volontaire d’une seconde autorisation."
+        },
+        {
+          "at": "2026-10-25T14:10:36.256Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:36.263Z",
+          "kind": "http",
+          "message": "/purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:10:37.352Z",
+          "kind": "authorization",
+          "message": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:10:37.352Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:46.858Z",
+          "kind": "http",
+          "message": "/purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:46.858Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f/ack?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:46.865Z",
+          "kind": "http",
+          "message": "/purchases/runner-b5d88725-67d3-416b-83bd-dd372f0b134f/ack?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:46.865Z",
+          "kind": "delivery",
+          "message": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:10:46.865Z",
+          "kind": "http",
+          "message": "GET /reports/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:10:47.093Z",
+          "kind": "http",
+          "message": "/reports/runner-b5d88725-67d3-416b-83bd-dd372f0b134f?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:47.093Z",
+          "kind": "evidence",
+          "message": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "d761d4b11a15afac7b93c175fd0bd8294091ddd51e68467e706be6e7ee6c8b7e",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382748
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 317,
+          "unknownObservations": 0
+        },
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f",
+          "mode": "naive",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "200000",
+          "transfers": [
+            {
+              "txHash": "8c23f65067bf6bf08207ef4d0bc66c0e24f02277b25b5a84ad8e4d3effbbbab2",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382750
+            },
+            {
+              "txHash": "5d98a81435fd1ff5dc7f2b1474a90bdc24e562ad33afaaf81561380c1e51cbb7",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382752
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "FAIL",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": 10745,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "d761d4b11a15afac7b93c175fd0bd8294091ddd51e68467e706be6e7ee6c8b7e",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382748
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        },
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f",
+          "mode": "naive",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "8c23f65067bf6bf08207ef4d0bc66c0e24f02277b25b5a84ad8e4d3effbbbab2",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382750
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "csv",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "8c46f35e-b95e-4970-82fa-0bf57eab0f09",
+      "scenario": "before-submit",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:10:47.317Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:10:50.421Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:10:50.421Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:50.444Z",
+          "kind": "http",
+          "message": "/purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:10:51.780Z",
+          "kind": "authorization",
+          "message": "runner-1af846c7-35bd-4e85-9390-5201675e6b09 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:10:51.780Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:52.993Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:10:52.993Z",
+          "kind": "http",
+          "message": "GET /reports/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:53.000Z",
+          "kind": "http",
+          "message": "/reports/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:53.000Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:10:53.000Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:56.231Z",
+          "kind": "http",
+          "message": "/purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:56.231Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:56.239Z",
+          "kind": "http",
+          "message": "/purchases/runner-1af846c7-35bd-4e85-9390-5201675e6b09/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:56.239Z",
+          "kind": "delivery",
+          "message": "runner-1af846c7-35bd-4e85-9390-5201675e6b09 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:10:56.239Z",
+          "kind": "http",
+          "message": "GET /reports/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:56.360Z",
+          "kind": "http",
+          "message": "/reports/runner-1af846c7-35bd-4e85-9390-5201675e6b09?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:10:56.360Z",
+          "kind": "evidence",
+          "message": "runner-1af846c7-35bd-4e85-9390-5201675e6b09 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-1af846c7-35bd-4e85-9390-5201675e6b09",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "1a81f711e4cdfd89959de77c7a94dfb5aae5536df919a22aeb375853e744801d",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382754
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 3246,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-1af846c7-35bd-4e85-9390-5201675e6b09",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "0",
+          "transfers": [],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "524c4786-77b1-4c81-8f8f-1e65046255c9",
+      "scenario": "confirmation-lost",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:10:56.422Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:10:59.534Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:10:59.534Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:10:59.558Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:11:00.547Z",
+          "kind": "authorization",
+          "message": "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:11:00.547Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:02.376Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:11:02.376Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:11:02.376Z",
+          "kind": "http",
+          "message": "GET /reports/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:02.381Z",
+          "kind": "http",
+          "message": "/reports/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:02.381Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:11:02.381Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:02.388Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:11:02.388Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:11:03.400Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:03.683Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:11:03.683Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:11:04.687Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:04.797Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 202"
+        },
+        {
+          "at": "2026-10-25T14:11:04.797Z",
+          "kind": "unknown",
+          "message": "Confirmation unavailable; preserve the original authorization."
+        },
+        {
+          "at": "2026-10-25T14:11:05.803Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:05.933Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:05.934Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:05.940Z",
+          "kind": "http",
+          "message": "/purchases/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:05.940Z",
+          "kind": "delivery",
+          "message": "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:11:05.940Z",
+          "kind": "http",
+          "message": "GET /reports/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:06.052Z",
+          "kind": "http",
+          "message": "/reports/runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:06.052Z",
+          "kind": "evidence",
+          "message": "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "c51eec48782c6f4361d8c08f83ed7a6de1a97b3187743969e1ed6d1135e841da",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382756
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 3567,
+          "unknownObservations": 4
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "0",
+          "transfers": [],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 1
+        }
+      ]
+    },
+    {
+      "runId": "f54da08c-09bc-403e-befd-c70478ad63e4",
+      "scenario": "ack-lost",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:11:06.510Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:11:10.157Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:11:10.157Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:10.185Z",
+          "kind": "http",
+          "message": "/purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:11:11.482Z",
+          "kind": "authorization",
+          "message": "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:11:11.482Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:21.797Z",
+          "kind": "http",
+          "message": "/purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:21.797Z",
+          "kind": "interruption",
+          "message": "Result received; client acknowledgment deliberately omitted."
+        },
+        {
+          "at": "2026-10-25T14:11:21.797Z",
+          "kind": "http",
+          "message": "GET /reports/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:21.935Z",
+          "kind": "http",
+          "message": "/reports/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:21.935Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:11:21.935Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:22.211Z",
+          "kind": "http",
+          "message": "/purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:22.211Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:22.218Z",
+          "kind": "http",
+          "message": "/purchases/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:22.218Z",
+          "kind": "delivery",
+          "message": "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:11:22.218Z",
+          "kind": "http",
+          "message": "GET /reports/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:22.369Z",
+          "kind": "http",
+          "message": "/reports/runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:22.369Z",
+          "kind": "evidence",
+          "message": "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "7d93f760958a48b89d3a5fe7f0636acfd6132f0f430d182882368caa7aea2858",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382759
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 421,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "7d93f760958a48b89d3a5fe7f0636acfd6132f0f430d182882368caa7aea2858",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382759
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "2a143111-04a1-43db-94ab-166f2bd5fa27",
+      "scenario": "baseline",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:11:22.651Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:11:26.267Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:11:26.267Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-374e469e-326d-40e2-aa65-3b65929cc2e4?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:26.289Z",
+          "kind": "http",
+          "message": "/purchases/runner-374e469e-326d-40e2-aa65-3b65929cc2e4?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:11:27.589Z",
+          "kind": "authorization",
+          "message": "runner-374e469e-326d-40e2-aa65-3b65929cc2e4 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:11:27.589Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-374e469e-326d-40e2-aa65-3b65929cc2e4?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:36.096Z",
+          "kind": "http",
+          "message": "/purchases/runner-374e469e-326d-40e2-aa65-3b65929cc2e4?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:36.097Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-374e469e-326d-40e2-aa65-3b65929cc2e4/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:36.103Z",
+          "kind": "http",
+          "message": "/purchases/runner-374e469e-326d-40e2-aa65-3b65929cc2e4/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:36.103Z",
+          "kind": "delivery",
+          "message": "runner-374e469e-326d-40e2-aa65-3b65929cc2e4 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:11:36.103Z",
+          "kind": "http",
+          "message": "GET /reports/runner-374e469e-326d-40e2-aa65-3b65929cc2e4?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:36.323Z",
+          "kind": "http",
+          "message": "/reports/runner-374e469e-326d-40e2-aa65-3b65929cc2e4?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:36.323Z",
+          "kind": "evidence",
+          "message": "runner-374e469e-326d-40e2-aa65-3b65929cc2e4 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-374e469e-326d-40e2-aa65-3b65929cc2e4",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "98ecbfa83a6b8374a475685b6be801a9ccddbe1f482d349a7cec730ca5dae596",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382762
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": []
+    },
+    {
+      "runId": "b7c5a2e1-8471-4054-b5b1-99a6b57fa16f",
+      "scenario": "drop",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:11:36.822Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:11:40.429Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:11:40.429Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:40.454Z",
+          "kind": "http",
+          "message": "/purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:11:41.564Z",
+          "kind": "authorization",
+          "message": "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:11:41.564Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:45.972Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:11:45.972Z",
+          "kind": "http",
+          "message": "GET /reports/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:46.098Z",
+          "kind": "http",
+          "message": "/reports/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:46.098Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:11:46.098Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:46.246Z",
+          "kind": "http",
+          "message": "/purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:46.246Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:46.251Z",
+          "kind": "http",
+          "message": "/purchases/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:46.251Z",
+          "kind": "delivery",
+          "message": "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:11:46.251Z",
+          "kind": "http",
+          "message": "GET /reports/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:46.375Z",
+          "kind": "http",
+          "message": "/reports/runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:46.375Z",
+          "kind": "evidence",
+          "message": "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "a833961e1bd929a8b1dc5c8a8631746c1d53c89f492d2808aedbf7551b28c5e7",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382764
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 280,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "a833961e1bd929a8b1dc5c8a8631746c1d53c89f492d2808aedbf7551b28c5e7",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382764
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "06909302-c3d4-4b68-a8d5-76b751b76360",
+      "scenario": "crash",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:11:46.934Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:11:50.563Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:11:50.563Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:50.581Z",
+          "kind": "http",
+          "message": "/purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:11:51.595Z",
+          "kind": "authorization",
+          "message": "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:11:51.595Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:56.421Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:11:58.510Z",
+          "kind": "process",
+          "message": "Marchand redémarré ; journaux conservés."
+        },
+        {
+          "at": "2026-10-25T14:11:58.510Z",
+          "kind": "http",
+          "message": "GET /reports/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:58.624Z",
+          "kind": "http",
+          "message": "/reports/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:58.624Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:11:58.624Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:58.770Z",
+          "kind": "http",
+          "message": "/purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:58.771Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:58.776Z",
+          "kind": "http",
+          "message": "/purchases/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:58.776Z",
+          "kind": "delivery",
+          "message": "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:11:58.776Z",
+          "kind": "http",
+          "message": "GET /reports/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:11:58.895Z",
+          "kind": "http",
+          "message": "/reports/runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:11:58.895Z",
+          "kind": "evidence",
+          "message": "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "c1cc1031b2d72c06f8b4de8a3ea1bfbac6a86a021027aee83948014696893747",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382766
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 2364,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "c1cc1031b2d72c06f8b4de8a3ea1bfbac6a86a021027aee83948014696893747",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382766
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    },
+    {
+      "runId": "0c076b1b-0815-4f4b-991a-ed079ac32bb4",
+      "scenario": "concurrent",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:11:59.079Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:12:02.719Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:12:02.719Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:02.747Z",
+          "kind": "http",
+          "message": "/purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:12:03.867Z",
+          "kind": "authorization",
+          "message": "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:12:03.867Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:03.868Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:11.245Z",
+          "kind": "http",
+          "message": "/purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:11.245Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:11.255Z",
+          "kind": "http",
+          "message": "/purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:11.255Z",
+          "kind": "delivery",
+          "message": "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:12:11.478Z",
+          "kind": "http",
+          "message": "/purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:11.478Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:11.483Z",
+          "kind": "http",
+          "message": "/purchases/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:11.483Z",
+          "kind": "delivery",
+          "message": "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:12:11.483Z",
+          "kind": "http",
+          "message": "GET /reports/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:11.641Z",
+          "kind": "http",
+          "message": "/reports/runner-90b78d06-0eb0-4b39-bca4-4b1b213210db?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:11.642Z",
+          "kind": "evidence",
+          "message": "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "6c1ec23827932345d3785b17b49a380953b7cb37fcd6ac961e7a925c3a284958",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382769
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": []
+    },
+    {
+      "runId": "63b60c25-8546-4c26-a204-26e99f46f700",
+      "scenario": "comparison",
+      "source": "TESTNET",
+      "application": "receipt",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-25T14:12:12.240Z",
+      "timeline": [
+        {
+          "at": "2026-10-25T14:12:16.376Z",
+          "kind": "process",
+          "message": "Facilitator et marchand prêts (processus locaux du runner)."
+        },
+        {
+          "at": "2026-10-25T14:12:16.376Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:16.418Z",
+          "kind": "http",
+          "message": "/purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:12:17.505Z",
+          "kind": "authorization",
+          "message": "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:12:17.505Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:26.401Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:12:26.401Z",
+          "kind": "http",
+          "message": "GET /reports/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:26.523Z",
+          "kind": "http",
+          "message": "/reports/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:26.523Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:12:26.523Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:26.658Z",
+          "kind": "http",
+          "message": "/purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:26.658Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2/ack?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:26.665Z",
+          "kind": "http",
+          "message": "/purchases/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2/ack?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:26.665Z",
+          "kind": "delivery",
+          "message": "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:12:26.665Z",
+          "kind": "http",
+          "message": "GET /reports/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable"
+        },
+        {
+          "at": "2026-10-25T14:12:26.838Z",
+          "kind": "http",
+          "message": "/reports/runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2?mode=durable → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:26.838Z",
+          "kind": "evidence",
+          "message": "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2 : rapport de l’observateur reçu."
+        },
+        {
+          "at": "2026-10-25T14:12:26.838Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:26.841Z",
+          "kind": "http",
+          "message": "/purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:12:28.051Z",
+          "kind": "authorization",
+          "message": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:12:28.051Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:36.038Z",
+          "kind": "interruption",
+          "message": "/purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive → réponse indisponible ; paiement à réconcilier."
+        },
+        {
+          "at": "2026-10-25T14:12:36.038Z",
+          "kind": "http",
+          "message": "GET /reports/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:36.150Z",
+          "kind": "http",
+          "message": "/reports/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:36.150Z",
+          "kind": "checkpoint",
+          "message": "Before recovery: UNKNOWN"
+        },
+        {
+          "at": "2026-10-25T14:12:36.150Z",
+          "kind": "authorization",
+          "message": "Fixture naïve : création volontaire d’une seconde autorisation."
+        },
+        {
+          "at": "2026-10-25T14:12:36.150Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:36.153Z",
+          "kind": "http",
+          "message": "/purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive → HTTP 402"
+        },
+        {
+          "at": "2026-10-25T14:12:37.130Z",
+          "kind": "authorization",
+          "message": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94 : autorisation sauvegardée localement avant envoi."
+        },
+        {
+          "at": "2026-10-25T14:12:37.130Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:41.847Z",
+          "kind": "http",
+          "message": "/purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:41.847Z",
+          "kind": "http",
+          "message": "POST /purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94/ack?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:41.854Z",
+          "kind": "http",
+          "message": "/purchases/runner-917fe560-eb42-431f-8272-5f5ab2df9c94/ack?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:41.854Z",
+          "kind": "delivery",
+          "message": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94 : intégrité du CSV vérifiée, accusé reçu par le marchand."
+        },
+        {
+          "at": "2026-10-25T14:12:41.854Z",
+          "kind": "http",
+          "message": "GET /reports/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive"
+        },
+        {
+          "at": "2026-10-25T14:12:42.148Z",
+          "kind": "http",
+          "message": "/reports/runner-917fe560-eb42-431f-8272-5f5ab2df9c94?mode=naive → HTTP 200"
+        },
+        {
+          "at": "2026-10-25T14:12:42.148Z",
+          "kind": "evidence",
+          "message": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94 : rapport de l’observateur reçu."
+        }
+      ],
+      "reports": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "3bc30c02ddfa061c1271629c724e2fed26025b6cf2eb979b227d23a71d0a0b52",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382772
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "PASS",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 263,
+          "unknownObservations": 0
+        },
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94",
+          "mode": "naive",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "200000",
+          "transfers": [
+            {
+              "txHash": "e6ccd78da9287d915388f5ac168ad93523acf64787396b524039a18b93ce495f",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382774
+            },
+            {
+              "txHash": "4d3f846b2159d10e4567a457b0a411da0e84d388963973ee568b082ecd61441f",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382775
+            }
+          ],
+          "responseRecovered": true,
+          "verdict": "FAIL",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": 5816,
+          "unknownObservations": 0
+        }
+      ],
+      "checkpoints": [
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2",
+          "mode": "durable",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "3bc30c02ddfa061c1271629c724e2fed26025b6cf2eb979b227d23a71d0a0b52",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382772
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        },
+        {
+          "schemaVersion": 1,
+          "purchaseId": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94",
+          "mode": "naive",
+          "network": "stellar:testnet",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "expectedAmountAtomic": "100000",
+          "settledAmountAtomic": "100000",
+          "transfers": [
+            {
+              "txHash": "e6ccd78da9287d915388f5ac168ad93523acf64787396b524039a18b93ce495f",
+              "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+              "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+              "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+              "amountAtomic": "100000",
+              "ledger": 5382774
+            }
+          ],
+          "responseRecovered": false,
+          "verdict": "UNKNOWN",
+          "reason": "Verdict reported by the independent engine observer.",
+          "serviceId": "receipt",
+          "recoveryMs": null,
+          "unknownObservations": 0
+        }
+      ]
+    }
+  ],
+  "reports": {
+    "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-749d8d31-9f99-48d9-93a4-5824a90adfa2",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "9c8faa35c8b5a43b509cfa932d996f03213bdf2f7f931ee7799003005571d832",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382732
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 5119,
+      "unknownObservations": 0
+    },
+    "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-a36c87a2-7514-4285-a8f6-ee66075d8a11",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "c654df5b8392cc0e55b8065c99a63920f6731d383ed4e102051686e45e4c3faf",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382734
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 3522,
+      "unknownObservations": 4
+    },
+    "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-f0b6340d-8dab-46c2-ab4d-bdbda897d996",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "ffb07a866fd7a4a66c5136de13bd508edf159200e221e2011690e74875f1becb",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382736
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 273,
+      "unknownObservations": 0
+    },
+    "runner-c86e90a3-348b-4463-98f3-af24d4d6046c": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-c86e90a3-348b-4463-98f3-af24d4d6046c",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "b91716623b346ca51b7b665e2788ea8016370c3763ad5014070366e8458041ed",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382738
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": null,
+      "unknownObservations": 0
+    },
+    "runner-c0423783-6e78-4d23-907a-ad72018ccdb3": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-c0423783-6e78-4d23-907a-ad72018ccdb3",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "c898bca65cc95b4ab69310a15185cc133db1e9ba088ce36ae5987c6d937ebc96",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382740
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 282,
+      "unknownObservations": 0
+    },
+    "runner-37002dde-db68-4aa8-9750-679781f0b696": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-37002dde-db68-4aa8-9750-679781f0b696",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "2c5800dcb20d142a95b358dca189c315c58f6ca7408323a214966a9bc11996b4",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382742
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 1843,
+      "unknownObservations": 0
+    },
+    "runner-ccec160f-164b-4788-8ad5-badc51e391ca": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-ccec160f-164b-4788-8ad5-badc51e391ca",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "a50eb42f646adc0dc41a271006efc3a9e662f979a12e679741cf29e624f15097",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382745
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": null,
+      "unknownObservations": 0
+    },
+    "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-38728b8d-b9a7-4dca-90f0-24244e2144d0",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "d761d4b11a15afac7b93c175fd0bd8294091ddd51e68467e706be6e7ee6c8b7e",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382748
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 317,
+      "unknownObservations": 0
+    },
+    "runner-b5d88725-67d3-416b-83bd-dd372f0b134f": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-b5d88725-67d3-416b-83bd-dd372f0b134f",
+      "mode": "naive",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "200000",
+      "transfers": [
+        {
+          "txHash": "8c23f65067bf6bf08207ef4d0bc66c0e24f02277b25b5a84ad8e4d3effbbbab2",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382750
+        },
+        {
+          "txHash": "5d98a81435fd1ff5dc7f2b1474a90bdc24e562ad33afaaf81561380c1e51cbb7",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382752
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "FAIL",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "csv",
+      "recoveryMs": 10745,
+      "unknownObservations": 0
+    },
+    "runner-1af846c7-35bd-4e85-9390-5201675e6b09": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-1af846c7-35bd-4e85-9390-5201675e6b09",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "1a81f711e4cdfd89959de77c7a94dfb5aae5536df919a22aeb375853e744801d",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382754
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 3246,
+      "unknownObservations": 0
+    },
+    "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-a1e19406-1b85-4c5e-bcc6-bd8a3f67eb4a",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "c51eec48782c6f4361d8c08f83ed7a6de1a97b3187743969e1ed6d1135e841da",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382756
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 3567,
+      "unknownObservations": 4
+    },
+    "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-2533b42d-3c91-41b7-a60f-57037f2ff2bf",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "7d93f760958a48b89d3a5fe7f0636acfd6132f0f430d182882368caa7aea2858",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382759
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 421,
+      "unknownObservations": 0
+    },
+    "runner-374e469e-326d-40e2-aa65-3b65929cc2e4": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-374e469e-326d-40e2-aa65-3b65929cc2e4",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "98ecbfa83a6b8374a475685b6be801a9ccddbe1f482d349a7cec730ca5dae596",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382762
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": null,
+      "unknownObservations": 0
+    },
+    "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-34c36212-f8c2-4d02-a6e1-58ff3c070dcb",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "a833961e1bd929a8b1dc5c8a8631746c1d53c89f492d2808aedbf7551b28c5e7",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382764
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 280,
+      "unknownObservations": 0
+    },
+    "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-3fbecca1-c366-4e80-aba8-ce9a03fe6c20",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "c1cc1031b2d72c06f8b4de8a3ea1bfbac6a86a021027aee83948014696893747",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382766
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 2364,
+      "unknownObservations": 0
+    },
+    "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-90b78d06-0eb0-4b39-bca4-4b1b213210db",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "6c1ec23827932345d3785b17b49a380953b7cb37fcd6ac961e7a925c3a284958",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382769
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": null,
+      "unknownObservations": 0
+    },
+    "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-60dcba7b-4d89-4e9b-9380-6976a946d2a2",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "3bc30c02ddfa061c1271629c724e2fed26025b6cf2eb979b227d23a71d0a0b52",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382772
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 263,
+      "unknownObservations": 0
+    },
+    "runner-917fe560-eb42-431f-8272-5f5ab2df9c94": {
+      "schemaVersion": 1,
+      "purchaseId": "runner-917fe560-eb42-431f-8272-5f5ab2df9c94",
+      "mode": "naive",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "200000",
+      "transfers": [
+        {
+          "txHash": "e6ccd78da9287d915388f5ac168ad93523acf64787396b524039a18b93ce495f",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382774
+        },
+        {
+          "txHash": "4d3f846b2159d10e4567a457b0a411da0e84d388963973ee568b082ecd61441f",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5382775
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "FAIL",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "receipt",
+      "recoveryMs": 5816,
+      "unknownObservations": 0
+    }
+  }
+}
