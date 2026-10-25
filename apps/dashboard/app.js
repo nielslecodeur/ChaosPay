@@ -21,8 +21,8 @@ let launchSkyJourney = () => {};
 if (starContext) {
   const starMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const home = starCanvas.closest('#home');
-  const stars = Array.from({ length: 176 }, () => ({
-    x: 0.12 + Math.random() * 0.88,
+  const stars = Array.from({ length: 232 }, () => ({
+    x: 0.01 + Math.random() * 0.98,
     y: Math.random(),
     radius: Math.random() * 1.4 + 0.35,
     phase: Math.random() * Math.PI * 2,
