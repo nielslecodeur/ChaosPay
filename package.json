@@ -7,6 +7,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "recover:agent": "tsx --env-file=.env scripts/recover-agent.ts",
     "quickstart": "npm ci && npm run dev:dashboard",
     "dev:merchant": "tsx --env-file=.env apps/demo-merchant/src/server.ts",
     "dev:facilitator": "tsx --env-file=.env apps/demo-merchant/src/facilitator.ts",

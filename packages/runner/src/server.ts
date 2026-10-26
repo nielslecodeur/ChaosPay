@@ -49,7 +49,7 @@ function restoreLocalRuns() {
       if (!raw.runId || !/^[a-zA-Z0-9_-]{1,100}$/.test(raw.runId) || name !== `${raw.runId}.json` ||
           typeof raw.scenario !== 'string' || !['SIMULATED', 'TESTNET', 'ARCHIVE'].includes(String(raw.source)) ||
           !['RUNNING', 'COMPLETE', 'INTERRUPTED'].includes(String(raw.status)) || typeof raw.startedAt !== 'string' ||
-          (raw.application !== undefined && !['csv', 'receipt'].includes(String(raw.application))) ||
+          (raw.application !== undefined && !['csv', 'receipt', 'invoice-agent'].includes(String(raw.application))) ||
           !Array.isArray(raw.timeline) || !Array.isArray(raw.reports)) throw new Error('Unsupported run record.');
       const timeline = raw.timeline.map(item => {
         if (!item || typeof item !== 'object' || typeof item.at !== 'string' || typeof item.kind !== 'string' || typeof item.message !== 'string')
@@ -94,6 +94,7 @@ app.post('/api/runs', (req, res) => {
   if (!validSource || !isSupportedApplication(application, source) || !isScenario(scenario)) {
     res.status(400).json({ error: 'Invalid scenario or application for this run mode.' }); return;
   }
+  if (application === 'invoice-agent' && !['baseline', 'drop'].includes(scenario)) { res.status(400).json({ error: 'Invoice agent supports baseline and drop only.' }); return; }
   if (busy) { res.status(409).json({ error: 'An experiment is already running.' }); return; }
   if (source === 'SIMULATED') {
     const run = simulate(scenario); run.application = application; runs.set(run.runId, run);
@@ -119,8 +120,14 @@ app.post('/api/runs', (req, res) => {
   void (async () => {
     try {
       process.loadEnvFile('.env');
-      const { execute } = await import('./live.js');
-      await execute(run, processes); run.status = 'COMPLETE';
+      if (application === 'invoice-agent') {
+        const { executeInvoiceAgent } = await import('./agent-live.js');
+        await executeInvoiceAgent(run, processes);
+      } else {
+        const { execute } = await import('./live.js');
+        await execute(run, processes);
+      }
+      run.status = 'COMPLETE';
     } catch {
       run.status = 'INTERRUPTED';
       event(run, 'error', 'Execution interrupted. Verdict is unknown without a report. Check configuration and ports; preserve logs and authorizations for recovery.');
