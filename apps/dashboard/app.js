@@ -38,23 +38,8 @@ const scenarios = {
   baseline: ['Everything works', 'A purchase with no failure, as a baseline.'],
 };
 const sourceText = { SIMULATED: 'SIMULATION · fictional data', TESTNET: 'TESTNET · live test', ARCHIVE: 'ARCHIVE · historical evidence' };
-const statusText = { RUNNING: 'Running', COMPLETE: 'Complete', INTERRUPTED: 'Interrupted' };
+const statusText = { RUNNING: 'Experiment running', COMPLETE: 'Experiment finished', INTERRUPTED: 'Experiment interrupted' };
 let state = { scenarios: [], runs: [], busy: false }, selected, previous = '', pending = false, reachable = false;
-const astronautCursor = $('astronaut-cursor');
-if (astronautCursor && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  addEventListener('pointermove', event => {
-    if (event.pointerType !== 'mouse' || !document.body.classList.contains('home-view')) {
-      astronautCursor.classList.remove('is-visible');
-      return;
-    }
-    astronautCursor.style.transform = `translate3d(${event.clientX - 42}px, ${event.clientY - 20}px, 0)`;
-    astronautCursor.classList.add('is-visible');
-  });
-  addEventListener('hashchange', () => {
-    if (!document.body.classList.contains('home-view')) astronautCursor.classList.remove('is-visible');
-  });
-  addEventListener('pointerleave', () => astronautCursor.classList.remove('is-visible'));
-}
 const starCanvas = $('starfield');
 const starContext = starCanvas?.getContext?.('2d');
 let launchSkyJourney = () => {};
@@ -382,6 +367,9 @@ const titleOf = run => run.source === 'ARCHIVE' ? (isPackageIntegration(run) ? '
 const appOf = (report, run) => apps[run.application] ?? apps[report.serviceId] ?? report.serviceId ?? 'Application not specified';
 function describe() {
   const testnet = $('source').value === 'TESTNET';
+  $('source-description').textContent = testnet
+    ? 'Submits real Stellar Testnet transactions using test funds. Confirm before sending.'
+    : 'Fictional amounts and results. No payment is sent.';
   const application = $('application');
   for (const option of application.options) option.disabled = testnet && !testnetApplications.has(option.value);
   let applicationNotice = '';
@@ -474,11 +462,27 @@ function technical(report, run) {
 }
 function reportCard(report, run) {
   const simulated = run.source === 'SIMULATED';
+  const archived = run.source === 'ARCHIVE';
   const overpaid = BigInt(report.settledAmountAtomic) > BigInt(report.expectedAmountAtomic);
   const paid = BigInt(report.settledAmountAtomic) > 0n;
-  const label = report.verdict === 'PASS' ? 'Purchase succeeded' : report.verdict === 'UNKNOWN' ? 'Purchase unresolved' : report.verdict === 'UNSUPPORTED' ? 'Evidence unsupported' : overpaid ? 'Customer overpaid' : 'Purchase not verified';
+  const label = report.verdict === 'PASS'
+    ? archived ? 'Payment reported as confirmed' : 'Payment confirmed'
+    : report.verdict === 'UNKNOWN' ? 'Payment status unknown'
+      : report.verdict === 'UNSUPPORTED' ? 'Evidence unsupported'
+        : overpaid ? 'Customer overpaid' : 'Payment not verified';
   const card = el('article', undefined, `panel report ${report.mode}`);
-  card.append(el('p', appOf(report, run), 'eyebrow'), el('h3', report.mode === 'naive' ? 'Pay again on retry' : 'Recover the same purchase'), badge(`${simulated ? 'Fictional · ' : ''}${label}`, report.verdict));
+  card.append(el('p', appOf(report, run), 'eyebrow'), el('h3', report.mode === 'naive' ? 'Pay again on retry' : 'Recover the same purchase'));
+  const evidence = el('div', undefined, 'payment-evidence');
+  evidence.append(el('h4', 'Payment evidence'), badge(`${simulated ? 'Fictional · ' : archived ? 'Historical · ' : ''}${label}`, report.verdict));
+  if (report.verdict === 'UNKNOWN') {
+    const nextStep = simulated
+      ? 'This fictional result does not establish any real payment state.'
+      : archived
+        ? 'This is a historical snapshot, not the current payment status. Check the original Testnet run before deciding what to do.'
+        : 'Do not create a new payment yet. Check the facilitator and Stellar evidence again, or reconcile manually.';
+    evidence.append(el('p', nextStep, 'evidence-next-step'));
+  }
+  card.append(evidence);
   const count = new Set(report.transfers.map(t => t.txHash).filter(Boolean)).size;
   const metrics = el('div', undefined, 'metrics');
   metrics.append(metric(paid ? xlm(report.settledAmountAtomic) : 'Not established', simulated ? 'Fictional payment' : 'Observed payment', `${count} ${simulated ? 'fictional' : 'observed'} settlement(s) · fees excluded`));
@@ -515,14 +519,21 @@ function reportCard(report, run) {
 }
 function render() {
   controls(); $('history').replaceChildren();
-  if (!state.runs.length) $('history').append(el('p', 'Your first run will appear here.', 'muted'));
-  for (const run of state.runs) {
+  const filter = $('history-filter').value;
+  const visibleRuns = state.runs.filter(run => filter === 'ALL' || run.source === filter);
+  if (!visibleRuns.length) $('history').append(el('p', state.runs.length ? 'No experiments match this source.' : 'Your first run will appear here.', 'muted'));
+  if (!visibleRuns.some(run => run.runId === selected)) selected = visibleRuns[0]?.runId;
+  for (const run of visibleRuns) {
     const b = el('button', titleOf(run), `history-item ${selected === run.runId ? 'active' : ''}`);
     b.setAttribute('aria-pressed', String(selected === run.runId));
     b.append(el('small', `${run.source === 'ARCHIVE' ? 'Multiple purchases' : apps[run.application] ?? 'Application not specified'} · ${statusText[run.status]}`), el('small', sourceText[run.source]), el('small', new Date(run.startedAt).toLocaleString('en-GB')));
     b.onclick = () => { selected = run.runId; render(); }; $('history').append(b);
   }
-  const run = state.runs.find(r => r.runId === selected); if (!run) return;
+  const run = visibleRuns.find(r => r.runId === selected);
+  if (!run) {
+    $('detail').replaceChildren(el('div', 'Choose a source with saved experiments to see its results.', 'empty'));
+    return;
+  }
   const detail = $('detail');
   const open = new Set([...detail.querySelectorAll('details[open]')].map(n => n.dataset.key));
   detail.replaceChildren();
@@ -557,7 +568,33 @@ async function refresh() {
   } catch { reachable = false; controls(); $('connection').textContent = 'Connection to the lab lost. Showing the latest results received; retrying automatically.'; }
 }
 for (const id of ['scenario', 'source', 'application']) $(id).onchange = () => { describe(); controls(); };
-$('launch').onclick = async () => {
+$('history-filter').onchange = () => render();
+const confirmation = $('testnet-confirmation');
+confirmation.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    confirmation.close();
+  }
+});
+confirmation.addEventListener('cancel', event => {
+  event.preventDefault();
+  confirmation.close();
+});
+confirmation.addEventListener('close', () => {
+  if ($('launch').disabled) $('balance-title').focus();
+});
+function confirmTestnetRun() {
+  if (typeof confirmation.showModal !== 'function') {
+    $('error').textContent = 'This browser cannot open the Testnet confirmation safely. Use a current browser before running this experiment.';
+    return;
+  }
+  const scenario = scenarios[$('scenario').value]?.[0] ?? $('scenario').value;
+  const application = apps[$('application').value] ?? $('application').value;
+  const maxPayments = $('scenario').value === 'comparison' ? 3 : 1;
+  $('testnet-confirmation-summary').textContent = `You selected “${scenario}” for ${application}. This run can submit up to ${maxPayments} settlement${maxPayments === 1 ? '' : 's'} using 0.01 test XLM each.`;
+  confirmation.showModal();
+}
+async function startRun() {
   pending = true; controls(); $('error').textContent = '';
   try {
     const response = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ChaosPay-Local': '1' }, body: JSON.stringify({ scenario: $('scenario').value, source: $('source').value, application: $('application').value }), signal: AbortSignal.timeout(15000) });
@@ -565,6 +602,15 @@ $('launch').onclick = async () => {
     selected = result.runId; previous = ''; await refresh(); $('balance-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) { $('error').textContent = e.name === 'TimeoutError' ? 'The start could not be confirmed. Check the experiment list before trying again.' : e.message; }
   finally { pending = false; controls(); }
+}
+$('launch').onclick = () => {
+  $('error').textContent = '';
+  if ($('source').value === 'TESTNET') confirmTestnetRun();
+  else startRun();
+};
+$('confirm-testnet').onclick = () => {
+  confirmation.close();
+  startRun();
 };
 if (['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002') {
   await refresh();

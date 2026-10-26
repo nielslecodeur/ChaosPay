@@ -14,7 +14,7 @@
     "smoke:payment": "tsx --env-file=.env scripts/smoke-payment.ts",
     "recover": "tsx --env-file-if-exists=.env scripts/recover.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test --test-concurrency=1 tests/*.test.ts packages/runner/tests/*.test.ts",
+    "test": "tsx --test --test-concurrency=1 tests/*.test.ts packages/runner/tests/*.test.ts apps/dashboard/presentation.test.mjs",
     "verify:engine": "tsx --env-file=.env scripts/verify-engine.ts",
     "dev:dashboard": "tsx packages/runner/src/server.ts",
     "dev:receipt": "tsx --env-file=.env apps/receipt-api/src/server.ts",

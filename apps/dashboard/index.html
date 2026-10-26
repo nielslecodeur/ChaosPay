@@ -1,9 +1,8 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="icon" type="image/svg+xml" href="/lumaid-mark.svg?v=9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — recover interrupted payments</title><link rel="icon" type="image/svg+xml" href="/lumaid-mark.svg?v=9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head>
 <body>
 <header><a class="brand" href="#home" aria-label="Lumaid home"><img class="brand-mark" src="/lumaid-mark.svg?v=9" alt=""><span>Lumaid</span></a><nav aria-label="Sections"><a href="#try" id="nav-try">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
-<div id="astronaut-cursor" aria-hidden="true"><img src="/astronaut.svg" alt=""></div>
 <main>
 <div id="home">
   <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
@@ -12,14 +11,15 @@
     <div class="home-copy">
       <p class="home-kicker">PAYMENT RECOVERY, REIMAGINED</p>
       <h1 id="home-title">Lumaid</h1>
-      <p class="home-tagline">Your payment never failed.</p>
+      <p class="home-tagline">Recover interrupted payments without blindly paying twice.</p>
+      <p class="home-description">Lumaid retries the original purchase and keeps uncertain payment states visible.</p>
       <div class="home-actions"><a class="home-cta" href="#try">Explore the demo</a><a class="home-secondary" href="#docs">How it works</a></div>
     </div>
     <div class="home-route" aria-label="Payment journey: authorized, settled, result recovered, receipt acknowledged">
       <div><span>01 / REQUEST</span><strong>Authorized</strong></div>
       <div><span>02 / NETWORK</span><strong>Settled</strong></div>
-      <div><span>03 / RECOVERY</span><strong>Result found</strong></div>
-      <div><span>04 / RECEIPT</span><strong>Acknowledged</strong></div>
+      <div><span>03 / RECOVERY</span><strong>Result recovered</strong></div>
+      <div><span>04 / RECEIPT</span><strong>Receipt acknowledged</strong></div>
     </div>
   </section>
   <section class="home-proof" aria-label="Lumaid recovery checks">
@@ -62,13 +62,22 @@
     <div class="steps">
       <label><span class="step">1 · Application</span><span>Which service is the client using?</span><select id="application"><optgroup label="Available on Testnet"><option value="csv">Convert a budget or expense table to CSV</option><option value="receipt">Generate a JSON invoice receipt</option></optgroup><optgroup label="Agent examples · simulation only"><option value="market-quote">Get a market quote for an asset</option><option value="web-research">Buy a short research brief</option><option value="delivery-status">Check a parcel delivery update</option><option value="weather-brief">Get a local weather briefing</option></optgroup></select><small id="application-description"></small></label>
       <label><span class="step">2 · Failure</span><span>What happens?</span><select id="scenario"></select><small id="description"></small></label>
-      <div class="execution"><label><span class="step">3 · Run mode</span><span>How would you like to try it?</span><select id="source"><option value="SIMULATED">Simulation · no payment</option><option value="TESTNET">Testnet · real test payment</option></select></label><button id="launch" disabled>See what happens to the customer</button></div>
+      <div class="execution"><label><span class="step">3 · Run mode</span><span>How would you like to try it?</span><select id="source"><option value="SIMULATED">Simulation · no payment</option><option value="TESTNET">Testnet · real test payment</option></select><small id="source-description">Fictional amounts and results. No payment is sent.</small></label><button id="launch" disabled>See what happens to the customer</button></div>
     </div>
     <p id="notice" class="notice" role="status" aria-live="polite"></p><p id="error" role="alert"></p><p id="connection" role="status" class="muted"></p>
   </section>
+  <dialog id="testnet-confirmation" aria-labelledby="testnet-confirmation-title" aria-describedby="testnet-confirmation-summary">
+    <form method="dialog" class="confirmation-card">
+      <p class="home-kicker">STELLAR TESTNET</p>
+      <h2 id="testnet-confirmation-title">Confirm Testnet experiment</h2>
+      <p id="testnet-confirmation-summary"></p>
+      <p class="confirmation-warning">These are real on-chain test transactions. A confirmed transaction cannot be cancelled.</p>
+      <div class="confirmation-actions"><button id="cancel-testnet" type="submit" value="cancel" class="secondary-button" autofocus>Cancel</button><button id="confirm-testnet" type="button">Confirm Testnet run</button></div>
+    </form>
+  </dialog>
   <div class="workspace">
-    <aside><h2>Your experiments</h2><p class="muted">Select a run or a saved campaign.</p><div id="history"></div></aside>
-    <section aria-labelledby="balance-title"><p class="step" id="balance-title">4 · Customer outcome</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="empty">Choose an application and a failure, then run the experiment. Simulation does not make any network payments.</div></div></section>
+    <aside><h2>Your experiments</h2><p class="muted">Select a run or a saved campaign.</p><label class="history-filter-label" for="history-filter">Show source</label><select id="history-filter"><option value="ALL">All sources</option><option value="SIMULATED">Simulation</option><option value="TESTNET">Testnet</option><option value="ARCHIVE">Archive</option></select><div id="history"></div></aside>
+    <section aria-labelledby="balance-title"><p class="step" id="balance-title" tabindex="-1">4 · Customer outcome</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="empty">Choose an application and a failure, then run the experiment. Simulation does not make any network payments.</div></div></section>
   </div>
   <footer>The Testnet lab runs two applications: CSV conversion and JSON receipt generation. The instant demo also shows fictional market-quote and parcel-tracking examples; these are not live integrations. A third API, built by our team and installed from the package, has historical evidence. Integration by an external team has not yet been validated. An acknowledgment confirms receipt by the client software, not that a person has read it.</footer>
   </section>
@@ -116,7 +125,7 @@
 </div>
 <div id="install" hidden>
   <div class="docs-layout">
-    <div class="install-platforms" role="tablist" aria-label="Choose your operating system" aria-orientation="vertical">
+    <div class="install-platforms" role="tablist" aria-label="Choose your operating system" aria-orientation="horizontal">
       <button id="tab-windows" class="install-platform" type="button" role="tab" aria-selected="true" aria-controls="panel-windows" tabindex="0">Windows</button>
       <button id="tab-linux" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-linux" tabindex="-1">Linux</button>
       <button id="tab-macos" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
