@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — recover interrupted payments</title><link rel="icon" type="image/svg+xml" href="/lumaid-mark.svg?v=9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Lumaid — Your payment never failed</title><link rel="icon" type="image/svg+xml" href="./lumaid-mark.svg?v=9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="./style.css"></head>
 <body>
-<header><a class="brand" href="#home" aria-label="Lumaid home"><img class="brand-mark" src="/lumaid-mark.svg?v=9" alt=""><span>Lumaid</span></a><nav aria-label="Sections"><a href="#try" id="nav-try">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
+<header><a class="brand" href="#home" aria-label="Lumaid home"><img class="brand-mark" src="./lumaid-mark.svg?v=9" alt=""><span>Lumaid</span></a><nav aria-label="Sections"><a href="#try" id="nav-try">Demo</a><a href="#docs" id="nav-docs">Documentation</a><a href="#install" id="nav-install">Installation</a></nav><span class="network">Stellar Testnet · test funds</span></header>
+<div id="astronaut-cursor" aria-hidden="true"><img src="./astronaut.svg" alt=""></div>
 <main>
 <div id="home">
   <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
@@ -11,8 +12,7 @@
     <div class="home-copy">
       <p class="home-kicker">PAYMENT RECOVERY, REIMAGINED</p>
       <h1 id="home-title">Lumaid</h1>
-      <p class="home-tagline">Recover interrupted payments without blindly paying twice.</p>
-      <p class="home-description">Lumaid retries the original purchase and keeps uncertain payment states visible.</p>
+      <p class="home-tagline">Your payment never failed.</p>
       <div class="home-actions"><a class="home-cta" href="#try">Explore the demo</a><a class="home-secondary" href="#docs">How it works</a></div>
     </div>
     <div class="home-route" aria-label="Payment journey: authorized, settled, result recovered, receipt acknowledged">
@@ -124,57 +124,54 @@
   </div>
 </div>
 <div id="install" hidden>
-  <div class="docs-layout">
-    <div class="install-platforms" role="tablist" aria-label="Choose your operating system" aria-orientation="horizontal">
-      <button id="tab-windows" class="install-platform" type="button" role="tab" aria-selected="true" aria-controls="panel-windows" tabindex="0">Windows</button>
-      <button id="tab-linux" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-linux" tabindex="-1">Linux</button>
-      <button id="tab-macos" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
-    </div>
+  <div class="docs-layout install-layout">
     <article class="doc">
-      <h1>Installation</h1>
-      <p class="lead">Lumaid runs locally on Stellar Testnet. No AI API key or financial provider is required.</p>
+      <p class="home-kicker">START WITHOUT SETUP</p>
+      <h1>Try Lumaid first</h1>
+      <p class="lead">You do not need to install anything, create an account, or connect to Stellar to see how recovery works.</p>
+      <a class="home-cta install-demo-link" href="#try">Open the instant demo <span aria-hidden="true">→</span></a>
+      <p>The browser demo uses fictional examples only. It sends no network requests and makes no payments. When you are ready to develop locally or test real Testnet transactions, open the optional setup below.</p>
+      <details class="install-advanced">
+        <summary>Set up the local lab (optional)</summary>
+        <p>Requires Git and Node.js 24+. The quickstart starts in simulation mode; Testnet setup is a separate, deliberate step.</p>
+        <div class="install-platforms" role="tablist" aria-label="Choose your operating system" aria-orientation="horizontal">
+          <button id="tab-windows" class="install-platform" type="button" role="tab" aria-selected="true" aria-controls="panel-windows" tabindex="0">Windows</button>
+          <button id="tab-linux" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-linux" tabindex="-1">Linux</button>
+          <button id="tab-macos" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
+        </div>
       <section id="panel-windows" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-windows">
         <h2>Windows setup</h2>
         <p>Open PowerShell and install Git and Node.js 24 with Windows Package Manager (winget):</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>winget install --id Git.Git --exact
 winget install --id OpenJS.NodeJS.LTS --exact</code><span class="copy-status sr-only" role="status"></span></pre>
-        <p>Close and reopen PowerShell, then clone the project and start the dashboard:</p>
+        <p>Close and reopen PowerShell, then clone the project and start the simulation:</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>git clone https://github.com/nielslecodeur/Lumaid.git
 cd Lumaid
-npm ci
-npm run setup:testnet
-npm run check:connections
-npm run dev:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
+npm run quickstart</code><span class="copy-status sr-only" role="status"></span></pre>
       </section>
       <section id="panel-linux" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
         <h2>Linux setup</h2>
         <p>In Bash, install Node Version Manager (nvm):</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash</code><span class="copy-status sr-only" role="status"></span></pre>
-        <p>Open a new terminal, install Node.js 24, then clone the project and start the dashboard:</p>
+        <p>Open a new terminal, install Node.js 24, then clone the project and start the simulation:</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>nvm install 24
 nvm use 24
 git clone https://github.com/nielslecodeur/Lumaid.git
 cd Lumaid
-npm ci
-npm run setup:testnet
-npm run check:connections
-npm run dev:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
+npm run quickstart</code><span class="copy-status sr-only" role="status"></span></pre>
       </section>
       <section id="panel-macos" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-macos" hidden>
         <h2>macOS setup</h2>
         <p>Install Node Version Manager (nvm) from Terminal:</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash</code><span class="copy-status sr-only" role="status"></span></pre>
-        <p>Quit and reopen Terminal, install Node.js 24, then clone the project and start the dashboard:</p>
+        <p>Quit and reopen Terminal, install Node.js 24, then clone the project and start the simulation:</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>nvm install 24
 nvm use 24
 git clone https://github.com/nielslecodeur/Lumaid.git
 cd Lumaid
-npm ci
-npm run setup:testnet
-npm run check:connections
-npm run dev:dashboard</code><span class="copy-status sr-only" role="status"></span></pre>
+npm run quickstart</code><span class="copy-status sr-only" role="status"></span></pre>
       </section>
-      <p>Open <code>http://127.0.0.1:3002</code>. The three Testnet accounts are funded for free, and the payment is 0.01 test XLM. Keys stay in <code>.env</code> and <code>.local/</code>, both ignored by Git. Never share these files.</p>
+      <p>Open <code>http://127.0.0.1:3002</code> and select Simulation. This path requires no Testnet setup and makes no payment. To enable Testnet, stop the dashboard and run <code>npm run setup:testnet</code>, then <code>npm run check:connections</code> and restart with <code>npm run dev:dashboard</code>. Testnet runs submit real test-network transactions; confirmed transactions cannot be cancelled. Credentials stay in <code>.env</code> and <code>.local/</code>. Never share these files.</p>
       <h2 id="inst-cli">Command line</h2>
       <p>To run the client on its own, stop the dashboard, then start the facilitator and merchant in separate terminals.</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>npm run dev:facilitator
@@ -205,15 +202,16 @@ const paid = await createPaidRouter({
 app.use("/paid", paid.router);</code></pre>
       <p>Added routes: <code>POST /paid/purchases/:id</code> (challenge, then signed purchase), <code>POST /paid/purchases/:id/ack</code> (acknowledgment), <code>GET /paid/reports/:id</code> (evidence and verdict), and <code>GET /paid/health</code>. The adapter is limited to loopback HTTP. Full guide: <code>docs/INTEGRATION_A.md</code>.</p>
       <p>The server kit makes repeat requests recoverable; it does not retry a disconnected client's request for it. A bot must securely persist the original purchase ID, request body, and signed authorization, then retry with exactly those values. Do not create a new authorization while the prior submission may be unknown: a confirmed Stellar transaction cannot be cancelled, and a refund is a separate payment.</p>
+      </details>
     </article>
   </div>
 </div>
-</main><script type="module" src="/app.js"></script>
-<script type="module" src="/copy-commands.js"></script>
-<script type="module" src="/quick-demo.js"></script>
+</main><script type="module" src="./app.js"></script>
+<script type="module" src="./copy-commands.js"></script>
+<script type="module" src="./quick-demo.js"></script>
 <script>
 const V={home:document.getElementById("home"),try:document.getElementById("try"),docs:document.getElementById("docs"),install:document.getElementById("install")};
-const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home";document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
+const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home",localServer=["127.0.0.1","localhost"].includes(location.hostname);document.body.classList.toggle("hosted-demo",!localServer);document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab&&!localServer)location.hash="try";else if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
 </script>
 </body></html>

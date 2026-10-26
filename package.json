@@ -7,6 +7,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "quickstart": "npm ci && npm run dev:dashboard",
     "dev:merchant": "tsx --env-file=.env apps/demo-merchant/src/server.ts",
     "dev:facilitator": "tsx --env-file=.env apps/demo-merchant/src/facilitator.ts",
     "setup:testnet": "tsx scripts/setup-testnet.ts",

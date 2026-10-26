@@ -1,142 +1,143 @@
-# Lumaid — HackMeridian
+# Lumaid
 
-What happens to a purchase when payment is confirmed but the HTTP response disappears?
+Recover an interrupted Stellar payment without blindly paying twice.
 
-Lumaid is a local failure-and-recovery lab for paid applications on Stellar. The x402 engine, runner and dashboard are integrated. A shared recovery kit powers two APIs: CSV conversion and JSON receipt generation. Reports compare evidence before and after recovery, as well as naive and durable modes.
+Lumaid is a local failure-and-recovery lab for paid applications on Stellar. It demonstrates what happens when payment succeeds but the response is lost, and compares payment evidence before and after recovery.
 
-## Getting started
+**Try the browser demo:** <https://nielslecodeur.github.io/ChaosPay/> — no installation, account, or payment required.
 
-Choose your operating system and follow its setup instructions. You will need Git and Node.js 24 to clone the project and prepare the Stellar Testnet demo.
+## Try it locally — no Testnet setup
 
-### Windows
+You only need **Git** and **Node.js 24 or newer**. No AI API key, financial-service account, or `.env` file is needed to try the simulation.
 
-Open PowerShell and install Git and Node.js 24 with Windows Package Manager (`winget`):
-
-```powershell
-winget install --id Git.Git --exact
-winget install --id OpenJS.NodeJS.LTS --exact
-```
-
-Close and reopen PowerShell, then clone and set up Lumaid:
-
-```powershell
+```sh
 git clone https://github.com/nielslecodeur/Lumaid.git
 cd Lumaid
-npm ci
+npm run quickstart
+```
+
+Open <http://127.0.0.1:3002>, choose **Demo**, and run a scenario in **Simulation** mode. The simulation uses fictional data, makes no payment, and sends no request to a payment network.
+
+The first run installs the exact dependencies from the lockfile, then starts the dashboard. Stop it at any time with **Ctrl+C**. To start it again after dependencies are installed, run `npm run dev:dashboard`.
+
+### Install Git and Node.js
+
+- **Windows:** install Git and Node.js with `winget install --id Git.Git --exact` and `winget install --id OpenJS.NodeJS.LTS --exact`, then reopen PowerShell.
+- **macOS/Linux:** install Git with your system package manager and Node.js 24+ using [Node.js](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm).
+
+Check that Node.js is version 24 or newer:
+
+```sh
+node --version
+npm --version
+```
+
+## Run a real Stellar Testnet experiment
+
+The dashboard's Testnet mode makes real **test-network** transactions; these funds have no real-world value, but a confirmed transaction cannot be cancelled. Start with the simulation above. When ready, stop the dashboard and configure the local test accounts:
+
+```sh
 npm run setup:testnet
 npm run check:connections
 npm run dev:dashboard
 ```
 
-### Linux
+Open <http://127.0.0.1:3002>, select an available Testnet application and scenario, then confirm the Testnet run in the dashboard. The setup creates three dedicated Stellar Testnet accounts and requests free test XLM from Friendbot. It writes credentials to `.env` and `.local/`; both are excluded from Git. **Do not share or commit them.**
 
-Install Git with your distribution's package manager if needed. In Bash, install Node Version Manager (`nvm`):
+The fixture currently supports two Testnet services: JSON-to-CSV conversion and JSON invoice-receipt generation. The market-quote, parcel-tracking, research, and weather examples are fictional browser simulations, not live integrations. The payment buys the demo service result; it does not pay an invoice represented in that result.
 
-```sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-```
+If setup stops after creating `.env`, keep that file and follow the message printed by the setup command. It preserves existing credentials rather than replacing them.
 
-Open a new terminal, install Node.js 24, then clone and set up Lumaid:
+## Run the standalone payment client
 
-```sh
-nvm install 24
-nvm use 24
-git clone https://github.com/nielslecodeur/Lumaid.git
-cd Lumaid
-npm ci
-npm run setup:testnet
-npm run check:connections
-npm run dev:dashboard
-```
+This optional path runs the merchant and facilitator separately. First complete the Testnet setup above, then use three terminals from the project directory:
 
-### macOS
-
-Install Git with Apple's Command Line Tools or Homebrew if needed. In Terminal, install Node Version Manager (`nvm`):
+**Terminal 1 — facilitator**
 
 ```sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+npm run dev:facilitator
 ```
 
-Quit and reopen Terminal, install Node.js 24, then clone and set up Lumaid:
+**Terminal 2 — merchant**
 
 ```sh
-nvm install 24
-nvm use 24
-git clone https://github.com/nielslecodeur/Lumaid.git
-cd Lumaid
-npm ci
-npm run setup:testnet
-npm run check:connections
-npm run dev:dashboard
+npm run dev:merchant
 ```
 
-Open http://127.0.0.1:3002. Choose CSV or JSON receipts, select TESTNET and a scenario; the runner manages its servers.
-
-To run the CLI client on its own, stop the dashboard, then run `npm run dev:facilitator` in one terminal and `npm run dev:merchant` in a second.
-
-In a third terminal:
+**Terminal 3 — make a small Testnet payment**
 
 ```sh
 npm run smoke:payment -- first-purchase durable none
 ```
 
-No AI API key or financial-service provider account is required. Three dedicated accounts are funded for free on Testnet. The payment is 0.01 test XLM and has no real-world value. Keys and logs stay in `.env` and `.local/`, which are excluded from Git.
+The demo payment is **0.01 test XLM**. It has no real-world value. Do not use real funds or real payment credentials with this lab.
 
-## Failure and recovery
+### Reproduce a lost response and recover
+
+Run both commands with the same purchase ID:
 
 ```sh
 npm run smoke:payment -- demo-outage durable drop
 npm run smoke:payment -- demo-outage durable none
 ```
 
-The first call is intentionally interrupted. The second reuses the original authorization and recovers the result without making a second payment.
+The first run intentionally drops the response. The second recovers the original result using the saved authorization; it does not create a replacement authorization or a second payment.
 
-If the client or runner closes before recovery finishes, inspect and resume a locally saved purchase with:
+If the client or runner stops before recovery completes, list and resume a saved purchase:
 
 ```sh
 npm run recover -- --list
 npm run recover -- demo-outage
 ```
 
-The command reuses the saved authorization, never signs a replacement, and keeps an uncertain result as `UNKNOWN` until evidence is available. See [the recovery guide](docs/RECOVER.md).
+Keep the merchant and facilitator running during recovery. If payment status is uncertain, Lumaid preserves the `UNKNOWN` result instead of blindly authorizing another payment. See the [recovery guide](docs/RECOVER.md) for options, diagnostics, and limitations.
 
-## Verification
+## Verify the project
+
+These commands run local checks and do not submit Testnet payments:
 
 ```sh
 npm run typecheck
 npm test
 ```
 
-After stopping any manually started servers:
+The following campaigns do submit real test-network transactions. Run them only after Testnet setup, and stop manually started services first:
 
 ```sh
 npm run verify:dashboard
-# The legacy CSV CLI campaign is also available:
+# Legacy CSV-only campaign:
 npm run verify:engine
 ```
 
-The campaign runs real Testnet scenarios for dropped responses, restarts, concurrency and the naive counterexample. Redacted reports are written to `evidence/public/`. Transaction hashes and transfer events allow independent verification beyond the merchant's response.
+Redacted campaign reports are written to `evidence/public/`. Transaction hashes and transfer events can be independently checked on Stellar Testnet.
+
+## What is included
+
+- A browser-only, fictional simulation for instant exploration.
+- A local dashboard and runner with simulation, Testnet, and archived evidence modes.
+- A Stellar Testnet x402 fixture for CSV conversion and JSON receipt generation.
+- Recovery scenarios for dropped responses, process restarts, concurrency, delayed confirmation, and lost acknowledgments.
+- A shared TypeScript recovery kit and APIs for integration experiments.
 
 ## Documentation
 
 - [Integrate the package into an existing API](docs/INTEGRATION_A.md)
-- [Recovery kit and two-API campaign](docs/RECOVERY_KIT.md)
+- [Recovery kit, scenarios, and campaign](docs/RECOVERY_KIT.md)
 - [Recover an interrupted purchase](docs/RECOVER.md)
-- [Setup guide and launch path A](docs/SETUP_A.md)
-- [Runner and dashboard API B](docs/ENGINE_API.md)
-- [Project scope and limitations](docs/PROJECT.md)
+- [Setup details and architecture](docs/SETUP_A.md)
+- [Runner and dashboard API](docs/ENGINE_API.md)
 - [Recovery and reconciliation operations](docs/RECOVERY_OPERATIONS.md)
-- [Work split between two AI agents](docs/WORK_SPLIT.md)
+- [Project scope and limitations](docs/PROJECT.md)
 - [Versions and dependencies](docs/versions.md)
-- [Roadmap to the highest score](docs/ROADMAP_TO_100.md)
+- [Roadmap](docs/ROADMAP_TO_100.md)
 - [Contributing](CONTRIBUTING.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-## Limitations
+## Important limitations
 
-The local fixture includes two deterministic services (CSV and JSON receipts), one Testnet asset and explicit failure hooks. A timeout remains UNKNOWN until the network provides evidence. The tests are not a security audit or a universal guarantee of exactly-once payments.
+Lumaid is an experimental local lab, not a production payment service. It supports a small deterministic fixture, one Testnet asset (native XLM), and explicit failure hooks. A timeout or missing receipt is not proof that a payment failed. Stellar transactions that have been confirmed cannot be cancelled; refunds require a separate transaction.
 
-Naive mode deliberately creates a new authorization on retry; it does not demonstrate a Stellar replay vulnerability. This lab must not handle real money or be exposed to the internet. Known dependency limitations are documented in [docs/versions.md](docs/versions.md).
+The tests do not constitute a security audit or guarantee exactly-once payments in every system. Do not expose this lab to the internet, use real money, or put private keys in browser code. See [known dependency limitations](docs/versions.md).
 
 ## License
 

@@ -307,6 +307,7 @@ test('quick demo labels extra agent use cases as fictional and keeps Testnet sco
 test('local service selector offers useful simulation-only agent examples', () => {
   const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
   const app = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
+  assert.match(html, /<title>Lumaid — Your payment never failed<\/title>/);
   for (const id of ['market-quote', 'web-research', 'delivery-status', 'weather-brief']) {
     assert.match(html, new RegExp(`<option value="${id}">`));
     assert.match(app, new RegExp(`'${id}':`));
@@ -317,8 +318,8 @@ test('local service selector offers useful simulation-only agent examples', () =
 test('Lumaid signal mark is present in the header and browser tab', () => {
   const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
   const logo = readFileSync(new URL('./lumaid-mark.svg', import.meta.url), 'utf8');
-  assert.match(html, /rel="icon"[^>]*href="\/lumaid-mark\.svg\?v=9"/);
-  assert.equal((html.match(/src="\/lumaid-mark\.svg\?v=9"/g) ?? []).length, 1);
+  assert.match(html, /rel="icon"[^>]*href="\.\/lumaid-mark\.svg\?v=9"/);
+  assert.equal((html.match(/src="\.\/lumaid-mark\.svg\?v=9"/g) ?? []).length, 1);
   assert.match(html, /class="brand-mark"/);
   assert.doesNotMatch(html, /class="home-mark"/);
   assert.match(html, /href="#try">Explore the demo/);
@@ -353,17 +354,26 @@ test('landing page uses the deep-space visual direction from the reference', () 
   assert.match(scene, /nebula-coral/);
   assert.match(scene, /nebula-violet/);
   assert.ok((scene.match(/<circle cx=/g) ?? []).length >= 70);
+  assert.match(scene, /<circle cx="235" cy="1010" r="465" fill="url\(#planet\)"\/>\s*<g class="spin-world">/);
+  const spinningWorld = scene.match(/<g class="spin-world">([\s\S]*?)<\/g>/)?.[1] ?? '';
+  assert.ok(spinningWorld);
+  assert.doesNotMatch(spinningWorld, /fill="url\(#planet\)"/);
 });
 
-test('landing page keeps the native pointer visible and explains cautious recovery', () => {
+test('landing page restores the astronaut cursor and previous hero treatment', () => {
   const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
   const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
   const app = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(html, /astronaut-cursor/);
-  assert.doesNotMatch(css, /cursor:none/);
-  assert.doesNotMatch(app, /astronautCursor/);
-  assert.match(html, /Recover interrupted payments without blindly paying twice/);
-  assert.match(html, /keeps uncertain payment states visible/);
+  assert.match(html, /id="astronaut-cursor"[^>]*aria-hidden="true"/);
+  assert.match(html, /src="\.\/astronaut\.svg"/);
+  assert.match(html, /Your payment never failed\./);
+  assert.match(app, /astronautCursor\.style\.transform = `translate3d/);
+  assert.match(app, /astronautCursor\.classList\.add\('is-visible'\)/);
+  assert.match(app, /!document\.body\.classList\.contains\('home-view'\)/);
+  assert.match(css, /#astronaut-cursor\{[^}]*pointer-events:none/);
+  assert.match(css, /body\.home-view #astronaut-cursor\{display:block\}/);
+  assert.match(css, /\.home-view \.home-secondary\{display:none\}/);
+  assert.match(css, /\.home-view \.home-route,\.home-view \.home-proof\{display:none\}/);
   assert.match(html, /class="home-route"[^>]*aria-label="Payment journey/);
 });
 
@@ -386,11 +396,14 @@ test('navigation stays right-aligned and space animations respect reduced motion
 test('installation provides Windows, Linux, and macOS tabs with platform-specific commands', () => {
   const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
   const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
+  const packageJson = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
   assert.equal((html.match(/role="tab"/g) ?? []).length, 3);
   assert.match(html, /id="tab-windows"[^>]*aria-selected="true"/);
   assert.match(html, /id="panel-windows"[^>]*role="tabpanel"/);
   assert.match(html, /id="panel-linux"[^>]*role="tabpanel"[^>]*hidden/);
   assert.match(html, /id="panel-macos"[^>]*role="tabpanel"[^>]*hidden/);
+  assert.match(html, /<h1>Try Lumaid first<\/h1>[\s\S]*?<a class="home-cta install-demo-link" href="#try">Open the instant demo/);
+  assert.match(html, /<details class="install-advanced">[\s\S]*?<summary>Set up the local lab \(optional\)<\/summary>/);
   assert.match(html, /winget install --id OpenJS\.NodeJS\.LTS --exact/);
   assert.equal((html.match(/class="install-command"/g) ?? []).length, 10);
   assert.equal((html.match(/class="copy-button"/g) ?? []).length, 10);
@@ -400,6 +413,26 @@ test('installation provides Windows, Linux, and macOS tabs with platform-specifi
   assert.match(css, /\.doc pre\.install-command\{grid-template-columns:minmax\(0,1fr\) 36px/);
   assert.match(css, /\.doc pre\.install-command code\{[^}]*white-space:pre-wrap/);
   assert.match(html, /git clone https:\/\/github\.com\/nielslecodeur\/Lumaid\.git/);
+  assert.equal(packageJson.scripts.quickstart, 'npm ci && npm run dev:dashboard');
+  assert.equal((html.match(/npm run quickstart/g) ?? []).length, 3);
+  assert.match(html, /select Simulation\. This path requires no Testnet setup and makes no payment/);
+  assert.match(css, /\.docs-layout\.install-layout\{grid-template-columns:minmax\(0,1fr\)\}/);
+});
+
+test('hosted browser demo uses relative assets and hides local Testnet controls', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('./style.css', import.meta.url), 'utf8');
+  assert.match(html, /href="\.\/style\.css"/);
+  assert.match(html, /src="\.\/app\.js"/);
+  assert.match(html, /src="\.\/quick-demo\.js"/);
+  assert.match(html, /localServer=\["127\.0\.0\.1","localhost"\]\.includes\(location\.hostname\)/);
+  assert.match(html, /if\(localLab&&!localServer\)location\.hash="try"/);
+  assert.match(css, /\.home-view \.cosmic-scene\{[^}]*url\("\.\/space-scene\.svg"\)/);
+  assert.match(css, /\.hosted-demo \.local-lab-section,\.hosted-demo \.quick-local-link\{display:none!important\}/);
+  const workflow = readFileSync(new URL('../../.github/workflows/deploy-demo.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /actions\/upload-pages-artifact@v4/);
+  assert.match(workflow, /path: apps\/dashboard/);
+  assert.match(workflow, /actions\/deploy-pages@v4/);
 });
 
 test('installation tabs switch panels and support keyboard navigation', () => {

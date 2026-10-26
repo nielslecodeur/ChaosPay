@@ -40,6 +40,21 @@ const scenarios = {
 const sourceText = { SIMULATED: 'SIMULATION · fictional data', TESTNET: 'TESTNET · live test', ARCHIVE: 'ARCHIVE · historical evidence' };
 const statusText = { RUNNING: 'Experiment running', COMPLETE: 'Experiment finished', INTERRUPTED: 'Experiment interrupted' };
 let state = { scenarios: [], runs: [], busy: false }, selected, previous = '', pending = false, reachable = false;
+const astronautCursor = $('astronaut-cursor');
+if (astronautCursor && matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || !document.body.classList.contains('home-view')) {
+      astronautCursor.classList.remove('is-visible');
+      return;
+    }
+    astronautCursor.style.transform = `translate3d(${event.clientX - 42}px, ${event.clientY - 20}px, 0)`;
+    astronautCursor.classList.add('is-visible');
+  });
+  addEventListener('hashchange', () => {
+    if (!document.body.classList.contains('home-view')) astronautCursor.classList.remove('is-visible');
+  });
+  addEventListener('pointerleave', () => astronautCursor.classList.remove('is-visible'));
+}
 const starCanvas = $('starfield');
 const starContext = starCanvas?.getContext?.('2d');
 let launchSkyJourney = () => {};

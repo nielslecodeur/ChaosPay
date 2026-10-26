@@ -125,8 +125,8 @@
     <path fill="#ff8374" d="m367 487 5 15 15 5-15 5-5 15-5-15-15-5 15-5z"/>
     <path fill="#ff776c" d="m980 669 7 20 20 7-20 7-7 20-7-20-20-7 20-7z"/>
   </g>
+  <circle cx="235" cy="1010" r="465" fill="url(#planet)"/>
   <g class="spin-world">
-    <circle cx="235" cy="1010" r="465" fill="url(#planet)"/>
     <circle cx="235" cy="1010" r="465" fill="#fff" opacity=".1" filter="url(#grain)" clip-path="url(#world)"/>
     <g clip-path="url(#world)" opacity=".47">
       <path d="M-160 611c287-87 610-32 792 104" fill="none" stroke="#ffad8c" stroke-width="27"/>
