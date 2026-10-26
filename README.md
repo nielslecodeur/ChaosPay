@@ -115,8 +115,10 @@ The campaign runs real Testnet scenarios for dropped responses, restarts, concur
 - [Setup guide and launch path A](docs/SETUP_A.md)
 - [Runner and dashboard API B](docs/ENGINE_API.md)
 - [Project scope and limitations](docs/PROJECT.md)
+- [Recovery and reconciliation operations](docs/RECOVERY_OPERATIONS.md)
 - [Work split between two AI agents](docs/WORK_SPLIT.md)
 - [Versions and dependencies](docs/versions.md)
+- [Roadmap to the highest score](docs/ROADMAP_TO_100.md)
 - [Contributing](CONTRIBUTING.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 

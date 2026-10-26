@@ -62,6 +62,81 @@ test("two kit instances share a durable submission claim",async()=>{
     assert.throws(()=>f.kit.acknowledge("purchase","durable",f.request.payload,"wrong"),{status:409});
   } finally {f.store.close();}
 });
+test("separate SQLite connections cannot submit one purchase twice",async()=>{
+  const dir=mkdtempSync(join(tmpdir(),"chaospay-concurrent-"));
+  const path=join(dir,"state.sqlite");
+  const secondStore=new Store(path);
+  const f=fixture(path);
+  try {
+    const second=new RecoveryKit({...f.options,store:secondStore});
+    const results=await Promise.all([f.kit.execute(f.request),second.execute(f.request)]);
+    assert.ok(results.every(result=>result.status==="READY"));
+    assert.equal(f.store.get("test:durable:purchase")?.state,"DELIVERY_STORED");
+    assert.equal(secondStore.get("test:durable:purchase")?.state,"DELIVERY_STORED");
+    assert.equal(f.submissions(),1);
+  } finally {
+    f.store.close();
+    secondStore.close();
+    rmSync(dir,{recursive:true,force:true});
+  }
+});
+test("a crash after SUBMITTING remains unknown and is never blindly resubmitted",async()=>{
+  const dir=mkdtempSync(join(tmpdir(),"chaospay-claim-crash-"));
+  const path=join(dir,"state.sqlite");
+  const f=fixture(path);
+  try {
+    const authDigest=digest(f.request.payload);
+    f.store.insert({
+      key:"test:durable:purchase",
+      purchaseId:f.request.purchaseId,
+      mode:f.request.mode,
+      bodyHash:digest(f.request.input),
+      authDigest,
+      buyer:"buyer",
+    });
+    assert.equal(f.store.claimSubmission("test:durable:purchase"),true);
+    f.store.close();
+
+    const reopened=new Store(path);
+    try {
+      const recovered=new RecoveryKit({...f.options,store:reopened});
+      assert.equal((await recovered.execute(f.request)).status,"UNKNOWN");
+      assert.equal(f.submissions(),0);
+      assert.equal(reopened.get("test:durable:purchase")?.state,"UNKNOWN");
+      assert.equal((await recovered.execute(f.request)).status,"UNKNOWN");
+      assert.equal(f.submissions(),0);
+    } finally {
+      reopened.close();
+    }
+  } finally {
+    rmSync(dir,{recursive:true,force:true});
+  }
+});
+test("a business side effect can repeat if result persistence fails",async()=>{
+  const f=fixture();
+  let effects=0;
+  let firstCall=true;
+  const kit=new RecoveryKit({
+    ...f.options,
+    produce:()=>{
+      effects++;
+      if(firstCall) {
+        firstCall=false;
+        throw new Error("Simulated failure after external effect.");
+      }
+      return {ok:true};
+    },
+  });
+  try {
+    await assert.rejects(kit.execute(f.request),/Simulated failure/);
+    const recovered=await kit.execute(f.request);
+    assert.equal(recovered.status,"READY");
+    assert.equal(effects,2);
+    assert.equal(f.submissions(),1);
+  } finally {
+    f.store.close();
+  }
+});
 test("stored JSON output survives reopening without regenerating result",async()=>{
   const dir=mkdtempSync(join(tmpdir(),"chaospay-kit-"));
   const f=fixture(join(dir,"state.sqlite"));
@@ -90,5 +165,42 @@ test("legacy CSV journal migration preserves payload, result and delivery",()=>{
     assert.equal(JSON.parse(migrated.result!),"raw,csv\\n");
     assert.equal(migrated.authDigest,"original");assert.equal(migrated.deliveries,1);
     assert.equal(store.claimSubmission(migrated.key),false);
+  } finally {store.close();}
+});
+
+test("report counts separate naive payments from different payers",async()=>{
+  const store=new Store(":memory:");
+  const transactions=new Map<string,string>();
+  let nextTransaction=0;
+  const gateway:PaymentGateway<{buyer:string}> = {
+    verify:async payload=>({isValid:true,payer:payload.buyer}),
+    settle:async payload=>{
+      const transaction="tx-"+(++nextTransaction);
+      transactions.set(transaction,payload.buyer);
+      return {success:true,transaction};
+    },
+    receipt:async()=>({}),
+    observe:async(txHash,expected)=>({
+      status:"CONFIRMED",txHash,reason:"fixture",
+      transfers:[{txHash,ledger:1,...expected,from:transactions.get(txHash)!}],
+    }),
+  };
+  const kit=new RecoveryKit({
+    store,gateway,serviceId:"test",tokenContract:"token",recipient:"merchant",amountAtomic:"100000",
+    produce:async()=>({ok:true}),
+  });
+  try {
+    for(const buyer of ["buyer-one","buyer-two"]){
+      const payload={buyer};
+      const request={purchaseId:"same-intent",mode:"naive" as const,payload,input:{service:"same"}};
+      const result=await kit.execute(request);
+      assert.equal(result.status,"READY");
+      if(result.status!=="READY") throw new Error("Expected a ready result.");
+      kit.acknowledge(request.purchaseId,request.mode,payload,result.resultHash);
+    }
+    const report=await kit.report("same-intent","naive");
+    assert.equal(report.verdict,"FAIL");
+    assert.equal(report.settledAmountAtomic,"200000");
+    assert.deepEqual(report.observations.map(o=>o.status),["CONFIRMED","CONFIRMED"]);
   } finally {store.close();}
 });

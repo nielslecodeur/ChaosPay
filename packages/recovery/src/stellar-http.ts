@@ -11,6 +11,7 @@ import { RecoveryKit, Store, RecoveryError, FaultTriggered, faults, type Fault }
 export interface PaidService<I,O> {
   serviceId: string; port: number; databasePath: string; description: string;
   validate: (body: unknown) => I;
+  /** Must be pure/deterministic or externally idempotent: a crash before result persistence can invoke it again. */
   produce: (input: I, context: { purchaseId: string; txHash: string; buyer: string }) => O | Promise<O>;
   legacyCsv?: boolean;
   basePath?: string;

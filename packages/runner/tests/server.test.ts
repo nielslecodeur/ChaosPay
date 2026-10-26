@@ -3,11 +3,24 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { unlinkSync } from 'node:fs';
+import { createServer } from 'node:net';
 
 test('local API loads archives, runs fixtures, exports and rejects cross-origin controls', async () => {
-  const base = 'http://127.0.0.1:3002';
-  if (await fetch(base + '/api/state').then(() => true, () => false)) throw new Error('Stop runner on port 3002 before integration tests');
-  const child = spawn(process.execPath, ['--import', 'tsx', 'packages/runner/src/server.ts'], { stdio: 'ignore', windowsHide: true });
+  const port = await new Promise<number>((resolve, reject) => {
+    const probe = createServer();
+    probe.once('error', reject);
+    probe.listen(0, '127.0.0.1', () => {
+      const address = probe.address();
+      if (!address || typeof address === 'string') { probe.close(); reject(new Error('Could not allocate a local test port.')); return; }
+      probe.close(error => error ? reject(error) : resolve(address.port));
+    });
+  });
+  const base = `http://127.0.0.1:${port}`;
+  const child = spawn(process.execPath, ['--import', 'tsx', 'packages/runner/src/server.ts'], {
+    stdio: 'ignore',
+    windowsHide: true,
+    env: { ...process.env, CHAOSPAY_RUNNER_PORT: String(port) },
+  });
   const exited = new Promise<void>(resolve => child.once('exit', () => resolve()));
   const files: string[] = [];
   try {

@@ -10,6 +10,11 @@ export function validateRows(input: unknown): Row[] {
 }
 export function toCsv(rows: Row[]): string {
   const columns = [...new Set(rows.flatMap(Object.keys))].sort();
-  const cell = (v: unknown) => '"' + String(v ?? "").replaceAll('"','""') + '"';
+  const cell = (v: unknown) => {
+    const value = String(v ?? "");
+    // A leading apostrophe makes spreadsheet formula-like strings plain text.
+    const safeValue = typeof v === "string" && /^[\u0000-\u0020]*[=+\-@]/.test(v) ? "'" + value : value;
+    return '"' + safeValue.replaceAll('"','""') + '"';
+  };
   return [columns.map(cell).join(","), ...rows.map(row => columns.map(k => cell(row[k])).join(","))].join("\n") + "\n";
 }

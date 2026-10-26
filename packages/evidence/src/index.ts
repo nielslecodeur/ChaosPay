@@ -21,7 +21,9 @@ export function verdict(observations: Observation[], e: PaymentExpectation, reco
   for (const observation of observations) unique.set(observation.txHash, observation);
   const all = [...unique.values()];
   const transfers = all.flatMap(o => o.transfers);
-  const paid = transfers.filter(t => t.tokenContract === e.tokenContract && t.from === e.from && t.to === e.to);
+  // Count every observed payment to this merchant for the asset, including payments from
+  // a different authorization/payer attached to the same logical purchase.
+  const paid = transfers.filter(t => t.tokenContract === e.tokenContract && t.to === e.to);
   const total = paid.reduce((sum, t) => sum + BigInt(t.amountAtomic), 0n).toString();
   const base = { transfers, settledAmountAtomic: total };
   if (BigInt(total) > BigInt(e.amountAtomic)) return { ...base, verdict: "FAIL", reason: "Confirmed payments exceed the price of one logical purchase." };

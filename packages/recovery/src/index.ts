@@ -20,6 +20,7 @@ export interface RecoveryInput<P,I> { purchaseId: string; mode: "durable" | "nai
 export interface RecoveryOptions<P,I,O> {
   store: Store; gateway: PaymentGateway<P>; serviceId: string;
   tokenContract: string; recipient: string; amountAtomic: string;
+  /** Must be pure/deterministic or externally idempotent: a crash before result persistence can invoke it again. */
   produce: (input: I, context: { purchaseId: string; txHash: string; buyer: string }) => O | Promise<O>;
 }
 export class RecoveryKit<P,I,O> {
@@ -107,7 +108,7 @@ export class RecoveryKit<P,I,O> {
     const observations: Observation[] = [];
     for (const p of purchases) {
       const known = p.txHash ? { transaction: p.txHash } : await gateway.receipt(p.authDigest).catch(() => ({} as { transaction?: string }));
-      observations.push(await gateway.observe(known.transaction ?? "",expected));
+      observations.push(await gateway.observe(known.transaction ?? "",this.expected(p)));
     }
     const responseRecovered = purchases.some(p => p.deliveries > 0);
     const interruptions = purchases.map(p => p.interruptedAt).filter((n): n is number => n !== null);

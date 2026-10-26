@@ -31,4 +31,4 @@ Prix : 100000 unités atomiques (0,01 XLM). Frais payés par le facilitator, dis
 
 npm audit signale un avis élevé sur Zod, propagé à @x402/core et @x402/stellar : GHSA-mrhx-c7xc-m3w5, épuisement mémoire sur collections surdimensionnées. Le SDK core déclare Zod ^3.24.2 ; l'audit ne propose pas de correction compatible automatique. Le laboratoire limite la taille des requêtes et écoute uniquement sur 127.0.0.1. Pas de remplacement forcé par une version majeure sans validation.
 
-Recontrôler avant une publication ou une mise à jour : npm audit. Ce code n'est pas déclaré prêt pour la production.
+Vérification répétée avec `npm ls zod --depth=4` : Zod 3.25.76. `npm audit --omit=dev` signale toujours le même avis HIGH et n'offre pas de correction. La limite JSON à 64 KB et l'écoute loopback réduisent l'exposition du laboratoire, mais ne corrigent pas la dépendance vulnérable. Recontrôler avant une publication ou une mise à jour : `npm audit`. Ce code n'est pas déclaré prêt pour la production.
