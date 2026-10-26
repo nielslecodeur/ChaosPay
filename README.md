@@ -91,6 +91,15 @@ npm run smoke:payment -- demo-outage durable none
 
 The first call is intentionally interrupted. The second reuses the original authorization and recovers the result without making a second payment.
 
+If the client or runner closes before recovery finishes, inspect and resume a locally saved purchase with:
+
+```sh
+npm run recover -- --list
+npm run recover -- demo-outage
+```
+
+The command reuses the saved authorization, never signs a replacement, and keeps an uncertain result as `UNKNOWN` until evidence is available. See [the recovery guide](docs/RECOVER.md).
+
 ## Verification
 
 ```sh
@@ -112,6 +121,7 @@ The campaign runs real Testnet scenarios for dropped responses, restarts, concur
 
 - [Integrate the package into an existing API](docs/INTEGRATION_A.md)
 - [Recovery kit and two-API campaign](docs/RECOVERY_KIT.md)
+- [Recover an interrupted purchase](docs/RECOVER.md)
 - [Setup guide and launch path A](docs/SETUP_A.md)
 - [Runner and dashboard API B](docs/ENGINE_API.md)
 - [Project scope and limitations](docs/PROJECT.md)

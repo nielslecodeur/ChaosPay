@@ -11,9 +11,10 @@ Le périmètre actuel est un laboratoire local sur Stellar Testnet : XLM de test
 - La base possède un kit de reprise, deux services de démonstration, un runner et un dashboard.
 - Les états `UNKNOWN`, `FAILED` et `PASS` sont distingués ; les archives et simulations sont identifiées comme telles.
 - Les corrections de comptage multi-payeurs, d’export CSV, de décodage XDR et de revendication SQLite multi-connexions sont maintenant couvertes par des tests déterministes.
-- La suite `npm test` (35 tests) et `npm run typecheck` ont réussi pendant la passe P0/P1. La suite ne réalise pas de paiement Testnet.
+- La suite `npm test` (61 tests) et `npm run typecheck` réussissent localement après les corrections runner et la commande de reprise. La suite ne réalise pas de paiement Testnet.
 - L’avis HIGH de Zod persiste : Zod 3.25.76 est toujours résolu et `npm audit --omit=dev` n’annonce pas de correctif. La surface loopback et la limite de requête réduisent l’exposition sans supprimer la vulnérabilité ; la production reste bloquée.
-- Le patch local proposant une commande `recover` reste non intégré et non inclus dans ces changements ; il ne doit pas être appliqué sans revue et tests.
+- La commande `recover` est intégrée avec validation du payload/résultat, contrôle loopback, vérification du rapport d'achat et diagnostics prudents ; les tests déterministes couvrent les reprises, états incertains, résultat corrompu et rapport d'un autre achat.
+- Le runner restaure son historique local au redémarrage et marque les runs interrompus ; ses écritures sont atomiques et son chemin de données/port sont configurables.
 - Les campagnes Testnet historiques ne constituent pas une exécution fraîche. Ne pas présenter leurs résultats comme tels.
 
 ## Principes de réalisation
@@ -55,17 +56,16 @@ Le périmètre actuel est un laboratoire local sur Stellar Testnet : XLM de test
 
 **Sortie attendue :** résultat d’audit reproductible, justification vérifiable et décision explicite. Aucun déploiement public tant que l’avis applicable n’est pas résolu ou accepté avec une analyse de risque.
 
-### 3. Revoir intégralement la proposition `recover` avant intégration
+### 3. Intégrer et valider la commande `recover`
 
-**Fichiers proposés dans le patch :** `packages/client-recovery/src/diagnosis.ts`, `packages/client-recovery/src/resume.ts`, `packages/client-recovery/src/local-files.ts`, `scripts/recover.ts`, `tests/recover.test.ts`.
+**Fichiers :** `packages/client-recovery/src/diagnosis.ts`, `packages/client-recovery/src/resume.ts`, `packages/client-recovery/src/local-files.ts`, `scripts/recover.ts`, `tests/recover.test.ts`, `docs/RECOVER.md`.
 
-- Avant toute conclusion de non-paiement, interroger et prendre en compte le journal du facilitator ; HTTP 402 ou reçu absent ne prouve pas que le réseau n’a pas réglé l’opération.
-- Ne pas recommander un nouvel achat si un reçu ou hash existe, si le marchand est indisponible, ou si l’observation est incertaine.
-- À la reprise, valider le contenu et le hash du résultat déjà enregistré avant de conclure que l’achat est terminé.
-- Valider les limites de tentatives et d’intervalle, le JSON des rapports, les chemins de fichiers, l’URL locale et les codes de sortie.
-- Tester base marchand perdue avec reçu facilitator existant, résultat local tronqué, répétition de commande, ACK perdu et panne pendant la reprise.
+- **Réalisé :** la commande relit l’autorisation et la requête d’origine, n’en signe pas de nouvelle, borne les tentatives, limite les envois au loopback, valide l’intégrité des résultats et refuse un rapport qui ne correspond pas à l’achat demandé.
+- **Réalisé :** les réponses HTTP 402, l’absence de reçu et les états incomplets ne sont pas présentés comme preuve de non-paiement ; les données invalides et les échecs d’écriture du journal sont signalés.
+- **Réalisé et testé :** répétition de commande, résultat local modifié, ACK manquant, réponse perdue, facilitator/RPC indisponible, reçu manquant et rapport attribué à un autre achat.
+- **Limite :** les simulations utilisent le vrai kit/SQLite mais un réseau piloté ; elles ne prouvent pas l’intégration réelle du facilitator sur Testnet.
 
-**Sortie attendue :** les états ambigus ne peuvent pas être présentés comme « aucun paiement » et n’entraînent jamais une nouvelle autorisation automatique. Le patch reste non appliqué tant que ces conditions ne sont pas satisfaites.
+**Sortie obtenue :** les états ambigus sont explicitement signalés et aucune autorisation n’est re-signée automatiquement. Cela ne constitue pas une garantie exactly-once si les journaux locaux, marchand ou facilitator sont perdus.
 
 ### 4. Garder le produit dans son périmètre sûr
 
@@ -122,16 +122,16 @@ Ne pas implémenter une résoumission automatique fondée sur un simple `404`. D
 
 ## P2 — Renforcer le produit et la démonstration
 
-### 9. Fiabiliser le runner et ses diagnostics
+### 9. Fiabiliser le runner et ses diagnostics — réalisé
 
 **Fichiers :** `packages/runner/src/server.ts`, `packages/runner/src/processes.ts`, `packages/runner/tests/server.test.ts`.
 
-- Restaurer l’historique local `.local/runner` au démarrage, sans le confondre avec les preuves archivées.
-- Rendre l’écriture des rapports atomique et les erreurs consultables sans exposer de secrets.
-- Remplacer les tests dépendants du port fixe par des ports configurables/éphémères lorsque possible.
-- Vérifier la fermeture des sous-processus, leur état après timeout et la conservation des erreurs utiles.
+- Historique local `.local/runner` restauré au démarrage et runs restés `RUNNING` reclassés `INTERRUPTED`, distincts des archives.
+- Écriture atomique ; une erreur de persistance empêche de présenter un run comme terminé.
+- Port et dossier de données configurables ; test HTTP isolé avec dossier temporaire.
+- Les 61 tests et le typecheck passent ; une répétition par un tiers et une campagne Testnet restent à faire.
 
-**Porte de sortie :** un redémarrage local ne fait pas disparaître les runs ; tests HTTP répétables et sans conflit de port.
+**Porte de sortie obtenue pour le runner local :** restauration et tests HTTP répétables. Les limites d’exécution Testnet ci-dessus restent ouvertes.
 
 ### 10. Finir l’expérience d’intégration
 

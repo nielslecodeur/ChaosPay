@@ -6,6 +6,7 @@ import { createEd25519Signer } from "@x402/stellar";
 import { ExactStellarScheme } from "@x402/stellar/exact/client";
 import { digest } from "../packages/evidence/src/index.js";
 import { config, secret, NETWORK, RPC_URL } from "../apps/demo-merchant/src/config.js";
+import { filePaths, LEGACY_SMOKE_BODY } from "../packages/client-recovery/src/local-files.js";
 
 const c = config();
 const id = process.argv[2] ?? "purchase-" + Date.now();
@@ -17,7 +18,7 @@ if (!["none","drop","crash"].includes(fault)) throw new Error("Fault must be non
 const fresh = process.argv.includes("--new-authorization");
 if (fresh && mode !== "naive") throw new Error("New authorization is only allowed for deliberately naive mode.");
 const url = c.merchantUrl + "/purchases/" + id + "?mode=" + mode;
-const body = { rows: [{ item: "demo", amount: 42 }, { item: "second", amount: 10 }] };
+const body = LEGACY_SMOKE_BODY;
 const cache = ".local/client-" + mode + "-" + id + ".json";
 let payload: PaymentPayload;
 if (existsSync(cache) && !fresh) {
@@ -35,6 +36,10 @@ if (existsSync(cache) && !fresh) {
   mkdirSync(".local",{ recursive: true });
   writeFileSync(cache,JSON.stringify(payload),{ mode: 0o600 });
 }
+mkdirSync(".local",{ recursive: true });
+writeFileSync(filePaths(".local",mode as "durable" | "naive",id).request,JSON.stringify({
+  application: "csv", merchantUrl: c.merchantUrl, path: "/purchases/" + id + "?mode=" + mode, body,
+},null,2) + "\n",{ mode: 0o600 });
 try {
   async function send() {
     const response = await fetch(url, {
@@ -56,7 +61,7 @@ try {
   if (process.argv.includes("--concurrent")) await Promise.all([send(),send()]);
   else await send();
 } catch {
-  console.log("Connection interrupted. Keep purchaseId " + id + " and reuse its cached payload after restart.");
+  console.log("Connection interrupted. Keep purchaseId " + id + ". Resume it with: npm run recover -- " + id);
   process.exitCode = 2;
 }
 const report = await fetch(c.merchantUrl + "/reports/" + id + "?mode=" + mode, { signal: AbortSignal.timeout(20000) }).then(r => r.json()).catch(() => null);
