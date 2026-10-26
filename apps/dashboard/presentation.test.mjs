@@ -220,7 +220,7 @@ test('changing run mode updates Testnet safety guidance and launch action', asyn
   assert.match(nodes.get('source-description').textContent, /Fictional amounts and results/);
   assert.equal(nodes.get('launch').textContent, 'Run simulation →');
 });
-test('Testnet mode limits service choices to implemented integrations', async () => {
+test('Testnet chooses an integrated service while agent examples remain selectable', async () => {
   const { nodes } = await mount(run());
   const application = nodes.get('application');
   application.value = 'web-research';
@@ -230,7 +230,7 @@ test('Testnet mode limits service choices to implemented integrations', async ()
   assert.equal(application.children.find(option => option.value === 'csv').disabled, false);
   assert.equal(application.children.find(option => option.value === 'receipt').disabled, false);
   for (const value of ['market-quote', 'web-research', 'delivery-status', 'weather-brief']) {
-    assert.equal(application.children.find(option => option.value === value).disabled, true);
+    assert.equal(application.children.find(option => option.value === value).disabled, false);
   }
   assert.match(nodes.get('application-description').textContent, /Testnet currently supports CSV conversion and JSON receipts only/);
 });
@@ -528,3 +528,17 @@ test('copy buttons copy commands and announce clipboard failures', async () => {
  assert.equal(nodes.get('launch').disabled,true);
  assert.match(nodes.get('connection').textContent,/local server/);
  });
+
+test('selecting an agent in Testnet switches to simulation without refresh', async () => {
+ for (const hosted of [true,false]) {
+ const {nodes}=await mount(run(),{hosted});
+ for(const value of ['web-research','market-quote','delivery-status','weather-brief']) {
+ nodes.get('source').value='TESTNET';nodes.get('source').onchange();
+ nodes.get('application').value=value;nodes.get('application').onchange();
+ assert.equal(nodes.get('application').value,value);
+ assert.equal(nodes.get('source').value,'SIMULATED');
+ assert.equal(nodes.get('launch').disabled,false);
+ assert.match(nodes.get('application-description').textContent,/Switched to Simulation/);
+ }
+ }
+});

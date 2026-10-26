@@ -387,7 +387,7 @@ function describe() {
     ? 'Submits real Stellar Testnet transactions using test funds. Confirm before sending.'
     : 'Fictional amounts and results. No payment is sent.';
   const application = $('application');
-  for (const option of application.options) option.disabled = testnet && !testnetApplications.has(option.value);
+  for (const option of application.options) option.disabled = false;
   let applicationNotice = '';
   if (testnet && !testnetApplications.has(application.value)) {
     application.value = 'csv';
@@ -579,12 +579,18 @@ async function refresh() {
     const response = await fetch('/api/state', { signal: AbortSignal.timeout(5000) }); if (!response.ok) throw new Error();
     const next = await response.json(); reachable = true; $('connection').textContent = ''; controls();
     if (JSON.stringify(next) === previous) return;
-    previous = JSON.stringify(next); state = next;
+    previous = JSON.stringify(next); state = next; controls();
     if (!$('scenario').options.length) for (const [id, [label]] of Object.entries(scenarios)) if (state.scenarios.some(s => s.id === id)) { const o = el('option', label); o.value = id; $('scenario').append(o); }
     describe(); render();
   } catch { reachable = false; controls(); $('connection').textContent = 'Connection to the lab lost. Showing the latest results received; retrying automatically.'; }
 }
 for (const id of ['scenario', 'source', 'application']) $(id).onchange = () => { describe(); controls(); };
+$('application').onchange = () => {
+  const switched = $('source').value === 'TESTNET' && !testnetApplications.has($('application').value);
+  if (switched) $('source').value = 'SIMULATED';
+  describe(); controls();
+  if (switched) $('application-description').textContent += ' Switched to Simulation: this agent example has no live Testnet integration.';
+};
 $('history-filter').onchange = () => render();
 const confirmation = $('testnet-confirmation');
 confirmation.addEventListener('keydown', event => {
