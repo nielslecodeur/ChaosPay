@@ -384,16 +384,21 @@ const isPackageIntegration = run => run.reports.length > 0 && run.reports.every(
 const titleOf = run => run.source === 'ARCHIVE' ? (isPackageIntegration(run) ? 'Independent package integration' : 'Saved campaign') : scenarios[run.scenario]?.[0] ?? run.scenario;
 const appOf = (report, run) => apps[run.application] ?? apps[report.serviceId] ?? report.serviceId ?? 'Application not specified';
 function describe() {
+  if (hostedLab && $('source').value === 'TESTNET') $('application').value = 'invoice-agent';
   const agent = $('application').value === 'invoice-agent';
+  const browserTestnet = hostedLab && ($('source').value === 'TESTNET' || agent);
   if (agent) $('source').value = 'TESTNET';
-  for (const option of $('scenario').options) option.disabled = agent && !['baseline', 'drop'].includes(option.value);
-  if (agent && !['baseline', 'drop'].includes($('scenario').value)) $('scenario').value = 'drop';
+  for (const option of $('scenario').options) option.disabled = (agent || browserTestnet) && !['baseline', 'drop'].includes(option.value);
+  if ((agent || browserTestnet) && !['baseline', 'drop'].includes($('scenario').value)) $('scenario').value = 'drop';
   const testnet = $('source').value === 'TESTNET';
   $('source-description').textContent = testnet
     ? 'Submits real Stellar Testnet transactions using test funds. Confirm before sending.'
     : 'Fictional amounts and results. No payment is sent.';
   const application = $('application');
-  for (const option of application.options) option.disabled = false;
+  for (const option of application.options) {
+    option.disabled = hostedLab && testnet && ['csv', 'receipt'].includes(option.value);
+    if (hostedLab && option.value === 'invoice-agent') option.textContent = 'Scripted invoice client (browser, no AI model)';
+  }
   let applicationNotice = '';
   if (testnet && !testnetApplications.has(application.value)) {
     application.value = 'csv';
@@ -406,6 +411,10 @@ function describe() {
   notice.textContent = testnet
     ? 'Stellar Testnet only — test funds have no real-world value. A comparison may make three test payments. Stop the demo servers before launching. '
     : 'Simulation only — no payment is made; amounts and results are fictional.';
+  if (hostedLab && testnet) {
+    $('application-description').textContent = 'Scripted invoice client in your browser, without Ollama. A real native XLM payment; the receipt is reconstructed locally. Not the server SDK or x402 integration.';
+    notice.textContent = 'Browser Testnet: one payment of 0.01 test XLM, plus network fees. Temporary accounts funded by Friendbot. Keep browser storage for recovery. Only normal purchase and lost response are supported. ';
+  }
   if (testnet) {
     const explorer = el('a', 'Open Stellar Expert ↗');
     explorer.href = 'https://stellar.expert/explorer/testnet';
@@ -417,7 +426,7 @@ function describe() {
 function controls() {
   const disabled = pending || state.busy || !reachable;
   for (const id of ['launch', 'application', 'scenario', 'source']) $(id).disabled = disabled;
-  if (hostedLab && $('source').value === 'TESTNET') { $('launch').disabled = true; $('connection').textContent = 'Testnet needs the local server. Use Installation, then open http://127.0.0.1:3002/#local-lab.'; } else if (hostedLab) $('connection').textContent = 'Browser simulation: no network payment. History lasts until this page is reloaded.';
+  if (hostedLab && $('source').value === 'TESTNET') { $('connection').textContent = 'Runs in this browser without a local server. An existing saved purchase is recovered instead of paid again.'; } else if (hostedLab) $('connection').textContent = 'Browser simulation: no network payment. History lasts until this page is reloaded.';
   $('launch').textContent = pending ? 'Starting…' : state.busy ? 'Experiment running…' : $('source').value === 'TESTNET' ? 'Run Testnet experiment →' : 'Run simulation →';
 }
 function metric(value, label, note) {
@@ -621,11 +630,20 @@ function confirmTestnetRun() {
   const application = apps[$('application').value] ?? $('application').value;
   const maxPayments = $('scenario').value === 'comparison' ? 3 : 1;
   $('testnet-confirmation-summary').textContent = `You selected “${scenario}” for ${application}. This run can submit up to ${maxPayments} settlement${maxPayments === 1 ? '' : 's'} using 0.01 test XLM each.`;
+  if (hostedLab) $('testnet-confirmation-summary').textContent = 'Scripted browser invoice demo: one native payment of 0.01 test XLM plus fees. No Ollama or x402 merchant. If a saved purchase exists, only its confirmation is checked. Test accounts are funded using Friendbot.';
   confirmation.showModal();
 }
 async function startRun() {
   if (hostedLab) {
-    if ($('source').value !== 'SIMULATED') return;
+    if ($('source').value === 'TESTNET') {
+      pending = true; controls();
+      try {
+        if (!globalThis.runBrowserTestnet) throw new Error('Browser demo is still loading. Please retry.');
+        await globalThis.runBrowserTestnet($('scenario').value);
+      } catch (error) { $('error').textContent = error.message; }
+      finally { pending = false; controls(); }
+      return;
+    }
     const scenario = $('scenario').value, id = 'browser-' + Date.now() + '-' + state.runs.length;
     const unknown = scenario === 'confirmation-lost';
     const report = mode => ({ schemaVersion: 1, purchaseId: id + '-' + mode, mode, network: 'stellar:testnet',
@@ -664,5 +682,9 @@ if (hostedLab) {
   reachable = true;
   for (const [id, [label]] of Object.entries(scenarios)) { const option = el('option', label); option.value = id; $('scenario').append(option); }
   $('scenario').value = 'comparison';
+  try {
+    const saved = JSON.parse(localStorage.getItem('lumaid.browser-testnet.v1') || 'null');
+    if (saved) { $('source').value = 'TESTNET'; $('application').value = 'invoice-agent'; $('scenario').value = saved.scenario; }
+  } catch {}
   describe(); controls(); render();
 }

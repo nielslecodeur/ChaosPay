@@ -49,16 +49,16 @@
       </label>
       <button id="quick-run" type="button">Run simulation</button>
     </div>
-    <p class="quick-safety">The quote and delivery examples use fictional data; none of these examples calls a real service. The Testnet lab below currently runs only CSV conversion and JSON receipt generation.</p>
+    <p class="quick-safety">The quote and delivery examples use fictional data; none of these examples calls a real service. The online Testnet lab below runs a scripted invoice purchase. The local server also supports CSV conversion and JSON receipts.</p>
     <section id="quick-result" class="quick-result is-empty" aria-live="polite" aria-label="Simulation result">
       <p class="empty">Pick a scenario, then run the simulation to see what the customer receives.</p>
     </section>
-    <a class="quick-local-link" href="#local-lab">Continue to the local Testnet lab</a>
+    <a class="quick-local-link" href="#local-lab">Continue to the Testnet lab</a>
   </section>
   <section id="local-lab" class="local-lab-section" aria-labelledby="lab-title">
-  <section class="intro"><p class="home-kicker">LUMAID / PAYMENT RECOVERY LAB</p><h1 id="lab-title">Local Testnet lab</h1><p class="tagline">Recreate a failure. Inspect what the customer actually receives.</p>
+  <section class="intro"><p class="home-kicker">LUMAID / PAYMENT RECOVERY LAB</p><h1 id="lab-title">Testnet lab</h1><p class="tagline">Recreate a failure. Inspect what the customer actually receives.</p>
     <div class="wire" aria-hidden="true"><i></i><span class="ok">Payment confirmed</span><span class="lost">Response lost</span></div></section>
-  <p class="hosted-lab-help">Online lab: simulations run in your browser. For real Testnet experiments, <a href="#install">install Lumaid</a> and <a href="http://127.0.0.1:3002/#local-lab">open your local lab</a>.</p>
+  <p class="hosted-lab-help">Online lab: simulations and the scripted Testnet invoice demo run in your browser. For the complete Ollama agent and server recovery kit, <a href="#install">install Lumaid</a> and <a href="http://127.0.0.1:3002/#local-lab">open your local lab</a>.</p>
   <section class="panel" aria-label="Set up an experiment">
     <div class="steps">
       <label><span class="step">1 · Application</span><span>Which service is the client using?</span><select id="application"><optgroup label="Available on Testnet"><option value="invoice-agent">AI agent ? verify an invoice (local Ollama)</option><option value="csv" selected>Convert a budget or expense table to CSV</option><option value="receipt">Generate a JSON invoice receipt</option></optgroup><optgroup label="Agent examples · simulation only"><option value="market-quote">Get a market quote for an asset</option><option value="web-research">Buy a short research brief</option><option value="delivery-status">Check a parcel delivery update</option><option value="weather-brief">Get a local weather briefing</option></optgroup></select><small id="application-description"></small></label>
@@ -66,6 +66,15 @@
       <div class="execution"><label><span class="step">3 · Run mode</span><span>How would you like to try it?</span><select id="source"><option value="SIMULATED">Simulation · no payment</option><option value="TESTNET">Testnet · real test payment</option></select><small id="source-description">Fictional amounts and results. No payment is sent.</small></label><button id="launch" disabled>See what happens to the customer</button></div>
     </div>
     <p id="notice" class="notice" role="status" aria-live="polite"></p><p id="error" role="alert"></p><p id="connection" role="status" class="muted"></p>
+  </section>
+  <section id="browser-testnet" class="notice" hidden aria-labelledby="browser-testnet-title">
+    <h2 id="browser-testnet-title">Browser Testnet purchase and recovery</h2>
+    <p>Real Stellar Testnet payment, scripted client, locally reconstructed invoice receipt. No AI model, x402 server or server recovery SDK is executed here. This demonstrates transaction reconciliation, not recovery of a remote business result. Network services may be unavailable.</p>
+    <pre id="browser-testnet-output" role="status" aria-live="polite" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+    <p><a id="browser-transaction" target="_blank" rel="noopener noreferrer"></a></p>
+    <button id="browser-recover" disabled>Recover saved purchase (no new payment)</button>
+    <button id="browser-new" disabled>Archive proof and allow a new purchase</button>
+    <p>Keep this browser's storage. Clearing it loses the recovery reference. Never use real funds or import an existing wallet. Private keys are temporary and never saved.</p>
   </section>
   <dialog id="testnet-confirmation" aria-labelledby="testnet-confirmation-title" aria-describedby="testnet-confirmation-summary">
     <form method="dialog" class="confirmation-card">
@@ -80,7 +89,7 @@
     <aside><h2>Your experiments</h2><p class="muted">Select a run or a saved campaign.</p><label class="history-filter-label" for="history-filter">Show source</label><select id="history-filter"><option value="ALL">All sources</option><option value="SIMULATED">Simulation</option><option value="TESTNET">Testnet</option><option value="ARCHIVE">Archive</option></select><div id="history"></div></aside>
     <section aria-labelledby="balance-title"><p class="step" id="balance-title" tabindex="-1">4 · Customer outcome</p><p id="announcement" class="sr-only" role="status"></p><div id="detail"><div class="empty">Choose an application and a failure, then run the experiment. Simulation does not make any network payments.</div></div></section>
   </div>
-  <footer>The Testnet lab runs two applications: CSV conversion and JSON receipt generation. The instant demo also shows fictional market-quote and parcel-tracking examples; these are not live integrations. A third API, built by our team and installed from the package, has historical evidence. Integration by an external team has not yet been validated. An acknowledgment confirms receipt by the client software, not that a person has read it.</footer>
+  <footer>The online Testnet lab demonstrates a scripted invoice purchase and read-only transaction recovery. The server lab supports CSV conversion, JSON receipts and the Ollama invoice agent. The instant demo also shows fictional market-quote and parcel-tracking examples; these are not live integrations. A third API, built by our team and installed from the package, has historical evidence. Integration by an external team has not yet been validated. An acknowledgment confirms receipt by the client software, not that a person has read it.</footer>
   </section>
 </div>
 <div id="docs" hidden>
@@ -142,7 +151,7 @@
           <button id="tab-macos" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
         </div>
       <section id="panel-windows" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-windows">
-        <h2>Windows: download, extract, launch</h2><p>No separate Git, Node.js or npm installation is required.</p><ol><li><a href="https://github.com/nielslecodeur/Lumaid/archive/refs/heads/main.zip">Download the project ZIP</a> and extract the entire folder.</li><li>Double-click <code>Lancer-Lumaid.cmd</code>. The first launch downloads a portable runtime and installs dependencies. Internet is required.</li><li>Your browser opens at <code>http://127.0.0.1:3002</code>. Keep the terminal open; Ctrl+C stops the server.</li></ol><p>For Testnet, stop the server, run <code>Configurer-Testnet.cmd</code>, then launch Lumaid again. Existing credentials are preserved. Requires Windows 64-bit. If port 3002 is occupied, close the previous server.</p><p><a href="https://github.com/nielslecodeur/Lumaid/blob/main/docs/INSTALLATION_SIMPLE.md">Installation guide</a></p></section>
+        <h2>Try online: no installation</h2><p><a href="#local-lab">Open the Testnet lab</a>, choose Testnet, then confirm the scripted invoice purchase. Recover its receipt after a lost response, even after refreshing. No local server or AI model is needed. Keep browser storage; Stellar Testnet and Friendbot must be reachable.</p><h2>Full server kit on Windows: download, extract, launch</h2><p>No separate Git, Node.js or npm installation is required.</p><ol><li><a href="https://github.com/nielslecodeur/Lumaid/archive/refs/heads/main.zip">Download the project ZIP</a> and extract the entire folder.</li><li>Double-click <code>Lancer-Lumaid.cmd</code>. The first launch downloads a portable runtime and installs dependencies. Internet is required.</li><li>Your browser opens at <code>http://127.0.0.1:3002</code>. Keep the terminal open; Ctrl+C stops the server.</li></ol><p>For Testnet, stop the server, run <code>Configurer-Testnet.cmd</code>, then launch Lumaid again. Existing credentials are preserved. Requires Windows 64-bit. If port 3002 is occupied, close the previous server.</p><p><a href="https://github.com/nielslecodeur/Lumaid/blob/main/docs/INSTALLATION_SIMPLE.md">Installation guide</a></p></section>
 <section id="panel-linux" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
         <h2>Linux setup</h2>
         <p>In Bash, install Node Version Manager (nvm):</p>
@@ -200,7 +209,7 @@ app.use("/paid", paid.router);</code></pre>
     </article>
   </div>
 </div>
-</main><script src="./runtime-config.js"></script><script type="module" src="./app.js"></script>
+</main><script src="./runtime-config.js"></script><script src="./vendor/stellar-sdk.min.js"></script><script type="module" src="./browser-testnet-ui.js"></script><script type="module" src="./app.js"></script>
 <script type="module" src="./copy-commands.js"></script>
 <script type="module" src="./quick-demo.js"></script>
 <script>

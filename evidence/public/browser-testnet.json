@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-26T12:11:20.898Z",
+  "environment": "Edge headless; static HTTP on localhost; direct Stellar Testnet",
+  "journal": {
+    "version": 1,
+    "id": "a9bee2d5-bce9-40b6-9a8c-6437f22ca5e9",
+    "hash": "11eeea67da061717b0c16bb21bff459957c066952b9ff9149d8bf27038449d4c",
+    "buyer": "GDYXRTKRQXVRNANW4CEHQXYM7F3UWXXUVAI3GK7IQBED3VSKILSGB5TB",
+    "seller": "GBCEP2735VCSQ7Z2ASUQY5OYBDM7KC36SNPPQDIJSY5OHNI3IUKQ2DPR",
+    "scenario": "drop",
+    "status": "RECOVERED",
+    "startedAt": "2026-10-26T12:11:16.093Z",
+    "ledger": 5398599,
+    "result": {
+      "purchaseId": "a9bee2d5-bce9-40b6-9a8c-6437f22ca5e9",
+      "invoice": "DEMO-001",
+      "subtotal": 20,
+      "tax": 4,
+      "total": 24,
+      "arithmeticValid": true,
+      "payment": "11eeea67da061717b0c16bb21bff459957c066952b9ff9149d8bf27038449d4c"
+    }
+  },
+  "submissionCount": 1,
+  "pageErrors": []
+}

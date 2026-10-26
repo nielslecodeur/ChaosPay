@@ -302,7 +302,7 @@ test('quick demo labels extra agent use cases as fictional and keeps Testnet sco
   assert.match(html, /An XLM\/EUR quote · sample data/);
   assert.match(html, /A parcel delivery update · fictional parcel/);
   assert.match(html, /none of these examples calls a real service/);
-  assert.match(html, /Testnet lab below currently runs only CSV conversion and JSON receipt generation/);
+  assert.match(html, /online Testnet lab below runs a scripted invoice purchase/);
 });
 
 test('local service selector offers useful simulation-only agent examples', () => {
@@ -330,7 +330,7 @@ test('Lumaid signal mark is present in the header and browser tab', () => {
   assert.match(html, /h==="#try"\|\|localLab\?"try":"home"/);
   assert.match(html, /localLab=h==="#local-lab"\|\|h==="#demo"/);
   assert.match(html, /if\(localLab\)document\.getElementById\("local-lab"\)\.scrollIntoView/);
-  assert.match(html, /href="#local-lab">Continue to the local Testnet lab/);
+  assert.match(html, /href="#local-lab">Continue to the Testnet lab/);
   assert.match(readFileSync(new URL('./app.js', import.meta.url), 'utf8'), /location\.hash = 'try'/);
   assert.match(logo, /<svg[^>]*viewBox="0 0 64 64"/);
   assert.match(logo, /M30 5v35a8 8 0 0 0 8 8h22/);
@@ -519,15 +519,15 @@ test('copy buttons copy commands and announce clipboard failures', async () => {
   assert.match(status.textContent, /Select and copy the command manually/);
 });
 
- test('hosted lab runs simulations without requests and blocks Testnet submissions', async () => {
+ test('hosted lab runs simulations without requests and enables standalone Testnet', async () => {
  const {nodes,calls}=await mount(run(),{hosted:true});
  assert.equal(nodes.get('launch').disabled,false);
  await nodes.get('launch').onclick();
  assert.match(nodes.get('detail').text,/SIMULATION/);
  assert.equal(calls.length,0);
  nodes.get('source').value='TESTNET';nodes.get('source').onchange();
- assert.equal(nodes.get('launch').disabled,true);
- assert.match(nodes.get('connection').textContent,/local server/);
+ assert.equal(nodes.get('launch').disabled,false);
+ assert.match(nodes.get('connection').textContent,/without a local server/);
  });
 
 test('selecting an agent in Testnet switches to simulation without refresh', async () => {
@@ -554,13 +554,13 @@ test('invoice agent selects Testnet and limits supported failures',async()=>{
  assert.equal(nodes.get('source').value,'SIMULATED');
 });
 
-test('remote runner enables Testnet while static hosting stays simulated',async()=>{
+test('remote runner and static browser both enable their own Testnet modes',async()=>{
  const remote=await mount(run(),{hosted:true,remoteServer:true});
  assert.ok(remote.calls.some(c=>c.url==='/api/state'));
  remote.nodes.get('source').value='TESTNET';remote.nodes.get('source').onchange();
  assert.equal(remote.nodes.get('launch').disabled,false);
  const page=await mount(run(),{hosted:true});
  page.nodes.get('source').value='TESTNET';page.nodes.get('source').onchange();
- assert.equal(page.nodes.get('launch').disabled,true);
+ assert.equal(page.nodes.get('launch').disabled,false);
  assert.equal(page.calls.length,0);
 });
