@@ -1,0 +1,25 @@
+[Unit]
+Description=Lumaid Testnet demo
+After=network-online.target ollama.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lumaid
+Group=lumaid
+WorkingDirectory=/opt/lumaid
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node --import tsx packages/runner/src/server.ts
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/lumaid/.local
+KillMode=control-group
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -150,6 +150,10 @@ app.get('/api/runs/:id/export', (req, res) => {
   if (!run) { res.sendStatus(404); return; }
   res.attachment(`chaospay-${run.runId}.json`).json(run);
 });
+app.get('/runtime-config.js', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.type('application/javascript').send('globalThis.LUMAID_SERVER = true;');
+});
 app.use(express.static(resolve(root, 'apps/dashboard')));
 const server = app.listen(port, '127.0.0.1', () => console.log(`ChaosPay dashboard: ${origin}`));
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => {

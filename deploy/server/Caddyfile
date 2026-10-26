@@ -1,0 +1,22 @@
+# Set LUMAID_DOMAIN and LUMAID_PASSWORD_HASH in the Caddy service environment.
+# Hash generated with: caddy hash-password
+{$LUMAID_DOMAIN} {
+    route {
+        basic_auth {
+            demo {$LUMAID_PASSWORD_HASH}
+        }
+        @foreignOrigin {
+            header Origin *
+            not header Origin https://{$LUMAID_DOMAIN}
+        }
+        respond @foreignOrigin "Origin not allowed" 403
+        request_body {
+            max_size 8KB
+        }
+        reverse_proxy 127.0.0.1:3002 {
+            header_up Host 127.0.0.1:3002
+            header_up Origin http://127.0.0.1:3002
+            header_up -Authorization
+        }
+    }
+}

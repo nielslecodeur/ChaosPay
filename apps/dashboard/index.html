@@ -200,12 +200,12 @@ app.use("/paid", paid.router);</code></pre>
     </article>
   </div>
 </div>
-</main><script type="module" src="./app.js"></script>
+</main><script src="./runtime-config.js"></script><script type="module" src="./app.js"></script>
 <script type="module" src="./copy-commands.js"></script>
 <script type="module" src="./quick-demo.js"></script>
 <script>
 const V={home:document.getElementById("home"),try:document.getElementById("try"),docs:document.getElementById("docs"),install:document.getElementById("install")};
-const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home",localServer=["127.0.0.1","localhost"].includes(location.hostname);document.body.classList.toggle("hosted-demo",!localServer);document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
+const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home",localServer=["127.0.0.1","localhost"].includes(location.hostname)||globalThis.LUMAID_SERVER===true;document.body.classList.toggle("hosted-demo",!localServer);document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
 </script>
 </body></html>

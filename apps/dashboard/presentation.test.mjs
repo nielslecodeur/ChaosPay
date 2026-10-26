@@ -34,6 +34,7 @@ async function mount(current, options = {}) {
   nodes.get('history-filter').value = 'ALL';
   const calls = []; let poll;
   const context = {
+    LUMAID_SERVER: options.remoteServer === true,
     document: { getElementById: id => nodes.get(id), createElement: tag => new Element(tag) }, AbortSignal,
     location: { hostname: options.hostname ?? (options.hosted ? 'lumaid.example' : '127.0.0.1'), port: options.hosted ? '' : '3002' },
     setInterval: callback => { poll = callback; },
@@ -551,4 +552,15 @@ test('invoice agent selects Testnet and limits supported failures',async()=>{
  assert.match(nodes.get('application-description').textContent,/Ollama/);
  nodes.get('application').value='web-research';nodes.get('application').onchange();
  assert.equal(nodes.get('source').value,'SIMULATED');
+});
+
+test('remote runner enables Testnet while static hosting stays simulated',async()=>{
+ const remote=await mount(run(),{hosted:true,remoteServer:true});
+ assert.ok(remote.calls.some(c=>c.url==='/api/state'));
+ remote.nodes.get('source').value='TESTNET';remote.nodes.get('source').onchange();
+ assert.equal(remote.nodes.get('launch').disabled,false);
+ const page=await mount(run(),{hosted:true});
+ page.nodes.get('source').value='TESTNET';page.nodes.get('source').onchange();
+ assert.equal(page.nodes.get('launch').disabled,true);
+ assert.equal(page.calls.length,0);
 });

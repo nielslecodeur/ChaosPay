@@ -1,4 +1,4 @@
-const hostedLab = !(['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002');
+const hostedLab = !(globalThis.LUMAID_SERVER === true || (['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002'));
 const $ = id => document.getElementById(id);
 const el = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
 const badge = (text, tone = '') => el('span', text, `badge ${tone}`);
@@ -655,7 +655,7 @@ $('confirm-testnet').onclick = () => {
   confirmation.close();
   startRun();
 };
-if (['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002') {
+if (!hostedLab) {
   await refresh();
   setInterval(refresh, 2000);
 }

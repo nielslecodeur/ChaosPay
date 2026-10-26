@@ -56,6 +56,9 @@ test('local API loads archives, runs fixtures, exports and rejects cross-origin 
     assert.equal(interrupted?.status, 'INTERRUPTED');
     assert.ok(interrupted?.timeline.some(entry => entry.kind === 'recovery'));
     assert.equal((await fetch(base)).status, 200);
+    const runtime = await fetch(base + '/runtime-config.js');
+    assert.equal(runtime.headers.get('cache-control'), 'no-store');
+    assert.equal(await runtime.text(), 'globalThis.LUMAID_SERVER = true;');
     const headers = { 'Content-Type': 'application/json', 'X-ChaosPay-Local': '1' };
     const body = JSON.stringify({ source: 'SIMULATED', scenario: 'comparison' });
     assert.equal((await fetch(base + '/api/runs', { method: 'POST', headers: { ...headers, Origin: 'https://untrusted.example' }, body })).status, 403);
