@@ -45,7 +45,7 @@ async function mount(current, options = {}) {
     },
   };
   await runInNewContext(`(async () => { ${readFileSync(new URL('./app.js', import.meta.url), 'utf8')} })()`, context);
-  nodes.get('history').children[0]?.onclick();
+  nodes.get('history').children[0]?.onclick?.();
   return { nodes, calls, poll };
 }
 test('UNKNOWN with no transfer is clearly uncertain and recommends safe follow-up', async () => {
@@ -426,9 +426,9 @@ test('hosted browser demo uses relative assets and hides local Testnet controls'
   assert.match(html, /src="\.\/app\.js"/);
   assert.match(html, /src="\.\/quick-demo\.js"/);
   assert.match(html, /localServer=\["127\.0\.0\.1","localhost"\]\.includes\(location\.hostname\)/);
-  assert.match(html, /if\(localLab&&!localServer\)location\.hash="try"/);
+  assert.doesNotMatch(html, /if\(localLab&&!localServer\)location\.hash="try"/);
   assert.match(css, /\.home-view \.cosmic-scene\{[^}]*url\("\.\/space-scene\.svg"\)/);
-  assert.match(css, /\.hosted-demo \.local-lab-section,\.hosted-demo \.quick-local-link\{display:none!important\}/);
+  assert.doesNotMatch(css, /\.hosted-demo \.local-lab-section[^}]*display:none/);
   const workflow = readFileSync(new URL('../../.github/workflows/deploy-demo.yml', import.meta.url), 'utf8');
   assert.match(workflow, /actions\/upload-pages-artifact@v4/);
   assert.match(workflow, /path: apps\/dashboard/);
@@ -517,3 +517,14 @@ test('copy buttons copy commands and announce clipboard failures', async () => {
   assert.match(attributes['aria-label'], /^Copy failed: Linux setup command 1:/);
   assert.match(status.textContent, /Select and copy the command manually/);
 });
+
+ test('hosted lab runs simulations without requests and blocks Testnet submissions', async () => {
+ const {nodes,calls}=await mount(run(),{hosted:true});
+ assert.equal(nodes.get('launch').disabled,false);
+ await nodes.get('launch').onclick();
+ assert.match(nodes.get('detail').text,/SIMULATION/);
+ assert.equal(calls.length,0);
+ nodes.get('source').value='TESTNET';nodes.get('source').onchange();
+ assert.equal(nodes.get('launch').disabled,true);
+ assert.match(nodes.get('connection').textContent,/local server/);
+ });

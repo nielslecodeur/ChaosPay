@@ -58,6 +58,7 @@
   <section id="local-lab" class="local-lab-section" aria-labelledby="lab-title">
   <section class="intro"><p class="home-kicker">LUMAID / PAYMENT RECOVERY LAB</p><h1 id="lab-title">Local Testnet lab</h1><p class="tagline">Recreate a failure. Inspect what the customer actually receives.</p>
     <div class="wire" aria-hidden="true"><i></i><span class="ok">Payment confirmed</span><span class="lost">Response lost</span></div></section>
+  <p class="hosted-lab-help">Online lab: simulations run in your browser. For real Testnet experiments, <a href="#install">install Lumaid</a> and <a href="http://127.0.0.1:3002/#local-lab">open your local lab</a>.</p>
   <section class="panel" aria-label="Set up an experiment">
     <div class="steps">
       <label><span class="step">1 · Application</span><span>Which service is the client using?</span><select id="application"><optgroup label="Available on Testnet"><option value="csv">Convert a budget or expense table to CSV</option><option value="receipt">Generate a JSON invoice receipt</option></optgroup><optgroup label="Agent examples · simulation only"><option value="market-quote">Get a market quote for an asset</option><option value="web-research">Buy a short research brief</option><option value="delivery-status">Check a parcel delivery update</option><option value="weather-brief">Get a local weather briefing</option></optgroup></select><small id="application-description"></small></label>
@@ -204,7 +205,7 @@ app.use("/paid", paid.router);</code></pre>
 <script type="module" src="./quick-demo.js"></script>
 <script>
 const V={home:document.getElementById("home"),try:document.getElementById("try"),docs:document.getElementById("docs"),install:document.getElementById("install")};
-const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home",localServer=["127.0.0.1","localhost"].includes(location.hostname);document.body.classList.toggle("hosted-demo",!localServer);document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab&&!localServer)location.hash="try";else if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
+const go=()=>{const h=location.hash,localLab=h==="#local-lab"||h==="#demo",k=h.startsWith("#doc")?"docs":h.startsWith("#inst")?"install":h==="#try"||localLab?"try":"home",localServer=["127.0.0.1","localhost"].includes(location.hostname);document.body.classList.toggle("hosted-demo",!localServer);document.body.classList.toggle("home-view",k==="home");for(const n in V){V[n].hidden=n!==k;const l=document.getElementById("nav-"+n);if(l)l.toggleAttribute("aria-current",n===k)}if(localLab)document.getElementById("local-lab").scrollIntoView({block:"start"});else if(h===""||h==="#home"||h==="#try"||h==="#docs"||h==="#install")scrollTo(0,0)};
 addEventListener("hashchange",go);go();
 </script>
 </body></html>

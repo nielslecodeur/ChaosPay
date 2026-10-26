@@ -1,3 +1,4 @@
+const hostedLab = !(['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002');
 const $ = id => document.getElementById(id);
 const el = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
 const badge = (text, tone = '') => el('span', text, `badge ${tone}`);
@@ -410,6 +411,7 @@ function describe() {
 function controls() {
   const disabled = pending || state.busy || !reachable;
   for (const id of ['launch', 'application', 'scenario', 'source']) $(id).disabled = disabled;
+  if (hostedLab && $('source').value === 'TESTNET') { $('launch').disabled = true; $('connection').textContent = 'Testnet needs the local server. Use Installation, then open http://127.0.0.1:3002/#local-lab.'; } else if (hostedLab) $('connection').textContent = 'Browser simulation: no network payment. History lasts until this page is reloaded.';
   $('launch').textContent = pending ? 'Starting…' : state.busy ? 'Experiment running…' : $('source').value === 'TESTNET' ? 'Run Testnet experiment →' : 'Run simulation →';
 }
 function metric(value, label, note) {
@@ -610,6 +612,20 @@ function confirmTestnetRun() {
   confirmation.showModal();
 }
 async function startRun() {
+  if (hostedLab) {
+    if ($('source').value !== 'SIMULATED') return;
+    const scenario = $('scenario').value, id = 'browser-' + Date.now() + '-' + state.runs.length;
+    const unknown = scenario === 'confirmation-lost';
+    const report = mode => ({ schemaVersion: 1, purchaseId: id + '-' + mode, mode, network: 'stellar:testnet',
+      tokenContract: 'fictional-token', expectedAmountAtomic: '100000', settledAmountAtomic: unknown ? '0' : mode === 'naive' ? '200000' : '100000',
+      transfers: [], responseRecovered: !unknown, recoveryMs: null,
+      verdict: unknown ? 'UNKNOWN' : mode === 'naive' ? 'FAIL' : 'PASS',
+      reason: 'Fictional browser scenario; no ledger observation or payment.' });
+    const run = {runId:id,application:$('application').value,scenario,source:'SIMULATED',status:'COMPLETE',startedAt:new Date().toISOString(),
+      reports: scenario === 'comparison' ? [report('naive'),report('durable')] : [report('durable')],
+      timeline:[{at:new Date().toISOString(),message:'Browser simulation only. No API or payment network was called.'}]};
+    state.runs.unshift(run); selected=id; render(); $('balance-title').scrollIntoView({block:'start'}); return;
+  }
   pending = true; controls(); $('error').textContent = '';
   try {
     const response = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-ChaosPay-Local': '1' }, body: JSON.stringify({ scenario: $('scenario').value, source: $('source').value, application: $('application').value }), signal: AbortSignal.timeout(15000) });
@@ -630,4 +646,11 @@ $('confirm-testnet').onclick = () => {
 if (['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '3002') {
   await refresh();
   setInterval(refresh, 2000);
+}
+
+if (hostedLab) {
+  reachable = true;
+  for (const [id, [label]] of Object.entries(scenarios)) { const option = el('option', label); option.value = id; $('scenario').append(option); }
+  $('scenario').value = 'comparison';
+  describe(); controls(); render();
 }
