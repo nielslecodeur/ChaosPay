@@ -6,6 +6,8 @@ Construire un agent local indépendant du dashboard qui achète une vérificatio
 
 Ce document décrit le travail à réaliser, pas une fonctionnalité déjà entièrement livrée. Les noms d'outils et les états ci-dessous sont des propositions de contrat à implémenter et tester.
 
+**Première implémentation disponible :** [examples/agent-invoice-demo](../examples/agent-invoice-demo/README.md) contient le client indépendant, le journal SQLite et la boucle d'outils Ollama. Les tests sont déterministes ; la validation réelle Ollama/Testnet de ce client et le lanceur agent restent à réaliser. Le guide de l'exemple précise les commandes et limites actuelles.
+
 **Critère de réussite :** après une panne injectée, le client récupère le résultat du même achat, avec l'autorisation initiale et un seul règlement attendu vérifié sur Stellar Testnet.
 
 Le service vérifie uniquement l'arithmétique de la facture. Le paiement achète cette vérification : il ne règle pas la facture et ne valide ni sa légalité ni ses taxes.
@@ -128,7 +130,7 @@ Réponse proposée, à adapter explicitement aux rapports existants :
 
 ## Étape 4 — Brancher l'agent IA
 
-Choisir un fournisseur de modèle avec appels d'outils et l'encapsuler dans un adaptateur. Documenter la variable de configuration choisie dans un `.env.example` sans secret. Une clé IA peut être nécessaire selon le fournisseur ; elle est distincte des clés Testnet.
+Utiliser Ollama en local (`/api/chat` avec tool calling) via l'adaptateur de l'exemple. Documenter `OLLAMA_HOST` et `OLLAMA_MODEL` dans un `.env.example` sans secret. Aucune clé API IA n'est requise pour Ollama local ; les clés Testnet restent distinctes.
 
 Boucle de l'agent :
 
