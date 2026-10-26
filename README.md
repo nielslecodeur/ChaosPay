@@ -6,7 +6,13 @@ Lumaid is a local failure-and-recovery lab for paid applications on Stellar. It 
 
 **Browser demo URL after GitHub Pages is enabled:** <https://nielslecodeur.github.io/Lumaid/> — no installation, account, or payment required.
 
-## Try it locally — no Testnet setup
+## Windows: double-click launch
+
+Download the repository with **Code → Download ZIP**, extract it, then double-click **Lancer-Lumaid.cmd**. No separate Git, Node.js or npm installation is needed. The first launch downloads a portable Node.js runtime, verifies its SHA256 and installs dependencies. The browser opens automatically; keep the terminal window open while using Lumaid.
+
+To prepare Testnet accounts, close the server and run **Configurer-Testnet.cmd**, then launch Lumaid again. Existing credentials are preserved. See [the simple installation guide](docs/INSTALLATION_SIMPLE.md).
+
+## Developer installation — no Testnet setup
 
 You only need **Git** and **Node.js 24 or newer**. No AI API key, financial-service account, or `.env` file is needed to try the simulation.
 

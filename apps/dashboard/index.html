@@ -127,29 +127,22 @@
   <div class="docs-layout install-layout">
     <article class="doc">
       <p class="home-kicker">START WITHOUT SETUP</p>
-      <h1>Try Lumaid first</h1>
+      <h1>Use Lumaid on your computer</h1>
       <p class="lead">You do not need to install anything, create an account, or connect to Stellar to see how recovery works.</p>
       <a class="home-cta install-demo-link" href="#try">Open the instant demo <span aria-hidden="true">→</span></a>
       <p>The browser demo uses fictional examples only. It sends no network requests and makes no payments. When you are ready to develop locally or test real Testnet transactions, open the optional setup below.</p>
-      <details class="install-advanced">
+      <section aria-labelledby="agent-install-title"><h2 id="agent-install-title">Connect your own AI agent</h2><p>The goal is to recover interrupted paid API requests from agents on your computer. Installing the lab does not automatically connect your existing agent.</p><ol><li>The API provider integrates the server recovery kit to retain purchase state and results.</li><li>Your agent client securely stores the purchase ID, exact request and original signed authorization.</li><li>After an interruption, the client reuses those values, verifies the result and acknowledges receipt. Unknown payment states require further evidence.</li></ol><p><strong>Available today:</strong> an experimental server package installed from a local archive and a recovery CLI for saved lab purchases. <strong>Still to build:</strong> a supported agent connector across languages and frameworks without manual Node.js setup.</p><p><a href="https://github.com/nielslecodeur/Lumaid/blob/main/docs/QUICKSTART.md">Server integration guide</a></p></section>
+<details class="install-advanced">
         <summary>Set up the local lab (optional)</summary>
-        <p>Requires Git and Node.js 24+. The quickstart starts in simulation mode; Testnet setup is a separate, deliberate step.</p>
+        <p>Windows provides a double-click launcher with a portable runtime. Linux and macOS use the developer setup below. Testnet configuration is a separate step.</p>
         <div class="install-platforms" role="tablist" aria-label="Choose your operating system" aria-orientation="horizontal">
           <button id="tab-windows" class="install-platform" type="button" role="tab" aria-selected="true" aria-controls="panel-windows" tabindex="0">Windows</button>
           <button id="tab-linux" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-linux" tabindex="-1">Linux</button>
           <button id="tab-macos" class="install-platform" type="button" role="tab" aria-selected="false" aria-controls="panel-macos" tabindex="-1">macOS</button>
         </div>
       <section id="panel-windows" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-windows">
-        <h2>Windows setup</h2>
-        <p>Open PowerShell and install Git and Node.js 24 with Windows Package Manager (winget):</p>
-<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>winget install --id Git.Git --exact
-winget install --id OpenJS.NodeJS.LTS --exact</code><span class="copy-status sr-only" role="status"></span></pre>
-        <p>Close and reopen PowerShell, then clone the project and start the simulation:</p>
-<pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>git clone https://github.com/nielslecodeur/Lumaid.git
-cd Lumaid
-npm run quickstart</code><span class="copy-status sr-only" role="status"></span></pre>
-      </section>
-      <section id="panel-linux" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
+        <h2>Windows: download, extract, launch</h2><p>No separate Git, Node.js or npm installation is required.</p><ol><li><a href="https://github.com/nielslecodeur/Lumaid/archive/refs/heads/main.zip">Download the project ZIP</a> and extract the entire folder.</li><li>Double-click <code>Lancer-Lumaid.cmd</code>. The first launch downloads a portable runtime and installs dependencies. Internet is required.</li><li>Your browser opens at <code>http://127.0.0.1:3002</code>. Keep the terminal open; Ctrl+C stops the server.</li></ol><p>For Testnet, stop the server, run <code>Configurer-Testnet.cmd</code>, then launch Lumaid again. Existing credentials are preserved. Requires Windows 64-bit. If port 3002 is occupied, close the previous server.</p><p><a href="https://github.com/nielslecodeur/Lumaid/blob/main/docs/INSTALLATION_SIMPLE.md">Installation guide</a></p></section>
+<section id="panel-linux" class="install-platform-panel" role="tabpanel" aria-labelledby="tab-linux" hidden>
         <h2>Linux setup</h2>
         <p>In Bash, install Node Version Manager (nvm):</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash</code><span class="copy-status sr-only" role="status"></span></pre>
@@ -171,7 +164,7 @@ git clone https://github.com/nielslecodeur/Lumaid.git
 cd Lumaid
 npm run quickstart</code><span class="copy-status sr-only" role="status"></span></pre>
       </section>
-      <p>Open <code>http://127.0.0.1:3002</code> and select Simulation. This path requires no Testnet setup and makes no payment. To enable Testnet, stop the dashboard and run <code>npm run setup:testnet</code>, then <code>npm run check:connections</code> and restart with <code>npm run dev:dashboard</code>. Testnet runs submit real test-network transactions; confirmed transactions cannot be cancelled. Credentials stay in <code>.env</code> and <code>.local/</code>. Never share these files.</p>
+      <p>Open <code>http://127.0.0.1:3002</code> and select Simulation. This path requires no Testnet setup and makes no payment. On Windows, stop the server and use Configurer-Testnet.cmd. For the developer installation, stop the dashboard and run <code>npm run setup:testnet</code>, then <code>npm run check:connections</code> and restart with <code>npm run dev:dashboard</code>. Testnet runs submit real test-network transactions; confirmed transactions cannot be cancelled. Credentials stay in <code>.env</code> and <code>.local/</code>. Never share these files.</p>
       <h2 id="inst-cli">Command line</h2>
       <p>To run the client on its own, stop the dashboard, then start the facilitator and merchant in separate terminals.</p>
 <pre class="install-command"><button class="copy-button" type="button" aria-label="Copy command" title="Copy command"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="12" rx="1.5"></rect><path d="M13.5 6.5V4.75A1.75 1.75 0 0 0 11.75 3h-7A1.75 1.75 0 0 0 3 4.75v8.5A1.75 1.75 0 0 0 4.75 15H6.5"></path></svg></button><code>npm run dev:facilitator
