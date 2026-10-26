@@ -1,0 +1,7 @@
+{
+  "invoice": {
+    "reference": "DEMO-001",
+    "declaredTotalMinor": "3000",
+    "lines": [{ "unitPriceMinor": "1200", "quantity": 2 }, { "unitPriceMinor": "500", "quantity": 1 }]
+  }
+}
