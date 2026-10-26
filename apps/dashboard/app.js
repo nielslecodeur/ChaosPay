@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const el = (tag, text, className) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (className) n.className = className; return n; };
 const badge = (text, tone = '') => el('span', text, `badge ${tone}`);
 const apps = {
+  'invoice-agent': 'AI invoice agent ? Ollama + Testnet',
   csv: 'CSV conversion',
   receipt: 'Receipt generation',
   'market-quote': 'Market quote · simulation',
@@ -12,6 +13,7 @@ const apps = {
   'invoice-check': 'Invoice check · installed package',
 };
 const appDescriptions = {
+  'invoice-agent': 'A local Ollama agent buys an invoice arithmetic check and uses Lumaid to recover its result. Requires Ollama; baseline or lost response only.',
   csv: 'The client pays to convert a small data table into a CSV file.',
   receipt: 'The client pays to generate a JSON receipt; this does not pay the invoice.',
   'market-quote': 'Simulation only: an agent requests a sample price quote for an asset.',
@@ -27,7 +29,7 @@ const appActions = {
   'delivery-status': 'check a parcel delivery update',
   'weather-brief': 'get a local weather briefing',
 };
-const testnetApplications = new Set(['csv', 'receipt']);
+const testnetApplications = new Set(['csv', 'receipt', 'invoice-agent']);
 const scenarios = {
   comparison: ['Compare two recovery strategies', 'After a lost response, compare paying again with recovering the existing purchase.'],
   drop: ['The response disappears', 'Payment is confirmed, but the client never receives the response.'],
@@ -382,6 +384,10 @@ const isPackageIntegration = run => run.reports.length > 0 && run.reports.every(
 const titleOf = run => run.source === 'ARCHIVE' ? (isPackageIntegration(run) ? 'Independent package integration' : 'Saved campaign') : scenarios[run.scenario]?.[0] ?? run.scenario;
 const appOf = (report, run) => apps[run.application] ?? apps[report.serviceId] ?? report.serviceId ?? 'Application not specified';
 function describe() {
+  const agent = $('application').value === 'invoice-agent';
+  if (agent) $('source').value = 'TESTNET';
+  for (const option of $('scenario').options) option.disabled = agent && !['baseline', 'drop'].includes(option.value);
+  if (agent && !['baseline', 'drop'].includes($('scenario').value)) $('scenario').value = 'drop';
   const testnet = $('source').value === 'TESTNET';
   $('source-description').textContent = testnet
     ? 'Submits real Stellar Testnet transactions using test funds. Confirm before sending.'
@@ -391,7 +397,7 @@ function describe() {
   let applicationNotice = '';
   if (testnet && !testnetApplications.has(application.value)) {
     application.value = 'csv';
-    applicationNotice = ' Testnet currently supports CSV conversion and JSON receipts only; select this example in simulation mode.';
+    applicationNotice = ' Testnet currently supports CSV conversion, JSON receipts and the local invoice agent; select this example in simulation mode.';
   }
   $('description').textContent = scenarios[$('scenario').value]?.[1] ?? '';
   $('application-description').textContent = (appDescriptions[application.value] ?? 'The client pays to use this service.') + applicationNotice;

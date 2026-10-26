@@ -3,14 +3,14 @@ import { setTimeout as delay } from 'node:timers/promises';
 
 export class Processes {
   private children = new Map<string, ChildProcess>();
-  async start(name: 'merchant' | 'facilitator', url: string, application: 'csv' | 'receipt' = 'csv') {
+  async start(name: 'merchant' | 'facilitator', url: string, application: 'csv' | 'receipt' | 'invoice-agent' = 'csv', env: Record<string, string> = {}) {
     const existing = this.children.get(name);
     if (existing && existing.exitCode === null && existing.signalCode === null) return;
     const occupied = await fetch(url + '/health', { signal: AbortSignal.timeout(700) }).then(() => true, () => false);
     if (occupied) throw new Error('Port already occupied');
     const file = name === 'merchant' ? 'server' : 'facilitator';
-    const entry = name === 'merchant' && application === 'receipt' ? 'apps/receipt-api/src/server.ts' : `apps/demo-merchant/src/${file}.ts`;
-    const child = spawn(process.execPath, ['--import', 'tsx', '--env-file=.env', entry], { stdio: 'ignore', windowsHide: true });
+    const entry = name === 'merchant' && application === 'invoice-agent' ? 'apps/invoice-agent-api/server.ts' : name === 'merchant' && application === 'receipt' ? 'apps/receipt-api/src/server.ts' : `apps/demo-merchant/src/${file}.ts`;
+    const child = spawn(process.execPath, ['--import', 'tsx', '--env-file=.env', entry], { stdio: 'ignore', windowsHide: true, env: { ...process.env, ...env } });
     let failed = false;
     child.on('error', () => { failed = true; });
     this.children.set(name, child);

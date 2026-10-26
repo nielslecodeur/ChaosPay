@@ -1,0 +1,986 @@
+From e67675a7986353cdcf60601a6a13060b307949e8 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sun, 25 Oct 2026 16:17:03 +0000
+Subject: [PATCH] =?UTF-8?q?feat(recover):=20commande=20de=20reprise=20d'un?=
+ =?UTF-8?q?=20achat=20et=20diagnostic=20des=20=C3=A9tats=20inconnus?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- npm run recover -- <achat> : retrouve l'autorisation et la requête sauvegardées,
+  consulte marchand et facilitator, rejoue l'autorisation d'origine sans re-signer,
+  vérifie le hash, sauvegarde le résultat avant l'accusé, affiche un bilan.
+- Diagnostic précis : confirmation en attente, RPC indisponible, reçu absent,
+  résultat non accusé, facilitator/marchand injoignable, autorisation refusée...
+- smoke:payment sauvegarde désormais la requête (format du runner).
+- 24 tests : vrai RecoveryKit + SQLite derrière un faux réseau.
+- docs/RECOVER.md ; limite documentée : un règlement échoué laisse l'achat bloqué.
+---
+ README.md                                   |   8 +-
+ docs/RECOVER.md                             |  53 ++++
+ package.json                                |   1 +
+ packages/client-recovery/src/diagnosis.ts   | 146 ++++++++++
+ packages/client-recovery/src/format.ts      |  38 +++
+ packages/client-recovery/src/local-files.ts | 113 ++++++++
+ packages/client-recovery/src/resume.ts      | 125 +++++++++
+ scripts/recover.ts                          |  69 +++++
+ scripts/smoke-payment.ts                    |   8 +-
+ tests/recover.test.ts                       | 282 ++++++++++++++++++++
+ 10 files changed, 840 insertions(+), 3 deletions(-)
+ create mode 100644 docs/RECOVER.md
+ create mode 100644 packages/client-recovery/src/diagnosis.ts
+ create mode 100644 packages/client-recovery/src/format.ts
+ create mode 100644 packages/client-recovery/src/local-files.ts
+ create mode 100644 packages/client-recovery/src/resume.ts
+ create mode 100644 scripts/recover.ts
+ create mode 100644 tests/recover.test.ts
+
+diff --git a/README.md b/README.md
+index 4a858f8..ca4f43d 100644
+--- a/README.md
++++ b/README.md
+@@ -35,6 +35,12 @@ npm run smoke:payment -- demo-coupure durable none
+ 
+ Le premier appel est volontairement interrompu. Le second réutilise l'autorisation originale et récupère le résultat sans second paiement.
+ 
++Après la fermeture du client ou du runner, une seule commande retrouve l'achat par son identifiant, sans nouvelle autorisation, ou explique précisément ce qui bloque :
++
++```sh
++npm run recover -- demo-coupure
++```
++
+ ## Vérifier
+ 
+ ```sh
+@@ -56,7 +62,7 @@ La campagne exécute réellement coupure, redémarrage, concurrence et contre-ex
+ 
+ - [Intégrer le paquet dans une API existante](docs/INTEGRATION_A.md)
+ - [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
+-- [Kit de reprise et campagne sur deux API](docs/RECOVERY_KIT.md)
++- [Reprendre un achat interrompu](docs/RECOVER.md)
+ - [Guide de connexion et lancement A](docs/SETUP_A.md)
+ - [API pour le runner et le dashboard B](docs/ENGINE_API.md)
+ - [Cadrage et limites](docs/PROJECT.md)
+diff --git a/docs/RECOVER.md b/docs/RECOVER.md
+new file mode 100644
+index 0000000..5ab447f
+--- /dev/null
++++ b/docs/RECOVER.md
+@@ -0,0 +1,53 @@
++# Reprendre un achat interrompu
++
++```sh
++npm run recover -- achat-123
++npm run recover -- --list          # achats retrouvables dans .local/
++```
++
++Après la fermeture du client ou du runner, une seule commande retrouve l'achat à partir de son identifiant et de ses fichiers sauvegardés, consulte le marchand et le facilitator, tente une reprise sûre et affiche un bilan. Si elle ne peut pas conclure, elle explique pourquoi, indique l'action recommandée et conserve toutes les données. Les serveurs doivent tourner (`npm run dev:facilitator`, puis `dev:merchant` ou `dev:receipt`).
++
++Options : `--mode durable|naive` (seulement si l'identifiant existe dans les deux modes), `--attempts N` (défaut 6), `--interval S` (défaut 2), `--json` (bilan structuré sur la sortie standard, progression sur stderr), `--dir <dossier>`.
++
++## Garanties
++
++- **Jamais de nouvelle autorisation.** La commande ne signe rien et n'a pas besoin de `BUYER_SECRET`. Elle rejoue l'autorisation d'origine ; la resoumission passe par le journal du marchand, qui ne règle qu'une fois. Elle n'injecte jamais de panne (`X-Chaos-Fault: none`).
++- **Le résultat n'est jamais perdu.** Il est vérifié par son hash, puis écrit dans `.local/result-*.json` (écriture atomique) **avant** l'accusé. Si l'accusé échoue, relancer la commande restitue le même résultat sans nouveau paiement.
++- **L'autorisation ne part que vers 127.0.0.1.** Une requête ou une autorisation locale incohérente est refusée avant tout envoi.
++- Relancer après un PASS dont le résultat est déjà sauvegardé localement ne fait aucun appel d'achat.
++
++## Fichiers utilisés (`.local/`, ignoré par Git)
++
++| Fichier | Contenu | Écrit par |
++| --- | --- | --- |
++| `client-<mode>-<id>.json` | autorisation originale | runner, `smoke:payment` |
++| `request-<mode>-<id>.json` | application, URL, chemin et corps de la requête | runner, `smoke:payment` |
++| `result-<mode>-<id>.json` | résultat vérifié | `recover` |
++| `recovery-<mode>-<id>.json` | journal des étapes de la reprise | `recover` |
++
++Les achats `smoke:payment` créés avant cette commande n'ont pas de fichier `request-*`. Le corps de démonstration est alors supposé et signalé ; s'il est faux, le marchand répond 409 avant tout paiement.
++
++## Diagnostics et actions
++
++| Cause | Signification | Action | Sortie |
++| --- | --- | --- | --- |
++| `RECOVERED` | Un paiement confirmé, résultat vérifié et accusé | Rien | 0 |
++| `CONFIRMATION_PENDING` | Transaction connue, le RPC ne la voit pas encore (pas une preuve d'échec) | Relancer dans quelques secondes | 2 |
++| `RPC_UNAVAILABLE` | Le RPC Stellar est injoignable côté marchand ; état inconnu, pas échoué | Relancer plus tard (`npm run check:connections`) | 2 |
++| `RESULT_NOT_ACKNOWLEDGED` | Paiement confirmé, accusé manquant | Relancer : le résultat enregistré est restitué puis accusé | 2 |
++| `FACILITATOR_UNAVAILABLE` | Le facilitator ne répond pas ; impossible de savoir s'il a reçu la demande | Le démarrer, relancer | 2 |
++| `RECEIPT_ABSENT` | Aucune transaction chez le marchand, aucun reçu chez le facilitator ; le marchand ne resoumet pas | Vérifier sur un explorateur Testnet ; sinon nouvel achat, décision explicite | 1 |
++| `SERVICE_UNREACHABLE` / `SERVICE_ERROR` | Marchand arrêté, redémarrage ou erreur 503 | Le démarrer, relancer | 2 |
++| `AUTHORIZATION_REJECTED` | Autorisation expirée ou invalide, aucun achat enregistré | Nouvel achat explicite ; `recover` ne re-signe jamais | 1 |
++| `REQUEST_MISMATCH` | Le marchand refuse le corps ou l'autorisation (409/400) | Vérifier `request-*.json` sans le modifier | 1 |
++| `PAYMENT_FAILED`, `PAYMENT_UNSUPPORTED`, `DOUBLE_PAYMENT` | Échec confirmé, transfert non interprétable ou plusieurs paiements | Ne pas relancer ; rapprochement manuel | 1 |
++| `RESULT_INTEGRITY`, `WRONG_SERVICE`, `REPORT_UNAVAILABLE` | Hash incohérent, mauvais service, bilan illisible | Voir le message affiché | 1 / 1 / 2 |
++
++Codes de sortie : 0 terminé, 1 bloqué ou erreur (décision humaine), 2 en attente (relancer la même commande est sûr).
++
++## Limites connues
++
++- **Règlement échoué = achat bloqué.** Si le facilitator est injoignable (ou rejette l'autorisation) au premier règlement, le journal du marchand passe en `UNKNOWN` sans hash et ne resoumet plus, même quand le facilitator revient. Aucun double paiement n'est possible, mais `recover` ne peut que diagnostiquer `RECEIPT_ABSENT`. Le test « reçu absent » de `tests/recover.test.ts` documente ce blocage.
++- La fenêtre de validité d'une autorisation est d'environ 2 minutes (`maxTimeoutSeconds`). Passé ce délai, une autorisation jamais soumise sera probablement rejetée ; la commande le signale mais n'en déduit pas de verdict définitif.
++- La distinction entre états inconnus repose sur les messages de l'observateur (`packages/stellar-observer`). Les tests utilisent l'observateur réel : un changement de message les fait échouer.
++- Testnet et services locaux uniquement. Les tests utilisent le vrai kit et SQLite derrière un faux réseau ; ils ne remplacent pas une campagne sur Testnet.
+diff --git a/package.json b/package.json
+index 7d65469..ed44d5a 100644
+--- a/package.json
++++ b/package.json
+@@ -12,6 +12,7 @@
+     "setup:testnet": "tsx scripts/setup-testnet.ts",
+     "check:connections": "tsx --env-file=.env scripts/check-connections.ts",
+     "smoke:payment": "tsx --env-file=.env scripts/smoke-payment.ts",
++    "recover": "tsx --env-file-if-exists=.env scripts/recover.ts",
+     "typecheck": "tsc --noEmit",
+     "test": "tsx --test tests/*.test.ts packages/runner/tests/*.test.ts",
+     "verify:engine": "tsx --env-file=.env scripts/verify-engine.ts",
+diff --git a/packages/client-recovery/src/diagnosis.ts b/packages/client-recovery/src/diagnosis.ts
+new file mode 100644
+index 0000000..b5e5714
+--- /dev/null
++++ b/packages/client-recovery/src/diagnosis.ts
+@@ -0,0 +1,146 @@
++import type { Observation, PurchaseReport } from "../../evidence/src/index.js";
++
++/** Ce que le facilitator dit de l'autorisation (GET /receipts/:digest), interrogé directement par le client. */
++export type FacilitatorProbe = "receipt-with-hash" | "receipt-without-hash" | "no-receipt" | "unavailable";
++/** done : terminé · retry-later : relancer la même commande plus tard est sûr · needs-human : relancer ne changera rien. */
++export type Outcome = "done" | "retry-later" | "needs-human";
++export type Cause =
++  | "RECOVERED" | "RESULT_NOT_ACKNOWLEDGED" | "CONFIRMATION_PENDING" | "RPC_UNAVAILABLE" | "RECEIPT_ABSENT"
++  | "FACILITATOR_UNAVAILABLE" | "PAYMENT_FAILED" | "PAYMENT_UNSUPPORTED" | "DOUBLE_PAYMENT"
++  | "AUTHORIZATION_REJECTED" | "REQUEST_MISMATCH" | "RESULT_INTEGRITY"
++  | "SERVICE_UNREACHABLE" | "SERVICE_ERROR" | "WRONG_SERVICE" | "REPORT_UNAVAILABLE";
++
++export interface Diagnosis { cause: Cause; outcome: Outcome; headline: string; why: string; action: string; }
++export type EngineReport = PurchaseReport & {
++  observations?: Observation[];
++  attempts?: { state: string; txHash: string; deliveries: number }[];
++};
++export interface Facts {
++  merchant: "ok" | "unreachable" | "wrong-service";
++  facilitator: FacilitatorProbe;
++  /** null : le marchand n'a aucun journal pour cet achat (404) ou est injoignable. */
++  report: EngineReport | null;
++  /** Dernière réponse du marchand à la reprise. 0 : aucune réponse (connexion coupée). */
++  last?: { status: number };
++  application: "csv" | "receipt";
++  resultSaved: boolean;
++  acknowledged: boolean;
++  integrityFailure?: boolean;
++  ageMs: number;
++}
++
++/** Fenêtre de validité d'une autorisation : maxTimeoutSeconds: 120 dans packages/recovery/src/stellar-http.ts. À garder alignée. */
++export const AUTH_WINDOW_MS = 120_000;
++const ONE_HOUR_MS = 3_600_000;
++
++const verdicts = ["PASS", "FAIL", "UNKNOWN", "UNSUPPORTED"];
++export function asEngineReport(value: unknown): EngineReport | null {
++  if (!value || typeof value !== "object") return null;
++  const r = value as Partial<EngineReport>;
++  if (r.schemaVersion !== 1 || typeof r.verdict !== "string" || !verdicts.includes(r.verdict) || !Array.isArray(r.transfers)) return null;
++  return value as EngineReport;
++}
++
++export const short = (hash: string) => hash ? hash.slice(0, 12) + "…" : "aucun";
++const d = (cause: Cause, outcome: Outcome, headline: string, why: string, action: string): Diagnosis => ({ cause, outcome, headline, why, action });
++const knownHashes = (r: EngineReport) => [...(r.observations ?? []).map(o => o.txHash), ...(r.attempts ?? []).map(a => a.txHash)].filter(Boolean);
++const minutes = (ms: number) => ms < 90_000 ? Math.round(ms / 1000) + " s" : Math.round(ms / 60_000) + " min";
++
++export function diagnose(f: Facts): Diagnosis {
++  const r = f.report, status = f.last?.status;
++  const startMerchant = f.application === "receipt" ? "npm run dev:receipt" : "npm run dev:merchant";
++
++  if (f.integrityFailure)
++    return d("RESULT_INTEGRITY", "needs-human", "Résultat reçu mais hash incohérent",
++      "Le hash du résultat renvoyé par le marchand ne correspond pas à son contenu. Aucun accusé n'a été envoyé et le résultat n'a pas été enregistré comme valide.",
++      "Ne pas utiliser ce résultat. Le paiement et l'autorisation sont conservés ; relancer la commande ne corrigera pas une incohérence du marchand : l'investiguer côté service.");
++  if (f.merchant === "wrong-service")
++    return d("WRONG_SERVICE", "needs-human", "Mauvais service à l'adresse enregistrée",
++      "L'adresse du marchand répond, mais ne s'identifie pas comme le service de cet achat. L'autorisation n'a pas été envoyée.",
++      "Démarrer le bon service (" + startMerchant + ") sur l'adresse enregistrée dans le fichier de requête, puis relancer.");
++  if (status === 409 || status === 400)
++    return d("REQUEST_MISMATCH", "needs-human", "Requête locale refusée par le marchand",
++      "Le marchand refuse la requête ou l'autorisation sauvegardées pour cet identifiant (HTTP " + status + ") : corps différent de l'achat d'origine ou autorisation rattachée à un autre achat. Aucun paiement n'a été déclenché par ce refus.",
++      "Vérifier que le fichier request-*.json est celui de l'achat d'origine, sans le modifier. Pour un ancien achat sans ce fichier, la requête était reconstruite : retrouver le corps d'origine ou abandonner cet achat.");
++  if (status === 402 && !(r && knownHashes(r).length))
++    return d("AUTHORIZATION_REJECTED", "needs-human", "Autorisation refusée avant tout règlement",
++      "Le marchand n'a pas validé l'autorisation sauvegardée (expirée — fenêtre d'environ " + minutes(AUTH_WINDOW_MS) + " — ou invalide) et n'a enregistré aucun achat : rien n'a été réglé par son intermédiaire.",
++      "Un nouvel achat exige une nouvelle autorisation, donc un nouveau paiement : à lancer explicitement (par exemple npm run smoke:payment -- <nouvel-identifiant> durable none). `recover` ne re-signe jamais.");
++
++  if (!r) {
++    if (f.acknowledged)
++      return d("REPORT_UNAVAILABLE", "retry-later", "Résultat accusé, bilan de preuve indisponible",
++        "Le résultat a été reçu, vérifié, enregistré et accusé, mais le rapport de l'observateur n'a pas pu être relu.",
++        "Relancer la même commande quand le marchand répond pour obtenir le verdict PASS ou UNKNOWN.");
++    if (f.merchant === "unreachable" || status === 0)
++      return d("SERVICE_UNREACHABLE", "retry-later", "Marchand injoignable",
++        "Le marchand ne répond pas (arrêté, en cours de redémarrage ou connexion coupée). Son journal SQLite et votre autorisation sont conservés ; rien n'a été renvoyé.",
++        "Démarrer le marchand (" + startMerchant + "), puis relancer la même commande.");
++    return d("SERVICE_ERROR", "retry-later", "Le marchand a signalé une erreur" + (status ? " (HTTP " + status + ")" : ""),
++      "Le marchand a interrompu l'opération et n'a pas pu fournir de rapport. L'autorisation d'origine reste valable côté journal.",
++      "Relancer la même commande dans quelques secondes ; consulter les journaux du marchand si l'erreur persiste.");
++  }
++
++  const obs = r.observations ?? [], hashes = knownHashes(r), hash = hashes[0] ?? "";
++  if (r.verdict === "PASS")
++    return d("RECOVERED", "done", "Achat récupéré",
++      "Un seul paiement attendu est confirmé sur le ledger (tx " + short(hash) + "), le résultat a été vérifié par son hash puis accusé.",
++      f.resultSaved ? "Rien à faire. Le résultat est sauvegardé localement." : "Rien à faire.");
++  if (r.verdict === "FAIL") {
++    if (BigInt(r.settledAmountAtomic) > BigInt(r.expectedAmountAtomic))
++      return d("DOUBLE_PAYMENT", "needs-human", "Plusieurs paiements confirmés pour un achat",
++        r.settledAmountAtomic + " unités atomiques confirmées pour " + r.expectedAmountAtomic + " attendues (transactions : " + hashes.map(short).join(", ") + ").",
++        "Ne pas relancer. Conserver le rapport et les hashes pour un rapprochement manuel.");
++    return d("PAYMENT_FAILED", "needs-human", "Paiement non valide",
++      (obs.find(o => o.status === "FAILED")?.reason ?? r.reason) + " (tx " + short(hash) + ").",
++      "Aucun paiement conforme n'est confirmé. Relancer ne changera rien ; un nouvel achat avec une nouvelle autorisation est une décision à prendre explicitement.");
++  }
++  if (r.verdict === "UNSUPPORTED")
++    return d("PAYMENT_UNSUPPORTED", "needs-human", "Transfert non interprétable",
++      "Les événements de la transaction " + short(hash) + " ne permettent pas de confirmer un transfert attendu.",
++      "Vérifier la transaction sur un explorateur Stellar Testnet ; l'observateur ne peut pas conclure.");
++
++  // verdict UNKNOWN : distinguer précisément pourquoi.
++  if (obs.length && obs.every(o => o.status === "CONFIRMED"))
++    return d("RESULT_NOT_ACKNOWLEDGED", "retry-later", "Paiement confirmé, résultat non accusé",
++      "Le transfert est confirmé (tx " + short(hash) + ") mais le marchand n'a pas reçu l'accusé de réception du résultat" + (f.resultSaved ? " ; le résultat est déjà sauvegardé localement." : "."),
++      "Relancer la même commande : le résultat enregistré est restitué sans nouveau paiement, puis accusé.");
++
++  const rpcDown = obs.some(o => o.status === "UNKNOWN" && /^Observer RPC unavailable/.test(o.reason));
++  const pending = obs.some(o => o.status === "UNKNOWN" && o.txHash && /^Not found in this RPC observation window/.test(o.reason));
++  const noHash = obs.some(o => o.status === "UNKNOWN" && !o.txHash);
++  const old = f.ageMs > ONE_HOUR_MS ? " L'achat date de plus d'une heure : l'historique du RPC est limité, vérifier aussi le hash sur un explorateur Stellar Testnet." : "";
++
++  if (rpcDown)
++    return d("RPC_UNAVAILABLE", "retry-later", "RPC Stellar indisponible",
++      "Le marchand n'a pas pu interroger le RPC Stellar (injoignable ou réponse illisible). L'état du paiement est inconnu, pas échoué" + (hash ? " (tx " + short(hash) + ")." : "."),
++      "Relancer plus tard la même commande (npm run check:connections teste le RPC). Aucune nouvelle autorisation, aucun nouveau paiement." + old);
++  if (pending)
++    return d("CONFIRMATION_PENDING", "retry-later", "Confirmation en attente",
++      "La transaction " + short(hash) + " est connue, mais le RPC ne la voit pas encore. Ce n'est pas une preuve d'échec : le règlement peut être en cours.",
++      "Relancer la même commande dans quelques secondes. Aucune nouvelle autorisation, aucun nouveau paiement." + old);
++
++  if (noHash || !obs.length) {
++    if (f.facilitator === "unavailable")
++      return d("FACILITATOR_UNAVAILABLE", "retry-later", "Facilitator injoignable",
++        "Le marchand n'a enregistré aucune transaction et le facilitator ne répond pas : impossible de savoir si la demande y a été enregistrée.",
++        "Démarrer le facilitator (npm run dev:facilitator), puis relancer la même commande. S'il n'a alors aucun reçu, le diagnostic deviendra « reçu absent ».");
++    if (f.facilitator === "receipt-with-hash")
++      return d("CONFIRMATION_PENDING", "retry-later", "Confirmation en attente",
++        "Le facilitator connaît une transaction pour cette autorisation, que le marchand n'a pas encore relue.",
++        "Relancer la même commande dans quelques secondes. Aucune nouvelle autorisation, aucun nouveau paiement.");
++    const states = (r.attempts ?? []).map(a => a.state).join(", ") || "inconnu";
++    const expired = f.ageMs > AUTH_WINDOW_MS ? " L'autorisation date de " + minutes(f.ageMs) + " : une resoumission serait probablement rejetée (fenêtre d'environ " + minutes(AUTH_WINDOW_MS) + ")." : "";
++    if (f.facilitator === "receipt-without-hash")
++      return d("RECEIPT_ABSENT", f.ageMs <= AUTH_WINDOW_MS ? "retry-later" : "needs-human", "Reçu incomplet : demande enregistrée, aucune transaction",
++        "Le facilitator a enregistré la demande mais aucune transaction signée n'y est associée : règlement en cours, ou interrompu avant la signature. Le facilitator ne resoumet jamais de lui-même (journal du marchand : " + states + ")." + expired,
++        f.ageMs <= AUTH_WINDOW_MS ? "Patienter une à deux minutes puis relancer la même commande."
++          : "Vérifier sur un explorateur Stellar Testnet les transferts récents du compte acheteur vers le marchand. Aucun transfert : l'achat n'a pas eu lieu et un nouvel achat exigera une nouvelle autorisation (décision explicite). Transfert trouvé : conserver son hash pour le rapprochement.");
++    return d("RECEIPT_ABSENT", "needs-human", "Reçu absent",
++      "Le marchand n'a enregistré aucune transaction et le facilitator n'a aucun reçu pour cette autorisation (journal du marchand : " + states + "). L'absence de reçu ne prouve pas l'absence de paiement, et le marchand ne resoumet jamais une autorisation déjà tentée : relancer la commande ne changera rien." + expired,
++      "Vérifier sur un explorateur Stellar Testnet les transferts récents du compte acheteur vers le marchand. Aucun transfert : l'achat n'a pas eu lieu et un nouvel achat exigera une nouvelle autorisation (décision explicite). Transfert trouvé : conserver son hash pour le rapprochement.");
++  }
++
++  return d("SERVICE_ERROR", "retry-later", "Preuve incomplète",
++    r.reason, "Relancer la même commande ; si l'état persiste, conserver le rapport de l'observateur.");
++}
+diff --git a/packages/client-recovery/src/format.ts b/packages/client-recovery/src/format.ts
+new file mode 100644
+index 0000000..991f6f3
+--- /dev/null
++++ b/packages/client-recovery/src/format.ts
+@@ -0,0 +1,38 @@
++import { short } from "./diagnosis.js";
++import type { ResumeResult } from "./resume.js";
++
++const wrap = (text: string, indent: string, width = 92) => {
++  const lines: string[] = []; let line = "";
++  for (const word of text.split(" ")) {
++    if (line && (line + " " + word).length > width - indent.length) { lines.push(line); line = word; } else line = line ? line + " " + word : word;
++  }
++  if (line) lines.push(line);
++  return lines.map((l, i) => (i ? indent : "") + l).join("\n");
++};
++
++const STATUS = { done: "TERMINÉ", "retry-later": "EN ATTENTE — relancer la même commande plus tard est sûr", "needs-human": "BLOQUÉ — décision humaine nécessaire" } as const;
++
++export function formatBilan(r: ResumeResult): string {
++  const rep = r.report, indent = "  ";
++  const paid = rep ? rep.transfers.length + " transfert(s) observé(s) · " + rep.settledAmountAtomic + " / " + rep.expectedAmountAtomic + " unités atomiques" : "non vérifiable (rapport indisponible)";
++  const tx = rep?.transfers[0]?.txHash ?? rep?.observations?.find(o => o.txHash)?.txHash ?? "";
++  const lines = [
++    "ChaosPay — reprise de l'achat « " + r.purchaseId + " »  (" + r.mode + " · " + r.application + ")",
++    "",
++    indent + "Verdict avant  : " + (r.before ? r.before.verdict : r.merchant === "ok" ? "aucun journal côté marchand (jamais reçu)" : "non consulté (marchand injoignable)"),
++    indent + "Verdict après  : " + (rep ? rep.verdict : "indisponible"),
++    indent + "Tentatives     : " + r.attemptsMade + " (autorisation d'origine, aucune re-signature)",
++    indent + "Paiements      : " + paid + (tx ? " · tx " + short(tx) : ""),
++    "",
++    indent + STATUS[r.diagnosis.outcome] + " : " + r.diagnosis.headline,
++    indent + "Pourquoi : " + wrap(r.diagnosis.why, indent + " ".repeat(11)),
++    indent + "Action   : " + wrap(r.diagnosis.action, indent + " ".repeat(11)),
++  ];
++  if (r.requestAssumed) lines.push("", indent + "Note : aucun fichier de requête trouvé ; le corps de démonstration `smoke:payment` a été supposé (sans effet de paiement si faux : le marchand répond 409).");
++  lines.push("", indent + "Données conservées");
++  lines.push(indent + "  autorisation : " + r.files.authorization);
++  if (r.files.request) lines.push(indent + "  requête      : " + r.files.request);
++  if (r.files.result) lines.push(indent + "  résultat     : " + r.files.result);
++  lines.push(indent + "  journal      : " + r.files.journal);
++  return lines.join("\n");
++}
+diff --git a/packages/client-recovery/src/local-files.ts b/packages/client-recovery/src/local-files.ts
+new file mode 100644
+index 0000000..4820aa8
+--- /dev/null
++++ b/packages/client-recovery/src/local-files.ts
+@@ -0,0 +1,113 @@
++import { mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync, existsSync } from "node:fs";
++import { dirname, join } from "node:path";
++import { PaymentPayloadV2Schema } from "@x402/core/schemas";
++import type { PaymentPayload } from "@x402/core/types";
++
++export type Mode = "durable" | "naive";
++export type Application = "csv" | "receipt";
++
++/** Données locales absentes, illisibles ou incohérentes : on s'arrête avant tout envoi réseau. */
++export class LocalDataError extends Error {}
++
++export const ID_PATTERN = /^[a-zA-Z0-9_-]{1,80}$/;
++export const DEFAULT_DIR = ".local";
++export const LEGACY_SMOKE_BODY = { rows: [{ item: "demo", amount: 42 }, { item: "second", amount: 10 }] };
++
++export interface LocalRequest { application: Application; merchantUrl: string; path: string; body: unknown; }
++export interface LocalPurchase {
++  id: string; mode: Mode; payload: PaymentPayload; request: LocalRequest;
++  /** true : .local/request-*.json absent, requête reconstruite pour un ancien achat `smoke:payment`. */
++  requestAssumed: boolean;
++  ageMs: number; resultSaved: boolean;
++  files: { authorization: string; request: string; result: string; journal: string };
++}
++export interface LogEntry { at: string; step: string; detail: string; }
++
++export function filePaths(dir: string, mode: Mode, id: string) {
++  const suffix = mode + "-" + id + ".json";
++  return {
++    authorization: join(dir, "client-" + suffix), request: join(dir, "request-" + suffix),
++    result: join(dir, "result-" + suffix), journal: join(dir, "recovery-" + suffix),
++  };
++}
++
++/** Les serveurs de démonstration n'écoutent que sur 127.0.0.1 : l'autorisation signée ne part jamais ailleurs. */
++export function loopbackUrl(raw: unknown, label: string): string {
++  let url: URL;
++  try { url = new URL(String(raw)); } catch { throw new LocalDataError(label + " : URL invalide."); }
++  if (url.protocol !== "http:" || url.hostname !== "127.0.0.1" || url.pathname !== "/" || url.search || url.hash || url.username || url.password)
++    throw new LocalDataError(label + " doit être de la forme http://127.0.0.1:<port> ; l'autorisation n'est jamais envoyée ailleurs.");
++  return url.origin;
++}
++
++function readJson(path: string, label: string): unknown {
++  try { return JSON.parse(readFileSync(path, "utf8")); }
++  catch { throw new LocalDataError(label + " illisible : " + path); }
++}
++
++export function writeJsonAtomic(path: string, value: unknown) {
++  mkdirSync(dirname(path), { recursive: true });
++  const temporary = path + ".tmp-" + process.pid;
++  writeFileSync(temporary, JSON.stringify(value, null, 2) + "\n", { mode: 0o600 });
++  renameSync(temporary, path); // jamais de fichier à moitié écrit : on garde l'ancien ou le nouveau
++}
++
++export function appendLog(dir: string, mode: Mode, id: string, step: string, detail: string, now = new Date()) {
++  const path = filePaths(dir, mode, id).journal;
++  let entries: LogEntry[] = [];
++  try { const old = JSON.parse(readFileSync(path, "utf8")); if (Array.isArray(old)) entries = old as LogEntry[]; } catch { /* premier passage */ }
++  entries.push({ at: now.toISOString(), step, detail });
++  writeJsonAtomic(path, entries.slice(-200));
++}
++
++export function saveResult(dir: string, mode: Mode, id: string, record: Record<string, unknown>) {
++  writeJsonAtomic(filePaths(dir, mode, id).result, record);
++}
++
++export function listPurchases(dir: string, now = Date.now()) {
++  if (!existsSync(dir)) return [];
++  const found: { id: string; mode: Mode; ageMs: number; hasRequest: boolean; resultSaved: boolean }[] = [];
++  for (const name of readdirSync(dir)) {
++    const m = /^client-(durable|naive)-([a-zA-Z0-9_-]{1,80})\.json$/.exec(name);
++    if (!m) continue;
++    const mode = m[1] as Mode, id = m[2]!, paths = filePaths(dir, mode, id);
++    found.push({ id, mode, ageMs: Math.max(0, now - statSync(paths.authorization).mtimeMs), hasRequest: existsSync(paths.request), resultSaved: existsSync(paths.result) });
++  }
++  return found.sort((a, b) => a.ageMs - b.ageMs);
++}
++
++function validateRequest(value: unknown, id: string, mode: Mode): LocalRequest {
++  const r = value as Partial<LocalRequest> | null;
++  if (!r || typeof r !== "object" || !["csv", "receipt"].includes(String(r.application)) || typeof r.path !== "string" || r.body === undefined)
++    throw new LocalDataError("Fichier de requête invalide.");
++  const merchantUrl = loopbackUrl(r.merchantUrl, "merchantUrl");
++  if (r.path !== "/purchases/" + id + "?mode=" + mode)
++    throw new LocalDataError("La requête sauvegardée ne correspond pas à l'achat " + id + " (" + mode + ").");
++  return { application: r.application as Application, merchantUrl, path: r.path, body: r.body };
++}
++
++export function loadPurchase(dir: string, id: string, requestedMode?: Mode, now = Date.now(), env: NodeJS.ProcessEnv = process.env): LocalPurchase {
++  if (!ID_PATTERN.test(id)) throw new LocalDataError("Identifiant d'achat invalide (1 à 80 caractères : lettres, chiffres, - ou _).");
++  const modes: Mode[] = requestedMode ? [requestedMode] : (["durable", "naive"] as const).filter(m => existsSync(filePaths(dir, m, id).authorization));
++  if (!modes.length) throw new LocalDataError("Aucune autorisation sauvegardée pour « " + id + " » dans " + dir + ". Lancez `npm run recover -- --list` pour voir les achats retrouvables.");
++  if (modes.length > 1) throw new LocalDataError("« " + id + " » existe en mode durable et naive : précisez --mode durable ou --mode naive.");
++  const mode = modes[0]!, files = filePaths(dir, mode, id);
++  if (!existsSync(files.authorization)) throw new LocalDataError("Aucune autorisation sauvegardée pour « " + id + " » en mode " + mode + ".");
++  let payload: PaymentPayload;
++  try { payload = PaymentPayloadV2Schema.parse(readJson(files.authorization, "Autorisation")) as unknown as PaymentPayload; }
++  catch (e) { if (e instanceof LocalDataError) throw e; throw new LocalDataError("Autorisation sauvegardée invalide : " + files.authorization); }
++
++  let request: LocalRequest, requestAssumed = false;
++  if (existsSync(files.request)) request = validateRequest(readJson(files.request, "Requête"), id, mode);
++  else {
++    // Anciens achats `smoke:payment` : le corps était fixe. Si l'hypothèse est fausse, le marchand répond 409 avant tout paiement.
++    request = { application: "csv", merchantUrl: loopbackUrl(env.MERCHANT_URL ?? "http://127.0.0.1:3001", "MERCHANT_URL"), path: "/purchases/" + id + "?mode=" + mode, body: LEGACY_SMOKE_BODY };
++    requestAssumed = true;
++  }
++  if ((payload as { resource?: { url?: string } }).resource?.url !== request.merchantUrl + request.path)
++    throw new LocalDataError("L'autorisation sauvegardée appartient à une autre URL que « " + request.merchantUrl + request.path + " » ; elle ne sera pas envoyée.");
++  return {
++    id, mode, payload, request, requestAssumed, files,
++    ageMs: Math.max(0, now - statSync(files.authorization).mtimeMs), resultSaved: existsSync(files.result),
++  };
++}
+diff --git a/packages/client-recovery/src/resume.ts b/packages/client-recovery/src/resume.ts
+new file mode 100644
+index 0000000..bdcf3e3
+--- /dev/null
++++ b/packages/client-recovery/src/resume.ts
+@@ -0,0 +1,125 @@
++import { PaymentPayloadV2Schema } from "@x402/core/schemas";
++import { digest } from "../../evidence/src/index.js";
++import { asEngineReport, diagnose, type Diagnosis, type EngineReport, type FacilitatorProbe, type Facts } from "./diagnosis.js";
++import { appendLog, loadPurchase, loopbackUrl, saveResult, type Application, type Mode } from "./local-files.js";
++
++export interface ResumeOptions {
++  dir: string; id: string; mode?: Mode; facilitatorUrl: string;
++  attempts?: number; intervalMs?: number;
++  fetch?: typeof fetch; sleep?: (ms: number) => Promise<void>; now?: () => number; log?: (line: string) => void;
++}
++export interface ResumeResult {
++  purchaseId: string; mode: Mode; application: Application; requestAssumed: boolean;
++  /** État du marchand au moment de la reprise : si non joignable, `before` et `report` n'ont pas pu être lus. */
++  merchant: Facts["merchant"];
++  diagnosis: Diagnosis; exitCode: 0 | 1 | 2;
++  before: { verdict: string; reason: string } | null;
++  report: EngineReport | null; facilitator: FacilitatorProbe;
++  attemptsMade: number; ageMs: number;
++  files: { authorization: string; request: string | null; result: string | null; journal: string };
++}
++
++interface Reply { status: number; body: unknown; }
++const SERVICE_ID: Record<Application, string> = { csv: "csv", receipt: "receipt" };
++const RETRYABLE = new Set([0, 202, 503]);
++const b64 = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64");
++
++async function call(fetchFn: typeof fetch, url: string, init: RequestInit, timeoutMs: number): Promise<Reply | null> {
++  try {
++    const response = await fetchFn(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
++    return { status: response.status, body: await response.json().catch(() => null) };
++  } catch { return null; } // connexion refusée, coupée ou expirée : aucune réponse
++}
++
++/**
++ * Reprend un achat avec l'autorisation ORIGINALE sauvegardée. Ne signe jamais de nouvelle autorisation :
++ * toute resoumission passe par le journal du marchand, qui ne règle qu'une fois.
++ */
++export async function resumePurchase(o: ResumeOptions): Promise<ResumeResult> {
++  const fetchFn = o.fetch ?? fetch, sleep = o.sleep ?? ((ms: number) => new Promise<void>(r => setTimeout(r, ms)));
++  const now = o.now ?? Date.now, log = o.log ?? (() => {});
++  const maxAttempts = Math.max(1, o.attempts ?? 6), interval = Math.max(0, o.intervalMs ?? 2000);
++  const facilitatorUrl = loopbackUrl(o.facilitatorUrl, "FACILITATOR_URL");
++
++  const local = loadPurchase(o.dir, o.id, o.mode, now());
++  const { mode, payload, request } = local;
++  const merchant = request.merchantUrl;
++  // Le facilitator indexe ses reçus par le digest du payload APRÈS parsing Zod (clés réordonnées, champs inconnus retirés).
++  const authDigest = digest(PaymentPayloadV2Schema.parse(payload));
++  const signature = b64(payload);
++  const note = (step: string, detail: string) => { log(detail); try { appendLog(o.dir, mode, o.id, step, detail, new Date(now())); } catch { /* le journal est un confort, jamais un blocage */ } };
++
++  const getReport = async () => {
++    const r = await call(fetchFn, merchant + "/reports/" + o.id + "?mode=" + mode, {}, 20_000);
++    return r?.status === 200 ? asEngineReport(r.body) : null;
++  };
++  const probeFacilitator = async (): Promise<FacilitatorProbe> => {
++    const r = await call(fetchFn, facilitatorUrl + "/receipts/" + authDigest, {}, 10_000);
++    if (!r) return "unavailable";
++    if (r.status === 404) return "no-receipt";
++    if (r.status !== 200) return "unavailable";
++    const tx = (r.body as { transaction?: unknown } | null)?.transaction;
++    return typeof tx === "string" && tx ? "receipt-with-hash" : "receipt-without-hash";
++  };
++
++  note("start", "Reprise de « " + o.id + " » (" + mode + ", " + request.application + (local.requestAssumed ? ", requête reconstruite" : "") + ") avec l'autorisation d'origine.");
++  const health = await call(fetchFn, merchant + "/health", {}, 3000);
++  let transport: Facts["merchant"] = health?.status === 200 ? "ok" : "unreachable";
++  if (transport === "ok" && (health!.body as { serviceId?: unknown } | null)?.serviceId !== SERVICE_ID[request.application]) transport = "wrong-service";
++  note("probe", transport === "ok" ? "Marchand joignable." : transport === "wrong-service" ? "Un autre service répond à l'adresse enregistrée." : "Marchand injoignable.");
++
++  const first = transport === "ok" ? await getReport() : null;
++  const before = first ? { verdict: first.verdict, reason: first.reason } : null;
++  if (transport === "ok") note("report", first ? "Verdict avant reprise : " + first.verdict + "." : "Le marchand n'a aucun journal pour cet achat.");
++
++  let last: Facts["last"], acknowledged = false, integrityFailure = false, attemptsMade = 0, resultSaved = local.resultSaved;
++  const alreadyDone = first?.verdict === "PASS" && local.resultSaved;
++  if (alreadyDone) note("skip", "Déjà récupéré : résultat sauvegardé et verdict PASS, aucun envoi.");
++
++  for (let i = 1; transport === "ok" && !alreadyDone && i <= maxAttempts; i++) {
++    attemptsMade = i;
++    const reply = await call(fetchFn, merchant + request.path, {
++      method: "POST", body: JSON.stringify(request.body),
++      headers: { "Content-Type": "application/json", "PAYMENT-SIGNATURE": signature, "X-Chaos-Fault": "none" },
++    }, 180_000);
++    last = { status: reply?.status ?? 0 };
++    note("attempt", "Tentative " + i + "/" + maxAttempts + " : " + (reply ? "HTTP " + reply.status : "aucune réponse (connexion coupée)") + ".");
++
++    if (reply?.status === 200) {
++      const body = (reply.body ?? {}) as { result?: unknown; resultHash?: unknown; txHash?: unknown; recovered?: unknown };
++      if (body.result === undefined || digest(body.result) !== body.resultHash) { integrityFailure = true; note("integrity", "Hash du résultat incohérent : pas d'accusé."); break; }
++      // Résultat sauvegardé AVANT l'accusé : si l'accusé échoue ou si le processus s'arrête, rien n'est perdu.
++      saveResult(o.dir, mode, o.id, { purchaseId: o.id, mode, txHash: body.txHash, resultHash: body.resultHash, savedAt: new Date(now()).toISOString(), result: body.result });
++      resultSaved = true;
++      note("result", "Résultat vérifié et sauvegardé.");
++      const ack = await call(fetchFn, merchant + "/purchases/" + o.id + "/ack?mode=" + mode, {
++        method: "POST", body: JSON.stringify({ resultHash: body.resultHash }),
++        headers: { "Content-Type": "application/json", "PAYMENT-SIGNATURE": signature },
++      }, 10_000);
++      note("ack", ack?.status === 200 ? "Accusé reçu par le marchand." : "Accusé non confirmé (" + (ack ? "HTTP " + ack.status : "aucune réponse") + ").");
++      if (ack?.status === 200) { acknowledged = true; break; }
++      last = { status: ack?.status ?? 0 };
++      if (!RETRYABLE.has(last.status)) break;
++    } else if (reply && !RETRYABLE.has(reply.status)) {
++      break; // refus définitif (400, 402, 409...) : réessayer ne changerait rien
++    } else if (reply?.status === 202) {
++      const b = reply.body as { status?: unknown; reason?: unknown } | null;
++      note("pending", "Statut " + String(b?.status ?? "UNKNOWN") + " : " + String(b?.reason ?? "confirmation non disponible") + ".");
++    } // sans réponse ou HTTP 503 : le marchand redémarre peut-être, on réessaie après l'intervalle
++    if (i < maxAttempts) await sleep(interval);
++  }
++
++  const report = transport === "ok" ? await getReport() : null;
++  const facilitator = await probeFacilitator();
++  const diagnosis = diagnose({
++    merchant: transport, facilitator, report, ...(last ? { last } : {}), application: request.application,
++    resultSaved, acknowledged, ...(integrityFailure ? { integrityFailure } : {}), ageMs: local.ageMs,
++  });
++  note("diagnosis", diagnosis.cause + " : " + diagnosis.headline + ".");
++  return {
++    purchaseId: o.id, mode, application: request.application, requestAssumed: local.requestAssumed, merchant: transport, diagnosis,
++    exitCode: diagnosis.outcome === "done" ? 0 : diagnosis.outcome === "retry-later" ? 2 : 1,
++    before, report, facilitator, attemptsMade, ageMs: local.ageMs,
++    files: { authorization: local.files.authorization, request: local.requestAssumed ? null : local.files.request, result: resultSaved ? local.files.result : null, journal: local.files.journal },
++  };
++}
+diff --git a/scripts/recover.ts b/scripts/recover.ts
+new file mode 100644
+index 0000000..1273ce7
+--- /dev/null
++++ b/scripts/recover.ts
+@@ -0,0 +1,69 @@
++import { parseArgs } from "node:util";
++import { formatBilan } from "../packages/client-recovery/src/format.js";
++import { DEFAULT_DIR, listPurchases, LocalDataError, type Mode } from "../packages/client-recovery/src/local-files.js";
++import { resumePurchase } from "../packages/client-recovery/src/resume.js";
++
++const HELP = `Usage : npm run recover -- <achat> [options]
++        npm run recover -- --list
++
++Reprend un achat interrompu avec l'autorisation ORIGINALE sauvegardée dans .local/ :
++consulte le marchand et le facilitator, rejoue la requête sans re-signer, vérifie le hash du
++résultat, le sauvegarde, envoie l'accusé et affiche un bilan. Si elle ne peut pas conclure,
++elle explique pourquoi et conserve toutes les données. Elle ne crée jamais de nouveau paiement.
++
++Les serveurs doivent tourner (npm run dev:facilitator, puis dev:merchant ou dev:receipt).
++
++Options
++  --mode durable|naive   Requis seulement si l'identifiant existe dans les deux modes
++  --attempts N           Tentatives maximum (défaut 6)
++  --interval S           Secondes entre deux tentatives (défaut 2)
++  --json                 Bilan en JSON sur la sortie standard (progression sur stderr)
++  --list                 Liste les achats retrouvables dans .local/
++  --dir <dossier>        Dossier des fichiers locaux (défaut .local)
++
++Code de sortie : 0 terminé · 1 bloqué ou erreur (décision humaine) · 2 en attente (relancer plus tard)`;
++
++function fail(message: string): never { console.error(message); process.exit(1); }
++
++let args;
++try {
++  args = parseArgs({ allowPositionals: true, options: {
++    mode: { type: "string" }, attempts: { type: "string" }, interval: { type: "string" },
++    json: { type: "boolean" }, list: { type: "boolean" }, help: { type: "boolean", short: "h" }, dir: { type: "string" },
++  } });
++} catch (e) { fail((e as Error).message + "\n\n" + HELP); }
++const { values, positionals } = args;
++if (values.help) { console.log(HELP); process.exit(0); }
++const dir = values.dir ?? DEFAULT_DIR;
++
++if (values.list) {
++  const found = listPurchases(dir);
++  if (!found.length) console.log("Aucun achat retrouvable dans " + dir + ".");
++  for (const p of found) console.log(p.id.padEnd(40) + p.mode.padEnd(8) + (p.resultSaved ? "résultat sauvegardé" : "résultat absent").padEnd(22) + (p.hasRequest ? "" : "requête absente (ancien achat)"));
++  process.exit(0);
++}
++
++const id = positionals[0];
++if (!id || positionals.length > 1) fail("Indiquez un identifiant d'achat.\n\n" + HELP);
++if (values.mode !== undefined && values.mode !== "durable" && values.mode !== "naive") fail("--mode doit valoir durable ou naive.");
++const number = (raw: string | undefined, name: string, fallback: number, min: number) => {
++  if (raw === undefined) return fallback;
++  const n = Number(raw);
++  if (!Number.isFinite(n) || n < min) fail(name + " invalide.");
++  return n;
++};
++
++try {
++  const result = await resumePurchase({
++    dir, id, ...(values.mode ? { mode: values.mode as Mode } : {}),
++    facilitatorUrl: process.env.FACILITATOR_URL ?? "http://127.0.0.1:4022",
++    attempts: Math.floor(number(values.attempts, "--attempts", 6, 1)),
++    intervalMs: number(values.interval, "--interval", 2, 0) * 1000,
++    log: line => console.error("· " + line),
++  });
++  console.log(values.json ? JSON.stringify(result, null, 2) : "\n" + formatBilan(result));
++  process.exitCode = result.exitCode;
++} catch (error) {
++  if (error instanceof LocalDataError) fail(error.message);
++  throw error;
++}
+diff --git a/scripts/smoke-payment.ts b/scripts/smoke-payment.ts
+index 45bf9d5..b998707 100644
+--- a/scripts/smoke-payment.ts
++++ b/scripts/smoke-payment.ts
+@@ -6,6 +6,7 @@ import { createEd25519Signer } from "@x402/stellar";
+ import { ExactStellarScheme } from "@x402/stellar/exact/client";
+ import { digest } from "../packages/evidence/src/index.js";
+ import { config, secret, NETWORK, RPC_URL } from "../apps/demo-merchant/src/config.js";
++import { filePaths, LEGACY_SMOKE_BODY } from "../packages/client-recovery/src/local-files.js";
+ 
+ const c = config();
+ const id = process.argv[2] ?? "purchase-" + Date.now();
+@@ -17,7 +18,7 @@ if (!["none","drop","crash"].includes(fault)) throw new Error("Fault must be non
+ const fresh = process.argv.includes("--new-authorization");
+ if (fresh && mode !== "naive") throw new Error("New authorization is only allowed for deliberately naive mode.");
+ const url = c.merchantUrl + "/purchases/" + id + "?mode=" + mode;
+-const body = { rows: [{ item: "demo", amount: 42 }, { item: "second", amount: 10 }] };
++const body = LEGACY_SMOKE_BODY;
+ const cache = ".local/client-" + mode + "-" + id + ".json";
+ let payload: PaymentPayload;
+ if (existsSync(cache) && !fresh) {
+@@ -35,6 +36,9 @@ if (existsSync(cache) && !fresh) {
+   mkdirSync(".local",{ recursive: true });
+   writeFileSync(cache,JSON.stringify(payload),{ mode: 0o600 });
+ }
++// Requête sauvegardée avec l'autorisation : `npm run recover -- <id>` peut ainsi reprendre l'achat sans rien reconstruire.
++mkdirSync(".local",{ recursive: true });
++writeFileSync(filePaths(".local",mode as "durable" | "naive",id).request,JSON.stringify({ application: "csv", merchantUrl: c.merchantUrl, path: "/purchases/" + id + "?mode=" + mode, body },null,2) + "\n",{ mode: 0o600 });
+ try {
+   async function send() {
+     const response = await fetch(url, {
+@@ -56,7 +60,7 @@ try {
+   if (process.argv.includes("--concurrent")) await Promise.all([send(),send()]);
+   else await send();
+ } catch {
+-  console.log("Connection interrupted. Keep purchaseId " + id + " and reuse its cached payload after restart.");
++  console.log("Connection interrupted. Keep purchaseId " + id + ". Resume it with: npm run recover -- " + id);
+   process.exitCode = 2;
+ }
+ const report = await fetch(c.merchantUrl + "/reports/" + id + "?mode=" + mode, { signal: AbortSignal.timeout(20000) }).then(r => r.json()).catch(() => null);
+diff --git a/tests/recover.test.ts b/tests/recover.test.ts
+new file mode 100644
+index 0000000..55c30db
+--- /dev/null
++++ b/tests/recover.test.ts
+@@ -0,0 +1,282 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { PaymentPayloadV2Schema } from "@x402/core/schemas";
++import type { PaymentPayload } from "@x402/core/types";
++import { RecoveryKit, RecoveryError, FaultTriggered, Store, type Fault, type PaymentGateway } from "../packages/recovery/src/index.js";
++import { digest } from "../packages/evidence/src/index.js";
++import { observe as realObserve } from "../packages/stellar-observer/src/index.js";
++import { diagnose, type Facts } from "../packages/client-recovery/src/diagnosis.js";
++import { formatBilan } from "../packages/client-recovery/src/format.js";
++import { filePaths, listPurchases, loadPurchase, LocalDataError, type Mode } from "../packages/client-recovery/src/local-files.js";
++import { resumePurchase } from "../packages/client-recovery/src/resume.js";
++
++const MERCHANT = "http://127.0.0.1:3001", FACILITATOR = "http://127.0.0.1:4022";
++const b64 = (v: unknown) => Buffer.from(JSON.stringify(v)).toString("base64");
++const BODY = { rows: [{ item: "demo", amount: 42 }] };
++const payloadFor = (url: string) => ({
++  x402Version: 2, resource: { url, description: "d", mimeType: "application/json" },
++  accepted: { scheme: "exact", network: "stellar:testnet", asset: "C".repeat(56), amount: "100000", payTo: "G".repeat(56), maxTimeoutSeconds: 120, extra: {} },
++  payload: { transaction: "AAAA" },
++});
++
++/** Vrai RecoveryKit + vrai Store SQLite + vrai observateur, derrière un faux réseau pilotable. */
++class World {
++  dir = mkdtempSync(join(tmpdir(), "chaospay-recover-"));
++  store = new Store(join(this.dir, "merchant.sqlite"));
++  settleCalls = 0; facilitatorUp = true; merchantUp = true; verifyOk = true;
++  rpc: "visible" | "pending" | "down" = "visible";
++  failAcks = 0; dropResponses = 0; fetchCalls = 0;
++  receipts = new Map<string, string>(); calls: string[] = []; faultHeaders: string[] = [];
++  private gateway: PaymentGateway<PaymentPayload> = {
++    verify: async () => this.verifyOk ? { isValid: true, payer: "buyer" } : { isValid: false },
++    settle: async (payload, withoutConfirmation) => {
++      this.settleCalls++;
++      if (!this.facilitatorUp) throw new Error("ECONNREFUSED");
++      const tx = String(this.receipts.size + 1).padStart(64, "a");
++      this.receipts.set(digest(payload), tx);
++      return withoutConfirmation ? {} : { success: true, transaction: tx };
++    },
++    receipt: async digestKey => {
++      if (!this.facilitatorUp) throw new Error("ECONNREFUSED");
++      const tx = this.receipts.get(digestKey); return tx ? { transaction: tx } : {};
++    },
++    observe: async (hash, expected) => {
++      const server = (getTransaction: () => Promise<unknown>) => ({ getTransaction }) as unknown as Parameters<typeof realObserve>[0];
++      if (!hash) return realObserve(server(async () => { throw new Error("unused"); }), hash, expected);
++      if (this.rpc === "down") return realObserve(server(async () => { throw new Error("offline"); }), hash, expected);
++      if (this.rpc === "pending") return realObserve(server(async () => ({ status: "NOT_FOUND" })), hash, expected);
++      return { status: "CONFIRMED", txHash: hash, reason: "test", transfers: [{ txHash: hash, ledger: 1, ...expected }] };
++    },
++  };
++  kit = new RecoveryKit<PaymentPayload, unknown, unknown>({ store: this.store, gateway: this.gateway, serviceId: "csv", tokenContract: "token", recipient: "merchant", amountAtomic: "100000", produce: input => ({ echo: input }) });
++
++  fetch = async (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
++    this.fetchCalls++;
++    const url = new URL(String(input)), method = init?.method ?? "GET", headers = new Headers(init?.headers);
++    const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
++    if (url.origin === FACILITATOR) {
++      if (!this.facilitatorUp) throw new TypeError("fetch failed");
++      const tx = this.receipts.get(url.pathname.split("/").pop()!);
++      return tx ? json(200, { success: true, transaction: tx }) : json(404, { error: "No receipt; not proof of nonpayment." });
++    }
++    if (url.origin !== MERCHANT || !this.merchantUp) throw new TypeError("fetch failed");
++    this.calls.push(method + " " + url.pathname);
++    const mode = (url.searchParams.get("mode") ?? "durable") as Mode;
++    try {
++      if (url.pathname === "/health") return json(200, { status: "ok", serviceId: "csv" });
++      const report = /^\/reports\/([^/]+)$/.exec(url.pathname);
++      if (report) return json(200, await this.kit.report(report[1]!, mode));
++      const payload = PaymentPayloadV2Schema.parse(JSON.parse(Buffer.from(headers.get("PAYMENT-SIGNATURE")!, "base64").toString("utf8"))) as unknown as PaymentPayload;
++      const ack = /^\/purchases\/([^/]+)\/ack$/.exec(url.pathname);
++      if (ack) {
++        if (this.failAcks > 0) { this.failAcks--; return json(503, { error: "interrupted" }); }
++        this.kit.acknowledge(ack[1]!, mode, payload, JSON.parse(String(init?.body)).resultHash);
++        return json(200, { acknowledged: true });
++      }
++      const purchase = /^\/purchases\/([^/]+)$/.exec(url.pathname)!;
++      this.faultHeaders.push(headers.get("X-Chaos-Fault") ?? "none");
++      if ((payload as { resource?: { url?: string } }).resource?.url !== MERCHANT + url.pathname + url.search) throw new RecoveryError(409, "Authorization belongs to another service or purchase.");
++      const result = await this.kit.execute({ purchaseId: purchase[1]!, mode, payload, input: JSON.parse(String(init?.body)), fault: (headers.get("X-Chaos-Fault") ?? "none") as Fault });
++      if (result.status !== "READY") return json(202, { purchaseId: purchase[1], ...result });
++      if (this.dropResponses > 0) { this.dropResponses--; throw new TypeError("fetch failed"); } // traité côté marchand, réponse perdue
++      return json(200, { purchaseId: purchase[1], mode, ...result });
++    } catch (e) {
++      if (e instanceof FaultTriggered || e instanceof TypeError) throw new TypeError("fetch failed");
++      return json(e instanceof RecoveryError ? e.status : 503, { error: String(e) });
++    }
++  };
++
++  /** Fichiers locaux seuls : le client est mort après la sauvegarde, avant tout envoi. */
++  seed(id: string, mode: Mode = "durable") {
++    const path = "/purchases/" + id + "?mode=" + mode, payload = payloadFor(MERCHANT + path), paths = filePaths(this.dir, mode, id);
++    writeFileSync(paths.authorization, JSON.stringify(payload));
++    writeFileSync(paths.request, JSON.stringify({ application: "csv", merchantUrl: MERCHANT, path, body: BODY }));
++    return { path, payload, paths };
++  }
++  /** Rejoue ce que fait le client d'origine (runner ou smoke:payment) : sauvegarde, puis envoi qui échoue. */
++  async start(id: string, fault: Fault, mode: Mode = "durable") {
++    const { path, payload, paths } = this.seed(id, mode);
++    try { await this.fetch(MERCHANT + path, { method: "POST", body: JSON.stringify(BODY), headers: { "PAYMENT-SIGNATURE": b64(payload), "X-Chaos-Fault": fault } }); } catch { /* coupure voulue */ }
++    return { payload, paths };
++  }
++  recover(id: string, extra: { attempts?: number; mode?: Mode } = {}) {
++    return resumePurchase({ dir: this.dir, id, facilitatorUrl: FACILITATOR, fetch: this.fetch, sleep: async () => {}, attempts: extra.attempts ?? 3, intervalMs: 0, ...(extra.mode ? { mode: extra.mode } : {}) });
++  }
++  purchasePosts() { return this.calls.filter(c => c === "POST /purchases/" + c.split("/")[2]).length; }
++  close() { this.store.close(); rmSync(this.dir, { recursive: true, force: true }); }
++}
++async function world(run: (w: World) => Promise<void>) { const w = new World(); try { await run(w); } finally { w.close(); } }
++
++// ── Reprise après chaque panne contrôlée ──────────────────────────────────────────────────────
++for (const fault of ["before-submit", "drop", "crash", "confirmation-lost"] as Fault[]) {
++  test("recover " + fault + " : une commande récupère l'achat sans second paiement", () => world(async w => {
++    const { paths } = await w.start("achat-1", fault);
++    const r = await w.recover("achat-1");
++    assert.equal(r.diagnosis.cause, "RECOVERED"); assert.equal(r.exitCode, 0);
++    assert.equal(r.report?.verdict, "PASS"); assert.equal(w.settleCalls, 1);
++    assert.deepEqual(JSON.parse(readFileSync(paths.result, "utf8")).result, { echo: BODY });
++    assert.match(formatBilan(r), /TERMINÉ : Achat récupéré/);
++  }));
++}
++test("recover relancé après PASS : aucun nouvel envoi, aucun paiement, résultat intact", () => world(async w => {
++  await w.start("achat-1", "drop");
++  await w.recover("achat-1");
++  const posts = w.purchasePosts(), settles = w.settleCalls;
++  const again = await w.recover("achat-1");
++  assert.equal(again.diagnosis.cause, "RECOVERED"); assert.equal(again.attemptsMade, 0);
++  assert.equal(w.purchasePosts(), posts); assert.equal(w.settleCalls, settles); assert.equal(settles, 1);
++}));
++test("client mort avant tout envoi : la reprise fait la première soumission, sans aucune panne injectée", () => world(async w => {
++  w.seed("achat-1");
++  const r = await w.recover("achat-1");
++  assert.equal(r.before, null); assert.equal(r.diagnosis.cause, "RECOVERED"); assert.equal(r.attemptsMade, 1);
++  assert.equal(w.settleCalls, 1);
++  assert.ok(w.faultHeaders.length > 0 && w.faultHeaders.every(h => h === "none"), "la reprise ne doit jamais injecter de panne");
++}));
++test("une reprise inconnue sans payload n'invente rien", () => world(async w => {
++  await assert.rejects(w.recover("inconnu"), LocalDataError);
++  assert.equal(w.fetchCalls, 0);
++}));
++
++// ── Les quatre états inconnus, expliqués ──────────────────────────────────────────────────────
++test("confirmation en attente : tx connue, RPC ne la voit pas encore, puis résolution", () => world(async w => {
++  await w.start("achat-1", "confirmation-lost"); w.rpc = "pending";
++  const r = await w.recover("achat-1");
++  assert.equal(r.diagnosis.cause, "CONFIRMATION_PENDING"); assert.equal(r.diagnosis.outcome, "retry-later"); assert.equal(r.exitCode, 2);
++  assert.equal(w.settleCalls, 1);
++  w.rpc = "visible";
++  assert.equal((await w.recover("achat-1")).diagnosis.cause, "RECOVERED"); assert.equal(w.settleCalls, 1);
++}));
++test("RPC indisponible : distingué de l'attente, jamais de resoumission", () => world(async w => {
++  await w.start("achat-1", "confirmation-lost"); w.rpc = "down";
++  const r = await w.recover("achat-1", { attempts: 4 });
++  assert.equal(r.diagnosis.cause, "RPC_UNAVAILABLE"); assert.equal(r.exitCode, 2); assert.equal(w.settleCalls, 1);
++  assert.ok(existsSync(r.files.authorization));
++}));
++test("résultat non accusé : résultat sauvegardé avant l'accusé, puis accusé à la relance", () => world(async w => {
++  const { paths } = await w.start("achat-1", "ack-lost"); w.failAcks = 5;
++  const r = await w.recover("achat-1", { attempts: 2 });
++  assert.equal(r.diagnosis.cause, "RESULT_NOT_ACKNOWLEDGED"); assert.equal(r.exitCode, 2);
++  assert.ok(existsSync(paths.result)); assert.equal(r.files.result, paths.result);
++  w.failAcks = 0;
++  assert.equal((await w.recover("achat-1")).diagnosis.cause, "RECOVERED"); assert.equal(w.settleCalls, 1);
++}));
++test("reçu absent : blocage détecté et expliqué, aucun nouveau paiement, données conservées", () => world(async w => {
++  // Limite connue du moteur : un règlement échoué (facilitator arrêté) laisse l'achat en UNKNOWN sans hash,
++  // et le kit ne resoumet jamais. Ce test documente le blocage ; il échouera le jour où le moteur sait le résoudre.
++  w.facilitatorUp = false; const { paths } = await w.start("achat-1", "none");
++  w.facilitatorUp = true;
++  const r = await w.recover("achat-1", { attempts: 3 });
++  assert.equal(r.diagnosis.cause, "RECEIPT_ABSENT"); assert.equal(r.diagnosis.outcome, "needs-human"); assert.equal(r.exitCode, 1);
++  assert.equal(w.settleCalls, 1); assert.equal(w.receipts.size, 0);
++  assert.ok(existsSync(paths.authorization) && existsSync(paths.request) && existsSync(paths.journal));
++  assert.match(r.diagnosis.why, /ne prouve pas l'absence de paiement/);
++}));
++test("facilitator injoignable : demandé de le relancer, pas de verdict définitif", () => world(async w => {
++  w.facilitatorUp = false; await w.start("achat-1", "none");
++  const r = await w.recover("achat-1", { attempts: 2 });
++  assert.equal(r.diagnosis.cause, "FACILITATOR_UNAVAILABLE"); assert.equal(r.exitCode, 2); assert.equal(r.facilitator, "unavailable");
++}));
++
++// ── Pannes pendant la reprise elle-même ───────────────────────────────────────────────────────
++test("réponse perdue pendant la reprise : nouvelle tentative, un seul paiement", () => world(async w => {
++  await w.start("achat-1", "drop"); w.dropResponses = 1;
++  const r = await w.recover("achat-1", { attempts: 3 });
++  assert.equal(r.diagnosis.cause, "RECOVERED"); assert.equal(w.settleCalls, 1); assert.equal(r.attemptsMade, 2);
++}));
++test("reprise à une seule tentative, réponse perdue : relancer termine sans nouveau paiement", () => world(async w => {
++  await w.start("achat-1", "drop"); w.dropResponses = 1;
++  const first = await w.recover("achat-1", { attempts: 1 });
++  assert.equal(first.diagnosis.cause, "RESULT_NOT_ACKNOWLEDGED"); assert.equal(first.files.result, null);
++  assert.equal((await w.recover("achat-1")).diagnosis.cause, "RECOVERED"); assert.equal(w.settleCalls, 1);
++}));
++test("marchand injoignable : rien n'est envoyé, données conservées", () => world(async w => {
++  const { paths } = await w.start("achat-1", "drop"); w.merchantUp = false;
++  const posts = w.purchasePosts();
++  const r = await w.recover("achat-1");
++  assert.equal(r.diagnosis.cause, "SERVICE_UNREACHABLE"); assert.equal(r.exitCode, 2); assert.equal(r.attemptsMade, 0);
++  assert.equal(w.purchasePosts(), posts); assert.ok(existsSync(paths.authorization));
++  w.merchantUp = true; assert.equal((await w.recover("achat-1")).diagnosis.cause, "RECOVERED"); assert.equal(w.settleCalls, 1);
++}));
++
++// ── Refus et garde-fous ───────────────────────────────────────────────────────────────────────
++test("corps modifié : 409 expliqué, aucun nouveau paiement", () => world(async w => {
++  const { paths } = await w.start("achat-1", "drop");
++  writeFileSync(paths.request, JSON.stringify({ application: "csv", merchantUrl: MERCHANT, path: "/purchases/achat-1?mode=durable", body: { rows: [{ item: "autre" }] } }));
++  const r = await w.recover("achat-1");
++  assert.equal(r.diagnosis.cause, "REQUEST_MISMATCH"); assert.equal(r.exitCode, 1); assert.equal(w.settleCalls, 1);
++}));
++test("autorisation refusée avant règlement : décision humaine, jamais de re-signature", () => world(async w => {
++  w.verifyOk = false; await w.start("achat-1", "none");
++  const r = await w.recover("achat-1");
++  assert.equal(r.diagnosis.cause, "AUTHORIZATION_REJECTED"); assert.equal(r.exitCode, 1); assert.equal(w.settleCalls, 0);
++  assert.match(r.diagnosis.action, /ne re-signe jamais/);
++}));
++test("l'autorisation ne part jamais vers une adresse non locale (chaque barrière testée seule)", () => world(async w => {
++  const { paths } = await w.start("achat-1", "drop");
++  // Barrière 1 : adresse du marchand. L'autorisation est rattachée à la même fausse URL, donc seule loopbackUrl peut refuser.
++  const evil = "http://evil.example:3001", path = "/purchases/achat-1?mode=durable";
++  writeFileSync(paths.authorization, JSON.stringify(payloadFor(evil + path)));
++  writeFileSync(paths.request, JSON.stringify({ application: "csv", merchantUrl: evil, path, body: BODY }));
++  const before = w.fetchCalls;
++  await assert.rejects(w.recover("achat-1"), /127\.0\.0\.1/);
++  assert.equal(w.fetchCalls, before);
++  // Barrière 2 : adresse du facilitator, avec des fichiers locaux sains.
++  w.seed("achat-2");
++  await assert.rejects(resumePurchase({ dir: w.dir, id: "achat-2", facilitatorUrl: "http://evil.example:4022", fetch: w.fetch }), /FACILITATOR_URL/);
++  assert.equal(w.fetchCalls, before);
++}));
++test("autorisation rattachée à une autre URL : refusée avant tout envoi", () => world(async w => {
++  const { paths } = await w.start("achat-1", "drop");
++  writeFileSync(paths.authorization, JSON.stringify(payloadFor(MERCHANT + "/purchases/autre?mode=durable")));
++  const before = w.fetchCalls;
++  await assert.rejects(w.recover("achat-1"), LocalDataError);
++  assert.equal(w.fetchCalls, before);
++}));
++test("identifiant existant dans les deux modes : demande --mode ; identifiant dangereux refusé", () => world(async w => {
++  await w.start("achat-1", "drop", "durable"); await w.start("achat-1", "drop", "naive");
++  await assert.rejects(w.recover("achat-1"), /--mode/);
++  assert.equal((await w.recover("achat-1", { mode: "durable" })).mode, "durable");
++  assert.throws(() => loadPurchase(w.dir, "../secret"), LocalDataError);
++}));
++test("ancien achat sans fichier de requête : requête reconstruite et signalée", () => world(async w => {
++  await w.start("achat-1", "drop");
++  rmSync(filePaths(w.dir, "durable", "achat-1").request);
++  const r = await resumePurchase({ dir: w.dir, id: "achat-1", facilitatorUrl: FACILITATOR, fetch: w.fetch, sleep: async () => {}, attempts: 1 });
++  assert.equal(r.requestAssumed, true); // le corps de démonstration diffère de BODY : 409, jamais un paiement
++  assert.equal(r.diagnosis.cause, "REQUEST_MISMATCH"); assert.equal(w.settleCalls, 1);
++  assert.match(formatBilan(r), /corps de démonstration/);
++}));
++test("le reçu du facilitator est retrouvé même si le fichier d'autorisation a un autre ordre de clés", () => world(async w => {
++  const { paths, payload } = await w.start("achat-1", "confirmation-lost"); w.rpc = "down";
++  const reordered = Object.fromEntries([...Object.entries({ ...payload, inconnu: 1 })].reverse());
++  assert.notEqual(digest(reordered), digest(PaymentPayloadV2Schema.parse(reordered)));
++  writeFileSync(paths.authorization, JSON.stringify(reordered));
++  const r = await w.recover("achat-1", { attempts: 1 });
++  assert.equal(r.facilitator, "receipt-with-hash");
++}));
++test("listPurchases retrouve les achats et leur état", () => world(async w => {
++  await w.start("achat-1", "drop"); await w.recover("achat-1"); await w.start("achat-2", "drop");
++  const found = listPurchases(w.dir);
++  assert.deepEqual(found.map(p => [p.id, p.resultSaved]).sort(), [["achat-1", true], ["achat-2", false]]);
++}));
++
++// ── Diagnostic pur ────────────────────────────────────────────────────────────────────────────
++const base: Facts = { merchant: "ok", facilitator: "no-receipt", report: null, application: "csv", resultSaved: false, acknowledged: false, ageMs: 1000 };
++const report = (verdict: string, extra: Record<string, unknown> = {}) => ({ schemaVersion: 1, purchaseId: "p", mode: "durable", network: "stellar:testnet", tokenContract: "t", expectedAmountAtomic: "100", settledAmountAtomic: "100", transfers: [], responseRecovered: false, verdict, reason: "r", ...extra }) as unknown as Facts["report"];
++test("diagnose : cas limites", () => {
++  assert.equal(diagnose({ ...base, integrityFailure: true }).cause, "RESULT_INTEGRITY");
++  assert.equal(diagnose({ ...base, merchant: "wrong-service" }).cause, "WRONG_SERVICE");
++  assert.equal(diagnose({ ...base, report: report("FAIL", { settledAmountAtomic: "200" }) }).cause, "DOUBLE_PAYMENT");
++  assert.equal(diagnose({ ...base, report: report("FAIL", { observations: [{ status: "FAILED", txHash: "a".repeat(64), transfers: [], reason: "Ledger confirmed failure." }] }) }).cause, "PAYMENT_FAILED");
++  assert.equal(diagnose({ ...base, report: report("UNSUPPORTED") }).cause, "PAYMENT_UNSUPPORTED");
++  assert.equal(diagnose({ ...base, acknowledged: true }).cause, "REPORT_UNAVAILABLE");
++  const noHash = report("UNKNOWN", { observations: [{ status: "UNKNOWN", txHash: "", transfers: [], reason: "No valid transaction hash." }], attempts: [{ state: "UNKNOWN", txHash: "", deliveries: 0 }] });
++  const fresh = diagnose({ ...base, facilitator: "receipt-without-hash", report: noHash });
++  assert.equal(fresh.outcome, "retry-later");
++  assert.equal(diagnose({ ...base, facilitator: "receipt-without-hash", report: noHash, ageMs: 10 * 60_000 }).outcome, "needs-human");
++  assert.match(diagnose({ ...base, report: noHash, ageMs: 10 * 60_000 }).why, /resoumission serait probablement rejetée/);
++});
+-- 
+2.43.0
+

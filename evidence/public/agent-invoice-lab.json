@@ -1,0 +1,56 @@
+{
+  "simulated": false,
+  "executedAt": "2026-10-26T07:12:43.638Z",
+  "model": "qwen2.5:latest",
+  "scenario": "drop",
+  "runId": "3e88a674-b6b5-4826-9669-5737862b5251",
+  "reports": {
+    "drop": {
+      "schemaVersion": 1,
+      "purchaseId": "3e88a674-b6b5-4826-9669-5737862b5251",
+      "mode": "durable",
+      "network": "stellar:testnet",
+      "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+      "expectedAmountAtomic": "100000",
+      "settledAmountAtomic": "100000",
+      "transfers": [
+        {
+          "txHash": "3e60216eea72f2a543e0bde94dd3ca6986436989a4ede80d1182a5794383ac79",
+          "tokenContract": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+          "from": "GDPSK345QY2GXPGJ4QSTKFPLIFIBRTC2CEDWMI7YKR355BJBTUYD4GAP",
+          "to": "GBUYHRAWUQDYV6OAXGJSL2T7PFAIX4IEKCQYCJMBIZPII2GSYXIIEHQ6",
+          "amountAtomic": "100000",
+          "ledger": 5395020
+        }
+      ],
+      "responseRecovered": true,
+      "verdict": "PASS",
+      "reason": "Verdict reported by the independent engine observer.",
+      "serviceId": "invoice-check",
+      "recoveryMs": 3350,
+      "unknownObservations": 0
+    }
+  },
+  "tools": [
+    {
+      "at": "2026-10-26T07:12:57.344Z",
+      "kind": "agent-tool",
+      "message": "purchase_invoice_check"
+    },
+    {
+      "at": "2026-10-26T07:13:05.413Z",
+      "kind": "agent-result",
+      "message": "PENDING: INTERRUPTED"
+    },
+    {
+      "at": "2026-10-26T07:13:08.452Z",
+      "kind": "agent-tool",
+      "message": "recover_purchase"
+    },
+    {
+      "at": "2026-10-26T07:13:08.864Z",
+      "kind": "agent-result",
+      "message": "COMPLETED: RECOVERED"
+    }
+  ]
+}

@@ -232,7 +232,7 @@ test('Testnet chooses an integrated service while agent examples remain selectab
   for (const value of ['market-quote', 'web-research', 'delivery-status', 'weather-brief']) {
     assert.equal(application.children.find(option => option.value === value).disabled, false);
   }
-  assert.match(nodes.get('application-description').textContent, /Testnet currently supports CSV conversion and JSON receipts only/);
+  assert.match(nodes.get('application-description').textContent, /Testnet currently supports CSV conversion, JSON receipts and the local invoice agent/);
 });
 test('busy and disconnected states disable launching another run', async () => {
   const busy = await mount(run(), { busy: true }); assert.equal(busy.nodes.get('launch').disabled, true);
@@ -541,4 +541,14 @@ test('selecting an agent in Testnet switches to simulation without refresh', asy
  assert.match(nodes.get('application-description').textContent,/Switched to Simulation/);
  }
  }
+});
+
+test('invoice agent selects Testnet and limits supported failures',async()=>{
+ const {nodes}=await mount(run());
+ nodes.get('application').value='invoice-agent';nodes.get('application').onchange();
+ assert.equal(nodes.get('source').value,'TESTNET');
+ assert.equal(nodes.get('scenario').value,'drop');
+ assert.match(nodes.get('application-description').textContent,/Ollama/);
+ nodes.get('application').value='web-research';nodes.get('application').onchange();
+ assert.equal(nodes.get('source').value,'SIMULATED');
 });
