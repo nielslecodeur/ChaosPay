@@ -4,7 +4,7 @@ Recover an interrupted Stellar payment without blindly paying twice.
 
 Lumaid is a local failure-and-recovery lab for paid applications on Stellar. It demonstrates what happens when payment succeeds but the response is lost, and compares payment evidence before and after recovery.
 
-**Try the browser demo:** <https://nielslecodeur.github.io/ChaosPay/> — no installation, account, or payment required.
+**Browser demo URL after GitHub Pages is enabled:** <https://nielslecodeur.github.io/Lumaid/> — no installation, account, or payment required.
 
 ## Try it locally — no Testnet setup
 
